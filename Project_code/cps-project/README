@@ -1,0 +1,35 @@
+======================================
+Preparing your workstation
+======================================
+
+The following packages are needed on Ubuntu (tested using 14.04).
+Install using apt-get
+
+arduino
+build-essential
+gawk
+git
+minicom
+subversion
+
+Your user needs to be a member of the 'dialout' group.
+This can be done using "useradd -G dialout <username>"
+You must re-login for the group changes to take effect.
+
+
+======================================
+Programming the adapter
+======================================
+
+To program the adapter, run the script "program_adapter.sh"
+
+
+======================================
+Building your project
+======================================
+
+In the code/Autopilot directory, running "make" will compile your
+project.  Running "make upload" will program the compiled code to the
+device.
+
+Your changes should be in code/Autopilot/Autopilot.pde and code/libraries/PID/
