@@ -18,6 +18,8 @@ class PIDcontroller {
 			m_fPrevOutput = 0;			
 			//m_fPrevError = 0;
 			m_fIntegral = 0;
+			m_iUpdateCounter = 0;
+			m_iUpdateSucceeded = 0;
 	
 			if( m_iDt == 0) {
 				//Fehlerroutine	
@@ -25,10 +27,11 @@ class PIDcontroller {
 		}
 
 		float update (const float error, const float derivative) {
-
+			m_iUpdateCounter++;
 			if (isnan(error) || isnan(derivative)){
 				return(m_fPrevOutput);
 			}
+			m_iUpdateSucceeded++;
 	
 			//float t_fDerivative;
 			float t_fOutput;
@@ -46,13 +49,20 @@ class PIDcontroller {
 
 			return(t_fOutput);
 		}
+		
+		float updateSuccessRate(){
+			if(m_iUpdateCounter==0){return(0);}
+			else{return(static_cast<float>(m_iUpdateSucceeded)/static_cast<float>(m_iUpdateCounter));}
+		}
 	
 	private:
 		float m_fPrevOutput;
 		//float m_fPrevError;
 		float m_fIntegral;
 		float m_fKp, m_fKi, m_fKd;
-		uint32_t m_iDt;		
+		uint32_t m_iDt;	
+		uint32_t m_iUpdateCounter;
+		uint32_t m_iUpdateSucceeded;
 
 };
 
