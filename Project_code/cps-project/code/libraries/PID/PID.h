@@ -37,6 +37,13 @@ class PIDcontroller {
 			float t_fOutput;
 	
 			m_fIntegral = m_fIntegral + error * static_cast<float> (m_iDt);
+			if(m_fIntegral > 100){
+				m_fIntegral = 100;
+			}
+			else if (m_fIntegral < -100){
+				m_fIntegral = -100;
+			}
+			
 			//t_fDerivative = (error - m_fPrevError) / static_cast<float> (m_iDt);
 	
 			t_fOutput = m_fKp * error +
