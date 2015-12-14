@@ -1,5 +1,4 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
-
 #define THISFIRMWARE "CPS-Autopilot-Project"
 
 #include <AP_Common.h>
