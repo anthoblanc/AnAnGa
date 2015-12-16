@@ -1,4 +1,4 @@
-/// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
+/// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil 
 #define THISFIRMWARE "CPS-Autopilot-Project"
 
 #include <AP_Common.h>
@@ -61,12 +61,12 @@ struct PIDs {
     PIDcontroller Pitch;
     PIDcontroller Speed;
 };
-struct PIDs PID = { {Kp_Heading,Ki_Heading,Kd_Heading,PERIOD},
-                        {Kp_Roll,Ki_Roll,Kd_Roll,PERIOD},
-                        {Kp_Altitude,Ki_Altitude,Kd_Altitude,PERIOD},
-                        {Kp_ClimbRate,Ki_ClimbRate,Kd_ClimbRate,PERIOD},
-                        {Kp_Pitch,Ki_Pitch,Kd_Pitch,PERIOD},
-                        {Kp_Speed,Ki_Speed,Kd_Speed,PERIOD}};
+struct PIDs PID = { {Kp_Heading,Ki_Heading,Kd_Heading,PERIOD,3},
+                        {Kp_Roll,Ki_Roll,Kd_Roll,PERIOD,1},
+                        {Kp_Altitude,Ki_Altitude,Kd_Altitude,PERIOD,9},
+                        {Kp_ClimbRate,Ki_ClimbRate,Kd_ClimbRate,PERIOD,3},
+                        {Kp_Pitch,Ki_Pitch,Kd_Pitch,PERIOD,1},
+                        {Kp_Speed,Ki_Speed,Kd_Speed,PERIOD,1}};
 
 
 

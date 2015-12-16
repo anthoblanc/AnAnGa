@@ -13,11 +13,14 @@ float speedPIDOut = 0;
 class PIDcontroller {
 
 	public:
-		PIDcontroller (const float Kp, const float Ki, const float Kd, const uint32_t dt) : 				m_fKp(Kp), m_fKi(Ki), m_fKd(Kd), m_iDt(dt) {
+		PIDcontroller (const float Kp, const float Ki, const float Kd, const uint32_t dt, 
+				      const uint8_t updateIntervall)  : 
+					m_fKp(Kp), m_fKi(Ki), m_fKd(Kd), m_iDt(dt) , m_iUpdateIntervall(updateIntervall){
 	
 			m_fPrevOutput = 0;			
-			//m_fPrevError = 0;
+			m_fPrevError = 0;
 			m_fIntegral = 0;
+			m_iUpdateIntervallCounter = 0;
 			m_iUpdateCounter = 0;
 			m_iUpdateSucceeded = 0;
 	
@@ -27,13 +30,48 @@ class PIDcontroller {
 		}
 
 		float update (const float error, const float derivative) {
-			m_iUpdateCounter++;
-			if (isnan(error) || isnan(derivative)){
+			
+			if (m_iUpdateIntervallCounter > 0){
+				m_iUpdateIntervallCounter--;
 				return(m_fPrevOutput);
+			}else{
+			
+				m_iUpdateIntervallCounter = m_iUpdateIntervall - 1;
+				m_iUpdateCounter++;
+				if (isnan(error) || isnan(derivative)){
+					return(0);
+				}
+				m_iUpdateSucceeded++;
+
+				float t_fOutput;
+		
+				m_fIntegral = m_fIntegral + error * static_cast<float> (m_iDt);
+				if(m_fIntegral > 100){
+					m_fIntegral = 100;
+				}
+				else if (m_fIntegral < -100){
+					m_fIntegral = -100;
+				}
+		
+				t_fOutput = m_fKp * error +
+							m_fKi * m_fIntegral +
+							m_fKd * derivative;
+		
+				m_fPrevOutput = t_fOutput;
+
+				return(t_fOutput);
+				
+			}
+		}
+		
+		float updateWODer (const float error) {
+			m_iUpdateCounter++;
+			if (isnan(error)){
+				return(0);
 			}
 			m_iUpdateSucceeded++;
 	
-			//float t_fDerivative;
+			float t_fDerivative;
 			float t_fOutput;
 	
 			m_fIntegral = m_fIntegral + error * static_cast<float> (m_iDt);
@@ -44,14 +82,14 @@ class PIDcontroller {
 				m_fIntegral = -100;
 			}
 			
-			//t_fDerivative = (error - m_fPrevError) / static_cast<float> (m_iDt);
+			t_fDerivative = (error - m_fPrevError) / static_cast<float> (m_iDt);
+			// Begrenzen?
 	
 			t_fOutput = m_fKp * error +
 						m_fKi * m_fIntegral +
-						m_fKd * derivative;
-						//m_fKd * t_fDerivative;
+						m_fKd * t_fDerivative;
 	
-			//m_fPrevError = error;
+			m_fPrevError = error;
 			m_fPrevOutput = t_fOutput;
 
 			return(t_fOutput);
@@ -64,9 +102,11 @@ class PIDcontroller {
 	
 	private:
 		float m_fPrevOutput;
-		//float m_fPrevError;
+		float m_fPrevError;
 		float m_fIntegral;
 		float m_fKp, m_fKi, m_fKd;
+		uint8_t m_iUpdateIntervall;
+		uint8_t m_iUpdateIntervallCounter;
 		uint32_t m_iDt;	
 		uint32_t m_iUpdateCounter;
 		uint32_t m_iUpdateSucceeded;
