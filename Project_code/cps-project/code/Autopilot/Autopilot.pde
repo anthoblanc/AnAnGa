@@ -26,19 +26,19 @@
 #define Kd_Roll 0
 
 // Gains for pidAltitude
-#define Kp_Altitude 0.8
-#define Ki_Altitude 0.01
-#define Kd_Altitude 0.01
+#define Kp_Altitude 1
+#define Ki_Altitude 0.001
+#define Kd_Altitude 0.1
 
 // Gains for pidClimbRate
-#define Kp_ClimbRate 0.5
-#define Ki_ClimbRate 0.0001
+#define Kp_ClimbRate 1
+#define Ki_ClimbRate 0
 #define Kd_ClimbRate 0
 
 // Gains for pidPitch
 #define Kp_Pitch 0.5
-#define Ki_Pitch 0.0001
-#define Kd_Pitch 0.001
+#define Ki_Pitch 0.00001
+#define Kd_Pitch 0.0001
 
 // Gains for pidSpeed
 #define Kp_Speed 1
@@ -61,10 +61,10 @@ struct PIDs {
     PIDcontroller Pitch;
     PIDcontroller Speed;
 };
-struct PIDs PID = { {Kp_Heading,Ki_Heading,Kd_Heading,PERIOD,3},
+struct PIDs PID = { {Kp_Heading,Ki_Heading,Kd_Heading,PERIOD,1},
                         {Kp_Roll,Ki_Roll,Kd_Roll,PERIOD,1},
-                        {Kp_Altitude,Ki_Altitude,Kd_Altitude,PERIOD,9},
-                        {Kp_ClimbRate,Ki_ClimbRate,Kd_ClimbRate,PERIOD,3},
+                        {Kp_Altitude,Ki_Altitude,Kd_Altitude,PERIOD,1},
+                        {Kp_ClimbRate,Ki_ClimbRate,Kd_ClimbRate,PERIOD,1},
                         {Kp_Pitch,Ki_Pitch,Kd_Pitch,PERIOD,1},
                         {Kp_Speed,Ki_Speed,Kd_Speed,PERIOD,1}};
 
@@ -181,7 +181,6 @@ void loop()
             dataSample.data.raw[i] = Wire.read();
             i++;
         }
-
         // Assignment of all read values to the state variables
         uvw.x = dataSample.data.f[I_VX];
         uvw.y = dataSample.data.f[I_VY];
@@ -229,8 +228,8 @@ void loop()
                                 phiThetaPsiDot.x);
 
         // Compute altitude PID
-        float altitudePIDOut = PID.Altitude.update(-targetAltitude + pnPePd.z,
-                                -pnPePdDot.z);
+        float altitudePIDOut = PID.Altitude.update(-targetAltitude + pnPePd.z/*,
+                                -pnPePdDot.z*/);
 
         // Compute climb rate PID
         float climbRatePIDOut = PID.ClimbRate.update(altitudePIDOut +   
@@ -245,7 +244,7 @@ void loop()
                             phiThetaPsiDot.y);
 
         // Compute speed PID
-        speedPIDOut = PID.Speed.update(targetSpeed - groundSpeed,groundSpeedDot);
+        speedPIDOut = PID.Speed.update(targetSpeed - groundSpeed/*,groundSpeedDot*/);
 
         // Constrain all control surface outputs to the range -1 to 1
         float aileronL = -1 * constrain(rollPIDOut, -1, 1);

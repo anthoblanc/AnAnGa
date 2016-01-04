@@ -73,5 +73,4 @@ struct vector pnPePdDot;
 float groundSpeed;
 float groundSpeedDot;
 
-
 #endif
