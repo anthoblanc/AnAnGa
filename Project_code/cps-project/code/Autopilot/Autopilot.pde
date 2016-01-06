@@ -14,6 +14,7 @@
 #include <AP_Curve.h>
 #include <PID.h>
 #include <formulasForStateVariables.h>
+#include <TrajectoryControl.h>
 
 // Gains for pidHeading
 #define Kp_Heading 1

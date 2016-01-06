@@ -11,7 +11,7 @@ class PIDcontroller {
 	public:
 		PIDcontroller (const float Kp, const float Ki, const float Kd, const uint32_t dt, 
 				      const int8_t updateIntervall = 1)  : 
-					m_fKp(Kp), m_fKi(Ki), m_fKd(Kd), m_iDt(dt) , m_iUpdateIntervall(updateIntervall){
+					m_fKp(Kp), m_fKi(Ki), m_fKd(Kd), m_iDt(dt) , m_iUpdateIntervall(updateIntervall) {
 	
 			m_fPrevOutput = 0;			
 			m_fPrevError[0] = 0;
@@ -46,6 +46,26 @@ class PIDcontroller {
 		void setLPFfrequency (const float RC) {
 			m_fAlpha = static_cast<float>(m_iDt) / (RC + static_cast<float>(m_iDt) );
 			return;
+		}
+		
+		
+		
+		// Setting the update intervall
+		void setUpdateIntervall (const int8_t updateIntervall) {
+			m_iUpdateIntervall = updateIntervall;
+			return;
+		}
+		
+		
+		
+		// Adjusting the Controller Gains Proportional, Integral, Derivative
+		void setControllerGains (const float Kp, const float Ki, const float Kd) {
+		
+			m_fKp = Kp;
+			m_fKi = Ki;
+			m_fKd = Kd;
+			return;
+		
 		}
 		
 		
