@@ -61,16 +61,4 @@ float acceleration ( struct vector uvw, struct vector uvwDot ){
     return (uvw.x*uvwDot.x + uvw.y*uvwDot.y + uvw.z*uvwDot.z)/(velocity(uvw));
     }
 
-
-// Declaration of all state variables for controlling the vehicle
-struct vector uvw;
-struct vector uvwDot;
-struct vector pqr;
-struct vector phiThetaPsi;
-struct vector phiThetaPsiDot;
-struct vector pnPePd;
-struct vector pnPePdDot;
-float groundSpeed;
-float groundSpeedDot;
-
 #endif

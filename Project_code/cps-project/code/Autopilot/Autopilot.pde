@@ -12,64 +12,12 @@
 #include <AP_Motors.h>
 #include <AP_Notify.h>
 #include <AP_Curve.h>
-#include <PID.h>
-#include <formulasForStateVariables.h>
-#include <TrajectoryControl.h>
-
-// Gains for pidHeading
-#define Kp_Heading 1
-#define Ki_Heading 0.0001
-#define Kd_Heading 0.01
-
-// Gains for pidRoll
-#define Kp_Roll 1
-#define Ki_Roll 0
-#define Kd_Roll 0
-
-// Gains for pidAltitude
-#define Kp_Altitude 1
-#define Ki_Altitude 0.001
-#define Kd_Altitude 0.1
-
-// Gains for pidClimbRate
-#define Kp_ClimbRate 1
-#define Ki_ClimbRate 0
-#define Kd_ClimbRate 0
-
-// Gains for pidPitch
-#define Kp_Pitch 0.5
-#define Ki_Pitch 0.00001
-#define Kd_Pitch 0.0001
-
-// Gains for pidSpeed
-#define Kp_Speed 1
-#define Ki_Speed 0.001
-#define Kd_Speed 0.001
 
 // Loop period in microseconds
 #define PERIOD 20000
 
 // Hardware Abstraction Layer
 const AP_HAL::HAL& hal = AP_HAL_BOARD_DRIVER;
-
-// Declare PIDs
-// NOTE: You need to implement your own PID class at ../libraries/PID/
-struct PIDs {
-    PIDcontroller Heading;
-    PIDcontroller Roll;
-    PIDcontroller Altitude;
-    PIDcontroller ClimbRate;
-    PIDcontroller Pitch;
-    PIDcontroller Speed;
-};
-struct PIDs PID = { {Kp_Heading,Ki_Heading,Kd_Heading,PERIOD,1},
-                        {Kp_Roll,Ki_Roll,Kd_Roll,PERIOD,1},
-                        {Kp_Altitude,Ki_Altitude,Kd_Altitude,PERIOD,1},
-                        {Kp_ClimbRate,Ki_ClimbRate,Kd_ClimbRate,PERIOD,1},
-                        {Kp_Pitch,Ki_Pitch,Kd_Pitch,PERIOD,1},
-                        {Kp_Speed,Ki_Speed,Kd_Speed,PERIOD,1}};
-
-
 
 // Number of data points sent by the simulator
 #define DATAPOINTS 15
@@ -106,10 +54,16 @@ struct sample {
 struct sample dataSample;
 
 // Control targets
-float targetHeading, targetAltitude, targetSpeed;
+struct ControlTargets {
+	float heading, altitude, speed;
+};
+struct ControlTargets target;
 
 // Hard bounds on the pitch and roll of the plane
-float hardMaxPitch, hardMaxRoll;
+struct HardBounds {
+	float maxPitch, maxRoll;
+};
+struct HardBounds hardBound;
 
 // Time of next PWM output
 uint32_t nextWrite;
@@ -133,6 +87,16 @@ float constrain(float val, float min, float max)
     }
 }
 
+// Own Libraries
+#include <PID.h>
+#include <formulasForStateVariables.h>
+#include <TrajectoryControl.h>
+#include <StandardController.h>
+
+// Construct Standard Controller
+StandardController stdCTRL;
+struct SteeringSignals stSig;
+
 // setup: called once at boot
 void setup()
 {
@@ -143,18 +107,9 @@ void setup()
     for(i = 0; i < DATAPOINTS; i++) {
         dataSample.data.f[i] = 0.0;
     }
-
-    // Initial flight control targets, note altitude is down.
-    targetHeading = 100.0*(M_PI/180.0);
-    targetSpeed = 15;
-    targetAltitude = -200;
-
-    // Set maximum pitch and roll to 30 degrees.
-    hardMaxPitch = 30.0*(M_PI/180.0);
-    hardMaxRoll = 30.0*(M_PI/180.0);
-
-    // Construct PIDs with gains
-    // Done above!
+	
+	// Set Constrains to flight manouvers and define Flight directions
+	stdCTRL.setup(target, hardBound);
 
     // Enable PWM output on channels 0 to 3
     hal.rcout->enable_ch(0);
@@ -182,81 +137,20 @@ void loop()
             dataSample.data.raw[i] = Wire.read();
             i++;
         }
-        // Assignment of all read values to the state variables
-        uvw.x = dataSample.data.f[I_VX];
-        uvw.y = dataSample.data.f[I_VY];
-        uvw.z = dataSample.data.f[I_VZ];
-
-        uvwDot.x = dataSample.data.f[I_AX];
-        uvwDot.y = dataSample.data.f[I_AY];
-        uvwDot.z = dataSample.data.f[I_AZ];
-
-        pqr.x = dataSample.data.f[I_P];
-        pqr.y = dataSample.data.f[I_Q];
-        pqr.z = dataSample.data.f[I_R];
-
-        phiThetaPsi.x = dataSample.data.f[I_PHI];
-        phiThetaPsi.y = dataSample.data.f[I_THETA];
-        phiThetaPsi.z = dataSample.data.f[I_PSI];
-
-        pnPePd.x = dataSample.data.f[I_LAT];
-        pnPePd.y = dataSample.data.f[I_LON];
-        pnPePd.z = dataSample.data.f[I_ALT];
-
-        // Calculate the missing state variables
-        phiThetaPsiDot = derivativeAngularRate( pqr, phiThetaPsi );
-        pnPePdDot = derivativeVelocity( uvw, phiThetaPsi );
-        groundSpeed = velocity( uvw );
-        groundSpeedDot = acceleration ( uvw, uvwDot );
-
-        // Use hal.console to receive a new target
-            // hal.console->read()???
-            // targetHeading = read()...
-            // ...
-
-        // Compute error in heading, ensuring it is in the range -Pi to Pi
-        if(targetHeading>M_PI){targetHeading = targetHeading - 2*M_PI;}
-        if(targetHeading<-M_PI){targetHeading = targetHeading + 2*M_PI;}
-
-        // Compute heading PID
-        float headingPIDOut = PID.Heading.update(targetHeading-phiThetaPsi.z,
-                                phiThetaPsiDot.z);
-
-        // Constrain output of heading PID such that it is a valid target roll
-        headingPIDOut = constrain(headingPIDOut,-hardMaxRoll,hardMaxRoll);
-        // Compute roll PID
-        rollPIDOut = PID.Roll.update(headingPIDOut - phiThetaPsi.x,
-                                phiThetaPsiDot.x);
-
-        // Compute altitude PID
-        float altitudePIDOut = PID.Altitude.update(-targetAltitude + pnPePd.z/*,
-                                -pnPePdDot.z*/);
-
-        // Compute climb rate PID
-        float climbRatePIDOut = PID.ClimbRate.update(altitudePIDOut +   
-                                 pnPePdDot.z,0);
-
-        // Constrain output of climb rate PID such that it is a valid target pitch
-        climbRatePIDOut = constrain (climbRatePIDOut,-hardMaxPitch,
-                            +hardMaxPitch);
-
-        // Compute pitch PID
-        pitchPIDOut = PID.Pitch.update(climbRatePIDOut - phiThetaPsi.y,
-                            phiThetaPsiDot.y);
-
-        // Compute speed PID
-        speedPIDOut = PID.Speed.update(targetSpeed - groundSpeed/*,groundSpeedDot*/);
-
+		
+		// Updating the StandardController
+		stSig = stdCTRL.update(dataSample, target, hardBound);
+		
         // Constrain all control surface outputs to the range -1 to 1
-        float aileronL = -1 * constrain(rollPIDOut, -1, 1);
-        float aileronR = constrain(rollPIDOut, -1, 1);
-        float elevatorL = constrain(pitchPIDOut, -1, 1);
-        float elevatorR = constrain(pitchPIDOut, -1, 1);
-        float throttle = constrain(speedPIDOut, -1, 1);
+        float aileronL = -1 * constrain(stSig.aileron, -1, 1);
+        float aileronR = constrain(stSig.aileron, -1, 1);
+        float elevatorL = constrain(stSig.elevator, -1, 1);
+        float elevatorR = constrain(stSig.elevator, -1, 1);
+        float throttle = constrain(stSig.throttle, -1, 1);
 
-#define SERVO_MIN 1000 // Minimum duty cycle
-#define SERVO_MID 1500 // Mid duty cycle
-#define SERVO_MAX 2000 // Maximum duty cycle
+		#define SERVO_MIN 1000 // Minimum duty cycle
+		#define SERVO_MID 1500 // Mid duty cycle
+		#define SERVO_MAX 2000 // Maximum duty cycle
         // Compute duty cycle for PWM output from generic control
         int16_t aileronLOut = ((aileronL+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
         int16_t aileronROut = ((aileronR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
@@ -269,22 +163,6 @@ void loop()
             hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
             
-            
-            hal.console->printf("targetAltitude: %f\n",targetAltitude);
-            hal.console->printf("altitude: %f\n", pnPePd.z);
-            hal.console->printf("error: %f\n", -targetAltitude+pnPePd.z);
-            hal.console->printf("PIDOut: %f\n",altitudePIDOut);
-hal.console->printf("targetClimbRate: %f\n",altitudePIDOut);
-            hal.console->printf("ClimbRate: %f\n", pnPePdDot.z);
-            hal.console->printf("error: %f\n", altitudePIDOut+pnPePdDot.z);
-            hal.console->printf("PIDOut: %f\n",climbRatePIDOut);
-hal.console->printf("targetPitch: %f\n",climbRatePIDOut);
-            hal.console->printf("Pitch: %f\n", phiThetaPsi.y);
-            hal.console->printf("error: %f\n", climbRatePIDOut-phiThetaPsi.y);
-            hal.console->printf("PIDOut: %f\n",pitchPIDOut);
-
-hal.console->printf("Update Success: %f\n",PID.Altitude.updateSuccessRate());
-
         }
         // Output PWM
         hal.rcout->write(0, throttleOut);
