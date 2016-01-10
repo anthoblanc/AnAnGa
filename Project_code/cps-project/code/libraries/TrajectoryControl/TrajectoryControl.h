@@ -3,7 +3,9 @@
 
 #include <math.h> //mathematical operator such as sqrt
 
-// General Math Operations
+/*##########################################################################################
+                                   General Math Operations  
+  ########################################################################################## */
 // Cross Product
 struct vector CrossProduct (const struct vector x, const struct vector y) {
 	
@@ -26,6 +28,7 @@ float ScalarProduct (const struct vector x, const struct vector y) {
 	return(z);
 }
 
+//Euclidian norm for 3D Vector
 float NormVector(const struct vector v) {
 	float norm;
 	norm=sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
@@ -33,6 +36,9 @@ float NormVector(const struct vector v) {
 }
 
 
+/*##########################################################################################
+                                   Class Trajectory Controller 
+  ########################################################################################## */
 
 // Struct for all steering signals, handed to the airplane
 struct SteeringSignals {
@@ -40,13 +46,9 @@ struct SteeringSignals {
 };
 
 
-
 // enum class for indicating PIDs in an array
 enum PID {Throttle, Aileron, Rudder, Elevator};
 
-
-
-// Class Trajectory Controller
 //	Controller for the flight on trajectories and with aerobatics
 //	Initialising needs the constructor and for every PID the 'set'-member-function!
 class TrajectoryController {
