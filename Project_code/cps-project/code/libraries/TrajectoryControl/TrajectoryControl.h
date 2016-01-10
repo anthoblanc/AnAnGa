@@ -1,6 +1,8 @@
 #ifndef TRAJECTORYCONTROL_H
 #define TRAJECTORYCONTROL_H
 
+#include <math.h> //mathematical operator such as sqrt
+
 // General Math Operations
 // Cross Product
 struct vector CrossProduct (const struct vector x, const struct vector y) {
@@ -22,6 +24,12 @@ float ScalarProduct (const struct vector x, const struct vector y) {
 	z = x.x * y.x + x.y * y.y + x.z * y.z;
 	
 	return(z);
+}
+
+float NormVector(const struct vector v) {
+	float norm;
+	norm=sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
+	return(norm);
 }
 
 
