@@ -54,8 +54,8 @@ class TrajectoryController {
 	public:
 	
 		// Constructor
-		TrajectoryController (const uint32_t dt, const float coFrequencyLPF = 0) :
-			m_iDt(dt) , m_fCOFrequencyLPF(coFrequencyLPF) {
+		TrajectoryController (const AP_HAL::HAL& hal, const uint32_t dt, const float coFrequencyLPF = 0) :
+			m_rHAL(hal), m_iDt(dt) , m_fCOFrequencyLPF(coFrequencyLPF) {
 
 			// Initialising member variables
 			int i;
@@ -190,8 +190,35 @@ class TrajectoryController {
 
 		
 		
+		// Access to the PIDs
+		// const is for denying any change in the PIDs
+		const PIDcontroller *getPIDAccess (const enum PID pidName) {
+			
+			int i;
+			switch(pidName) {
+				case Throttle :
+					i = 0;
+					break;
+				case Aileron :
+					i = 1;
+					break;
+				case Rudder :
+					i = 2;
+					break;
+				case Elevator :
+					i = 3;
+					break;
+				default:
+					// Error-Routine
+					return(NULL);
+			}
+			
+			return(m_cPIDs[i]);}
+		
+		
 		
 	private:
+		const AP_HAL::HAL& m_rHAL;	// reference to the console (for printing messages)
 		PIDcontroller* m_cPIDs[4];	// Array of the PIDs
 		uint32_t m_iDt;	// Intervall time for update rate (for case updateIntervall==1); time in microseconds
 		float m_fCOFrequencyLPF;	// Cut-off-frequency for the Low-Pass-Filter
@@ -200,6 +227,44 @@ class TrajectoryController {
 
 };
 
+
+
+// Variables for the Trajectory Controller
+#define CO_Freq_LPF 0	// Cut-off frequency for the low-pass-filter of the derivatives
+
+#define Kp_Throttle 1
+#define Ki_Throttle 0
+#define Kd_Throttle 0
+#define IntLim_Throttle 100
+#define Casc_Throttle 1
+
+#define Kp_Aileron 1
+#define Ki_Aileron 0
+#define Kd_Aileron 0
+#define IntLim_Aileron 100
+#define Casc_Aileron 1
+
+#define Kp_Rudder 1
+#define Ki_Rudder 0
+#define Kd_Rudder 0
+#define IntLim_Rudder 100
+#define Casc_Rudder 1
+
+#define Kp_Elevator 1
+#define Ki_Elevator 0
+#define Kd_Elevator 0
+#define IntLim_Elevator 100
+#define Casc_Elevator 1
+
+void setupTrCTRL (TrajectoryController& trCTRL) {
+
+	trCTRL.setPID ( Throttle, Kp_Throttle, Ki_Throttle, Kd_Throttle, IntLim_Throttle, Casc_Throttle );
+	trCTRL.setPID ( Aileron, Kp_Aileron, Ki_Aileron, Kd_Aileron, IntLim_Aileron, Casc_Aileron );
+	trCTRL.setPID ( Rudder, Kp_Rudder, Ki_Rudder, Kd_Rudder, IntLim_Rudder, Casc_Rudder );
+	trCTRL.setPID ( Elevator, Kp_Elevator, Ki_Elevator, Kd_Elevator, IntLim_Elevator, Casc_Elevator );
+
+	return;
+}
 
 
 

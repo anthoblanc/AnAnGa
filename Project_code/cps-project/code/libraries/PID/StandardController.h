@@ -6,31 +6,37 @@
 #define Kp_Heading 1
 #define Ki_Heading 0.0001
 #define Kd_Heading 0.01
+#define Casc_Heading 1
 
 // Gains for pidRoll
 #define Kp_Roll 1
 #define Ki_Roll 0
 #define Kd_Roll 0
+#define Casc_Roll 1
 
 // Gains for pidAltitude
 #define Kp_Altitude 1
 #define Ki_Altitude 0.001
 #define Kd_Altitude 0.1
+#define Casc_Altitude 1
 
 // Gains for pidClimbRate
 #define Kp_ClimbRate 1
 #define Ki_ClimbRate 0
 #define Kd_ClimbRate 0
+#define Casc_ClimbRate 1
 
 // Gains for pidPitch
 #define Kp_Pitch 0.5
 #define Ki_Pitch 0.00001
 #define Kd_Pitch 0.0001
+#define Casc_Pitch 1
 
 // Gains for pidSpeed
 #define Kp_Speed 1
 #define Ki_Speed 0.001
 #define Kd_Speed 0.001
+#define Casc_Speed 1
 
 // Declare PIDs
 struct PIDs {
@@ -48,6 +54,9 @@ enum StateVariables {UVW,UVWdot,PQR,PhiThetaPsi,PhiThetaPsiDot,PnPePd,PnPePdDot}
 class StandardController {
 
 	public:
+	
+		// Constructor
+		StandardController( const AP_HAL::HAL& hal ) : m_rHAL(hal) {}
 		
 		// Instructions for the setup routine
 		void setup(struct ControlTargets& target, struct HardBounds& hardBound) {
@@ -150,12 +159,15 @@ class StandardController {
 		
 	private:
 	
-		struct PIDs PID = { {Kp_Heading,Ki_Heading,Kd_Heading,PERIOD,1},
-                        {Kp_Roll,Ki_Roll,Kd_Roll,PERIOD,1},
-                        {Kp_Altitude,Ki_Altitude,Kd_Altitude,PERIOD,1},
-                        {Kp_ClimbRate,Ki_ClimbRate,Kd_ClimbRate,PERIOD,1},
-                        {Kp_Pitch,Ki_Pitch,Kd_Pitch,PERIOD,1},
-                        {Kp_Speed,Ki_Speed,Kd_Speed,PERIOD,1}};
+		const AP_HAL::HAL& m_rHAL;	// reference to the console (for printing messages)
+		
+		// All PIDs of the controller
+		struct PIDs PID = { {Kp_Heading,Ki_Heading,Kd_Heading,PERIOD,Casc_Heading},
+                        {Kp_Roll,Ki_Roll,Kd_Roll,PERIOD,Casc_Roll},
+                        {Kp_Altitude,Ki_Altitude,Kd_Altitude,PERIOD,Casc_Altitude},
+                        {Kp_ClimbRate,Ki_ClimbRate,Kd_ClimbRate,PERIOD,Casc_ClimbRate},
+                        {Kp_Pitch,Ki_Pitch,Kd_Pitch,PERIOD,Casc_Pitch},
+                        {Kp_Speed,Ki_Speed,Kd_Speed,PERIOD,Casc_Speed}};
 		
 		// Declaration of all state variables for controlling the vehicle
 		struct vector uvw;
