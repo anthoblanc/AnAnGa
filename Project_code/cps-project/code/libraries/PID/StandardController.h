@@ -81,32 +81,8 @@ class StandardController {
 				
 			struct SteeringSignals out;
 			
-			// Assignment of all read values to the state variables
-			uvw.x = dataSample.data.f[I_VX];
-			uvw.y = dataSample.data.f[I_VY];
-			uvw.z = dataSample.data.f[I_VZ];
-
-			uvwDot.x = dataSample.data.f[I_AX];
-			uvwDot.y = dataSample.data.f[I_AY];
-			uvwDot.z = dataSample.data.f[I_AZ];
-
-			pqr.x = dataSample.data.f[I_P];
-			pqr.y = dataSample.data.f[I_Q];
-			pqr.z = dataSample.data.f[I_R];
-
-			phiThetaPsi.x = dataSample.data.f[I_PHI];
-			phiThetaPsi.y = dataSample.data.f[I_THETA];
-			phiThetaPsi.z = dataSample.data.f[I_PSI];
-
-			pnPePd.x = dataSample.data.f[I_LAT];
-			pnPePd.y = dataSample.data.f[I_LON];
-			pnPePd.z = dataSample.data.f[I_ALT];
-
-			// Calculate the missing state variables
-			phiThetaPsiDot = derivativeAngularRate( pqr, phiThetaPsi );
-			pnPePdDot = derivativeVelocity( uvw, phiThetaPsi );
-			groundSpeed = velocity( uvw );
-			groundSpeedDot = acceleration ( uvw, uvwDot );
+			// From the measured data of the plane, calculate all necessary state variables.
+			calculateStateVariables (dataSample, uvw, uvwDot, pqr, phiThetaPsi, pnPePd, phiThetaPsiDot, pnPePdDot, groundSpeed, groundSpeedDot);
 
 			// Compute heading PID
 			float headingPIDOut = PID.Heading.update(target.heading-phiThetaPsi.z, phiThetaPsiDot.z);
