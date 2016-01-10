@@ -94,8 +94,11 @@ float constrain(float val, float min, float max)
 #include <StandardController.h>
 
 // Construct Standard Controller
-StandardController stdCTRL;
+StandardController stdCTRL(hal);
 struct SteeringSignals stSig;
+
+// Construct the Aerobatic Trajectory Controller
+TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
 
 // setup: called once at boot
 void setup()
@@ -110,6 +113,9 @@ void setup()
 	
 	// Set Constrains to flight manouvers and define Flight directions
 	stdCTRL.setup(target, hardBound);
+	
+	// Make all settings for the Aerobatic Trajectory Controller
+	setupTrCTRL(trCTRL);
 
     // Enable PWM output on channels 0 to 3
     hal.rcout->enable_ch(0);
@@ -140,6 +146,13 @@ void loop()
 		
 		// Updating the StandardController
 		stSig = stdCTRL.update(dataSample, target, hardBound);
+		
+		// Updating the Aerobatic Trajectory Controller
+		float deltaL, phiRef=0;
+		struct vector aCMDb, gCMDb, eulerDesired = {0,0,0};
+		int8_t aerobatOn = 0;
+		// Place code here for calculating the desired Trajectory at time t_k <-----------
+		stSig = trCTRL.update(deltaL,aCMDb,gCMDb,phiRef,aerobatOn,eulerDesired);
 		
         // Constrain all control surface outputs to the range -1 to 1
         float aileronL = -1 * constrain(stSig.aileron, -1, 1);
