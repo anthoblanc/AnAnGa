@@ -149,7 +149,7 @@ void loop()
 		stSig = stdCTRL.update(dataSample, target, hardBound);
 		
 		
-		// Updating the Aerobatic Trajectory Controller
+/*		// Updating the Aerobatic Trajectory Controller
 			float deltaL, phiRef=0;
 			struct vector aCMDn, gCMDn, aCMDb, gCMDb, eulerDesired = {0,0,0};
 			int8_t aerobatOn = 0;
@@ -165,7 +165,7 @@ void loop()
 			aCMDb = NEDtoBODY (aCMDn, phiThetaPsi);
 			gCMDb = NEDtoBODY (gCMDn, phiThetaPsi);
 			stSig = trCTRL.update(deltaL,aCMDb,gCMDb,phiRef,aerobatOn,eulerDesired);
-			
+*/			
 			
 		
         // Constrain all control surface outputs to the range -1 to 1

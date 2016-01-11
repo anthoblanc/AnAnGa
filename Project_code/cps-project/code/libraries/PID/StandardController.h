@@ -3,10 +3,10 @@
 
 // Set the gains for all PIDS
 // Gains for pidHeading
-#define Kp_Heading 1
+#define Kp_Heading 1.5
 #define Ki_Heading 0.0001
-#define Kd_Heading 0.01
-#define Casc_Heading 1
+#define Kd_Heading 0.1
+#define Casc_Heading 3
 
 // Gains for pidRoll
 #define Kp_Roll 1
@@ -15,27 +15,27 @@
 #define Casc_Roll 1
 
 // Gains for pidAltitude
-#define Kp_Altitude 1
-#define Ki_Altitude 0.001
+#define Kp_Altitude 2
+#define Ki_Altitude 0.01
 #define Kd_Altitude 0.1
-#define Casc_Altitude 1
+#define Casc_Altitude 3
 
 // Gains for pidClimbRate
 #define Kp_ClimbRate 1
 #define Ki_ClimbRate 0
 #define Kd_ClimbRate 0
-#define Casc_ClimbRate 1
+#define Casc_ClimbRate 3
 
 // Gains for pidPitch
-#define Kp_Pitch 0.5
-#define Ki_Pitch 0.00001
-#define Kd_Pitch 0.0001
+#define Kp_Pitch 1
+#define Ki_Pitch 0
+#define Kd_Pitch 0
 #define Casc_Pitch 1
 
 // Gains for pidSpeed
 #define Kp_Speed 1
-#define Ki_Speed 0.001
-#define Kd_Speed 0.001
+#define Ki_Speed 0
+#define Kd_Speed 0
 #define Casc_Speed 1
 
 // Declare PIDs
@@ -56,14 +56,28 @@ class StandardController {
 	public:
 	
 		// Constructor
-		StandardController( const AP_HAL::HAL& hal ) : m_rHAL(hal) {}
+		StandardController( const AP_HAL::HAL& hal ) : m_rHAL(hal) {
+
+			PID.Heading.setIntegralLimit (1);
+			PID.Heading.setLPFfrequency(0);		
+			PID.Roll.setIntegralLimit (1);
+			PID.Roll.setLPFfrequency(0);		
+			PID.Altitude.setIntegralLimit (10);
+			PID.Altitude.setLPFfrequency(10);		
+			PID.ClimbRate.setIntegralLimit (1);
+			PID.ClimbRate.setLPFfrequency(30);		
+			PID.Pitch.setIntegralLimit (1);
+			PID.Pitch.setLPFfrequency(0);		
+			PID.Speed.setIntegralLimit (1);
+			PID.Speed.setLPFfrequency(0);		
+		}
 		
 		// Instructions for the setup routine
 		void setup(struct ControlTargets& target, struct HardBounds& hardBound) {
 			// Initial flight control targets, note altitude is down.
 			target.heading = 100.0*(M_PI/180.0);
 			target.speed = 15;
-			target.altitude = -200;
+			target.altitude = -100;
 
 			// Compute error in heading, ensuring it is in the range -Pi to Pi
 			if(target.heading>M_PI){target.heading = target.heading - 2*M_PI;}
@@ -106,7 +120,7 @@ class StandardController {
 
 			// Compute speed PID
 			out.throttle = PID.Speed.update(target.speed - groundSpeed,groundSpeedDot);
-			
+    hal.console->printf("%f\t%f\t%f\t%f\t%f\t%f\n",-target.altitude + pnPePd.z,altitudePIDOut,altitudePIDOut + pnPePdDot.z,climbRatePIDOut,climbRatePIDOut - phiThetaPsi.y,out.elevator);			
 			return(out);
 		
 		}
