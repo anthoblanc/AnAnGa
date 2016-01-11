@@ -32,4 +32,24 @@ Subtask to do:
 
 struct vector Provide_nice_curve_acc();
 
+/*
+#########################################################################""
+			Get_Acc_straigth();
+#########################################################################
+
+This function provide the accelerator vector to reach a point with the shortest path.
+
+NEED:
+This function need to #include the 
+struct StateVariable {
+    struct vector uvw, uvwDot ,pqr, phiThetaPsi, phiThetaPsiDot, pnPePd, pnPePdDot;
+    float groundSpeed, groundSpeedDot;
+};
+
+OUPUT:
+acceleration vector expressed in the gnd referential
+
+*/
+struct vector Get_Acc_straigth();
+
 #endif
