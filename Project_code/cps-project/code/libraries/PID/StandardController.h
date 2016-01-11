@@ -48,7 +48,7 @@ struct PIDs {
     PIDcontroller Speed;
 };
 
-enum StateVariables {UVW,UVWdot,PQR,PhiThetaPsi,PhiThetaPsiDot,PnPePd,PnPePdDot};
+enum States {UVW,UVWdot,PQR,PhiThetaPsi,PhiThetaPsiDot,PnPePd,PnPePdDot};
 						
 // Class Standardcontroller
 class StandardController {
@@ -94,9 +94,19 @@ class StandardController {
 		struct SteeringSignals update (const struct sample dataSample, const struct ControlTargets target, const struct HardBounds hardBound){
 				
 			struct SteeringSignals out;
+			struct StateVariables stateVars;
 			
 			// From the measured data of the plane, calculate all necessary state variables.
-			calculateStateVariables (dataSample, uvw, uvwDot, pqr, phiThetaPsi, pnPePd, phiThetaPsiDot, pnPePdDot, groundSpeed, groundSpeedDot);
+			stateVars = calculateStateVariables (dataSample);
+			uvw = stateVars.uvw;
+			uvwDot = stateVars.uvwDot;
+			pqr = stateVars.pqr;
+			phiThetaPsi = stateVars.phiThetaPsi;
+			phiThetaPsiDot = stateVars.phiThetaPsiDot;
+			pnPePd = stateVars.pnPePd;
+			pnPePdDot = stateVars.pnPePdDot;
+			groundSpeed = stateVars.groundSpeed;
+			groundSpeedDot = stateVars.groundSpeedDot;
 
 			// Compute heading PID
 			float headingPIDOut = PID.Heading.update(target.heading-phiThetaPsi.z, phiThetaPsiDot.z);
@@ -110,7 +120,7 @@ class StandardController {
 			float altitudePIDOut = PID.Altitude.update(-target.altitude + pnPePd.z, -pnPePdDot.z);
 
 			// Compute climb rate PID
-			float climbRatePIDOut = PID.ClimbRate.update(altitudePIDOut + pnPePdDot.z);
+			float climbRatePIDOut = PID.ClimbRate.update(altitudePIDOut + pnPePdDot.z,0);
 
 			// Constrain output of climb rate PID such that it is a valid target pitch
 			climbRatePIDOut = constrain (climbRatePIDOut,-hardBound.maxPitch, +hardBound.maxPitch);
@@ -126,7 +136,7 @@ class StandardController {
 		}
 		
 		// Getting values of the state variables of the plane
-		struct vector getVector (const enum StateVariables x) {
+		struct vector getVector (const enum States x) {
 			struct vector out;
 			switch(x) {
 				case UVW: 		out = uvw;break;

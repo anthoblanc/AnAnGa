@@ -149,23 +149,22 @@ void loop()
 		stSig = stdCTRL.update(dataSample, target, hardBound);
 		
 		
-/*		// Updating the Aerobatic Trajectory Controller
+		// Updating the Aerobatic Trajectory Controller
 			float deltaL, phiRef=0;
 			struct vector aCMDn, gCMDn, aCMDb, gCMDb, eulerDesired = {0,0,0};
 			int8_t aerobatOn = 0;
 			
 			// From the measured data of the plane, calculate all necessary state variables.
-			struct vector uvw, uvwDot ,pqr, phiThetaPsi, phiThetaPsiDot, pnPePd, pnPePdDot;
-			float groundSpeed, groundSpeedDot;
-			calculateStateVariables (dataSample, uvw, uvwDot, pqr, phiThetaPsi, pnPePd, phiThetaPsiDot, pnPePdDot, groundSpeed, groundSpeedDot);
+			struct StateVariables stateVars;
+			stateVars = calculateStateVariables (dataSample);
 			
 			// Place code here for calculating the desired Trajectory at time t_k <-----------
 			
 			// Access the control structure
-			aCMDb = NEDtoBODY (aCMDn, phiThetaPsi);
-			gCMDb = NEDtoBODY (gCMDn, phiThetaPsi);
+			aCMDb = NEDtoBODY (aCMDn, stateVars.phiThetaPsi);
+			gCMDb = NEDtoBODY (gCMDn, stateVars.phiThetaPsi);
 			stSig = trCTRL.update(deltaL,aCMDb,gCMDb,phiRef,aerobatOn,eulerDesired);
-*/			
+		
 			
 		
         // Constrain all control surface outputs to the range -1 to 1

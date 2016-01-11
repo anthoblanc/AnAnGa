@@ -91,36 +91,43 @@ struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaP
 }
 
 // From the measured data of the plane, calculate all necessary state variables.
-void calculateStateVariables (const struct sample dataSample, struct vector& uvw, struct vector& uvwDot, struct vector& pqr, struct vector& phiThetaPsi, struct vector& pnPePd, struct vector& phiThetaPsiDot, struct vector& pnPePdDot, float& groundSpeed, float& groundSpeedDot) {
+struct StateVariables {
+	struct vector uvw, uvwDot ,pqr, phiThetaPsi, phiThetaPsiDot, pnPePd, pnPePdDot;
+	float groundSpeed, groundSpeedDot;
+};
+
+struct StateVariables calculateStateVariables (const struct sample dataSample) {
+	
+	struct StateVariables out;
 
 	// Assignment of all read values to the state variables
-	uvw.x = dataSample.data.f[I_VX];
-	uvw.y = dataSample.data.f[I_VY];
-	uvw.z = dataSample.data.f[I_VZ];
+	out.uvw.x = dataSample.data.f[I_VX];
+	out.uvw.y = dataSample.data.f[I_VY];
+	out.uvw.z = dataSample.data.f[I_VZ];
 
-	uvwDot.x = dataSample.data.f[I_AX];
-	uvwDot.y = dataSample.data.f[I_AY];
-	uvwDot.z = dataSample.data.f[I_AZ];
+	out.uvwDot.x = dataSample.data.f[I_AX];
+	out.uvwDot.y = dataSample.data.f[I_AY];
+	out.uvwDot.z = dataSample.data.f[I_AZ];
 
-	pqr.x = dataSample.data.f[I_P];
-	pqr.y = dataSample.data.f[I_Q];
-	pqr.z = dataSample.data.f[I_R];
+	out.pqr.x = dataSample.data.f[I_P];
+	out.pqr.y = dataSample.data.f[I_Q];
+	out.pqr.z = dataSample.data.f[I_R];
 
-	phiThetaPsi.x = dataSample.data.f[I_PHI];
-	phiThetaPsi.y = dataSample.data.f[I_THETA];
-	phiThetaPsi.z = dataSample.data.f[I_PSI];
+	out.phiThetaPsi.x = dataSample.data.f[I_PHI];
+	out.phiThetaPsi.y = dataSample.data.f[I_THETA];
+	out.phiThetaPsi.z = dataSample.data.f[I_PSI];
 
-	pnPePd.x = dataSample.data.f[I_LAT];
-	pnPePd.y = dataSample.data.f[I_LON];
-	pnPePd.z = dataSample.data.f[I_ALT];
+	out.pnPePd.x = dataSample.data.f[I_LAT];
+	out.pnPePd.y = dataSample.data.f[I_LON];
+	out.pnPePd.z = dataSample.data.f[I_ALT];
 
 	// Calculate the missing state variables
-	phiThetaPsiDot = derivativeAngularRate( pqr, phiThetaPsi );
-	pnPePdDot = derivativeVelocity( uvw, phiThetaPsi );
-	groundSpeed = velocity( uvw );
-	groundSpeedDot = acceleration ( uvw, uvwDot );
+	out.phiThetaPsiDot = derivativeAngularRate( out.pqr, out.phiThetaPsi );
+	out.pnPePdDot = derivativeVelocity( out.uvw, out.phiThetaPsi );
+	out.groundSpeed = velocity( out.uvw );
+	out.groundSpeedDot = acceleration ( out.uvw, out.uvwDot );
 	
-	return;
+	return(out);
 }
 
 #endif
