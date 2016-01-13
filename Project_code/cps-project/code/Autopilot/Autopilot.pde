@@ -163,7 +163,7 @@ void loop()
 		
 		// Updating the Aerobatic Trajectory Controller
 		float deltaL, phiRef=0;
-		struct vector aCMD_refin, gCMD_refin = {0,0,9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
+		struct vector aCMD_refin, gCMD_refin = {0,0,-9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
 		int8_t aerobatOn = 0;
 		
 		// From the measured data of the plane, calculate all necessary state variables.
@@ -174,6 +174,11 @@ void loop()
 			
 			// Path Control
         // use two points before loop to decide direction
+	if (time <tstart){     //
+	trajectory_refgnd.x = 6;
+	trajectory_refgnd.y = 80;
+         trajectory_refgnd.z = -10;
+        }
         if (time >= (tstart - 1500000) && time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
         pnPePdtmp0 = stateVars.pnPePd;
         }
@@ -222,7 +227,10 @@ void loop()
             nextPrint += 1000000;
             hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-            
+	
+		//hal.console->printf("\naCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
+		hal.console->printf("Position: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+		//hal.console->printf("\naCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
         }
         // Output PWM
         hal.rcout->write(0, throttleOut);
