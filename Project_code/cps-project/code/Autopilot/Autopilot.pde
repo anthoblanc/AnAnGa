@@ -74,6 +74,12 @@ uint32_t nextPrint;
 // mod ensures that val is between min and max. This is mostly used
 // for ensuring that angles are within the range -Pi to Pi.
 
+// Path start end time
+uint32_t tstart = 30000000; // path starting time
+uint32_t tend = 50000000; // path ending time
+
+// Target path coordinates
+float targetAltitude, targetlat, targetlon; 
 
 // constrain bounds val to at least min and at most max.
 float constrain(float val, float min, float max)
@@ -92,6 +98,7 @@ float constrain(float val, float min, float max)
 #include <formulasForStateVariables.h>
 #include <TrajectoryControl.h>
 #include <StandardController.h>
+#include <Path.h>
 
 // Construct Standard Controller
 StandardController stdCTRL(hal);
@@ -159,6 +166,22 @@ void loop()
 			stateVars = calculateStateVariables (dataSample);
 			
 			// Place code here for calculating the desired Trajectory at time t_k <-----------
+			
+			// Path Control
+        // use two points before loop to decide direction
+        if (time >= (tstart - 1500000) && time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
+        pnPePdtmp0 = stateVars.pnPePd;
+        }
+         if(time >= (tstart - 5000000) && time <= tstart) { // coordinate just before loop
+         pnPePdtmp = stateVars.pnPePd;
+         }
+        // 20s -> 40s, perform loop, give target coordinates two secs in the future
+        if(time >= tstart && time <= tend) {
+        pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
+        targetlat = pathned.x - stateVars.pnPePd.x;
+        targetlon = pathned.y - stateVars.pnPePd.y;
+        targetAltitude = pathned.z- stateVars.pnPePd.z;
+        }
 			
 			// Access the control structure
 			aCMDb = NEDtoBODY (aCMDn, stateVars.phiThetaPsi);
