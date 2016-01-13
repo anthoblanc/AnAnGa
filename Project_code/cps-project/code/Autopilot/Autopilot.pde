@@ -146,7 +146,7 @@ void loop()
 		
 		
 		// Updating the StandardController
-		stSig = stdCTRL.update(dataSample, target, hardBound);
+		//stSig = stdCTRL.update(dataSample, target, hardBound);
 		
 		
 		// Updating the Aerobatic Trajectory Controller
