@@ -151,7 +151,7 @@ void loop()
 		
 		// Updating the Aerobatic Trajectory Controller
 			float deltaL, phiRef=0;
-			struct vector aCMDn, gCMDn, aCMDb, gCMDb, eulerDesired = {0,0,0};
+			struct vector aCMD_refin, gCMD_refin, aCMD_refin, gCMD_refin, eulerDesired = {0,0,0};
 			int8_t aerobatOn = 0;
 			
 			// From the measured data of the plane, calculate all necessary state variables.
@@ -159,11 +159,12 @@ void loop()
 			stateVars = calculateStateVariables (dataSample);
 			
 			// Place code here for calculating the desired Trajectory at time t_k <-----------
-			
+			aCMD
+
 			// Access the control structure
-			aCMDb = NEDtoBODY (aCMDn, stateVars.phiThetaPsi);
-			gCMDb = NEDtoBODY (gCMDn, stateVars.phiThetaPsi);
-			stSig = trCTRL.update(deltaL,aCMDb,gCMDb,phiRef,aerobatOn,eulerDesired);
+			aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
+			gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
+			stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,phiRef,aerobatO_refin,eulerDesired);
 		
 			
 		
