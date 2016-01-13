@@ -30,7 +30,7 @@ OUPUT:
 acceleration vector expressed in the gnd referential
 
 */
-struct vector Get_Acc_straigth(const struct vector velocity_refgnd, const struct vector trajectory_refgnd);
+struct vector Get_Acc_straigth(struct vector velocity_refgnd, struct vector trajectory_refgnd);
 
 
 

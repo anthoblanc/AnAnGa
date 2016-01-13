@@ -1,6 +1,10 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil 
 #define THISFIRMWARE "CPS-Autopilot-Project"
 
+/* ######################
+         Library
+   ###################### */
+
 #include <AP_Common.h>
 #include <AP_HAL.h>
 #include <AP_HAL_AVR.h>
@@ -12,6 +16,7 @@
 #include <AP_Motors.h>
 #include <AP_Notify.h>
 #include <AP_Curve.h>
+
 
 // Loop period in microseconds
 #define PERIOD 20000
@@ -78,9 +83,6 @@ uint32_t nextPrint;
 uint32_t tstart = 30000000; // path starting time
 uint32_t tend = 50000000; // path ending time
 
-// Target path coordinates
-float targetAltitude, targetlat, targetlon; 
-
 // constrain bounds val to at least min and at most max.
 float constrain(float val, float min, float max)
 {
@@ -99,6 +101,9 @@ float constrain(float val, float min, float max)
 #include <TrajectoryControl.h>
 #include <StandardController.h>
 #include <Path.h>
+#include <Acceleration_mgt.h>
+
+struct vector trajectory_refgnd; //contain the direction of the path "L"
 
 // Construct Standard Controller
 StandardController stdCTRL(hal);
@@ -133,7 +138,7 @@ void setup()
     // Set next times for PWM output, serial output, and target change
     nextWrite = hal.scheduler->micros() + PERIOD;
     nextPrint = hal.scheduler->micros() + 1000000;
-
+    
 }
 
 // loop: called repeatedly in a loop
@@ -157,15 +162,15 @@ void loop()
 		
 		
 		// Updating the Aerobatic Trajectory Controller
-			float deltaL, phiRef=0;
-			struct vector aCMD_refin, gCMD_refin, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
-			int8_t aerobatOn = 0;
+		float deltaL, phiRef=0;
+		struct vector aCMD_refin, gCMD_refin = {0,0,9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
+		int8_t aerobatOn = 0;
+		
+		// From the measured data of the plane, calculate all necessary state variables.
+		struct StateVariables stateVars;
+		stateVars = calculateStateVariables (dataSample);
 			
-			// From the measured data of the plane, calculate all necessary state variables.
-			struct StateVariables stateVars;
-			stateVars = calculateStateVariables (dataSample);
 			
-			// Place code here for calculating the desired Trajectory at time t_k <-----------
 			
 			// Path Control
         // use two points before loop to decide direction
@@ -176,17 +181,23 @@ void loop()
          pnPePdtmp = stateVars.pnPePd;
          }
         // 20s -> 40s, perform loop, give target coordinates two secs in the future
-        if(time >= tstart && time <= tend) {
-        pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
-        targetlat = pathned.x - stateVars.pnPePd.x;
-        targetlon = pathned.y - stateVars.pnPePd.y;
-        targetAltitude = pathned.z- stateVars.pnPePd.z;
+        if(time >= tstart && time <= tend) 
+        {
+            pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
+            
+            //calculate the deisred path "L"
+            trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
+            trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
+            trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;      
         }
+
+        // Place code here for calculating the desired Trajectory at time t_k <-----------
+        aCMD_refin=vector Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
 			
-			// Access the control structure
-			aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
-			gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
-			stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,phiRef,aerobatOn,eulerDesired);
+		// Access the control structure
+		aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
+		gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
+		stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,phiRef,aerobatOn,eulerDesired);
 		
 			
 		
