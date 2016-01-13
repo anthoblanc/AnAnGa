@@ -4,7 +4,7 @@
 struct vector Provide_nice_curve_acc()
 {
 	struct vector acc_cmd;
-	return vector acc_cmd;
+	return( acc_cmd );
 }
 
 struct vector Get_Acc_straigth(struct vector velocity_refgnd, struct vector trajectory_refgnd)
@@ -23,5 +23,5 @@ struct vector Get_Acc_straigth(struct vector velocity_refgnd, struct vector traj
     		float groundSpeed, groundSpeedDot;
 	};*/
 
-	return vector acc_cmd;
+	return(acc_cmd);
 }
