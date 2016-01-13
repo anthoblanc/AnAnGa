@@ -7,11 +7,9 @@ struct vector Provide_nice_curve_acc()
 	return vector acc_cmd;
 }
 
-struct vector Get_Acc_straigth()
+struct vector Get_Acc_straigth(const struct vector velocity_refgnd, const struct vector trajectory_refgnd)
 {
 	struct vector acc_cmd;
-	const struct vector velocity_refgnd;
-	const struct vector trajectory_refgnd;
 	
 	acc_cmd=CrossProduct(CrossProduct(velocity_refgnd,trajectory_refgnd),velocity_refgnd); // V*L*V
 	
