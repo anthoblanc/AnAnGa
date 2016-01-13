@@ -101,7 +101,7 @@ float constrain(float val, float min, float max)
 #include <TrajectoryControl.h>
 #include <StandardController.h>
 #include <Path.h>
-#include <Acceleration_mgt.h>
+#include "../libraries/Trajectory_management/Acceleration_mgt.h"
 
 struct vector trajectory_refgnd; //contain the direction of the path "L"
 
@@ -192,7 +192,7 @@ void loop()
         }
 
         // Place code here for calculating the desired Trajectory at time t_k <-----------
-        aCMD_refin=vector Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
+        aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
 			
 		// Access the control structure
 		aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);

@@ -65,4 +65,6 @@ Subtask to do:
 
 struct vector Provide_nice_curve_acc();
 
+#include "Acceleration_mgt.cpp"
+
 #endif
