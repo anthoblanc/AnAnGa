@@ -137,6 +137,7 @@ void setup()
     hal.rcout->enable_ch(1);
     hal.rcout->enable_ch(2);
     hal.rcout->enable_ch(3);
+    //hal.rcout->enable_ch(5); // Enabling the rudder
 
     // Set next times for PWM output, serial output, and target change
     nextWrite = hal.scheduler->micros() + PERIOD;
@@ -242,6 +243,7 @@ void loop()
         float elevatorL = constrain(stSig.elevator, -1, 1);
         float elevatorR = constrain(stSig.elevator, -1, 1);
         float throttle = constrain(stSig.throttle, -1, 1);
+        float rudder = constrain(stSig.rudder, -1, 1);
 
         #define SERVO_MIN 1000 // Minimum duty cycle
         #define SERVO_MID 1500 // Mid duty cycle
@@ -252,6 +254,7 @@ void loop()
         int16_t elevatorLOut = ((elevatorL+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
         int16_t elevatorROut = ((elevatorR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
         int16_t throttleOut = ((throttle+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
+        int16_t rudderOut = ((rudder+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
 
         // Printing in 20mx cycle
         if (firstLoop){
@@ -277,6 +280,7 @@ void loop()
         hal.rcout->write(1, elevatorLOut);
         hal.rcout->write(2, aileronROut);
         hal.rcout->write(3, aileronLOut);
+        //hal.rcout->write(5, rudderOut);   // Rudder output
     }
 }
 
