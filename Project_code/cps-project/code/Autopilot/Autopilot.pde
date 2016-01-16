@@ -105,6 +105,9 @@ float constrain(float val, float min, float max)
 
 struct vector trajectory_refgnd; //contain the direction of the path "L"
 
+// temporary variables
+uint8_t firstLoop = 1;
+
 // Construct Standard Controller
 StandardController stdCTRL(hal);
 struct SteeringSignals stSig;
@@ -157,53 +160,80 @@ void loop()
         }
 		
 		
-		// Updating the StandardController
-		//stSig = stdCTRL.update(dataSample, target, hardBound);
+            // Updating the StandardController
+            //stSig = stdCTRL.update(dataSample, target, hardBound);
 		
 		
-		// Updating the Aerobatic Trajectory Controller
-		float deltaL, phiRef=0;
-		struct vector aCMD_refin, gCMD_refin = {0,0,-9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
-		int8_t aerobatOn = 0;
-		
-		// From the measured data of the plane, calculate all necessary state variables.
-		struct StateVariables stateVars;
-		stateVars = calculateStateVariables (dataSample);
+            // Updating the Aerobatic Trajectory Controller
+            float deltaL, phiRef=0;
+            struct vector aCMD_refin, gCMD_refin = {0,0,-9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
+            int8_t aerobatOn = 0;
+
+            // From the measured data of the plane, calculate all necessary state variables.
+            struct StateVariables stateVars;
+            stateVars = calculateStateVariables (dataSample);
 			
 			
 			
-			// Path Control
-        // use two points before loop to decide direction
-	if (time <tstart){     //
-	trajectory_refgnd.x = 6;
-	trajectory_refgnd.y = 80;
-         trajectory_refgnd.z = -10;
-        }
-        if (time >= (tstart - 1500000) && time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
-        pnPePdtmp0 = stateVars.pnPePd;
-        }
-         if(time >= (tstart - 5000000) && time <= tstart) { // coordinate just before loop
-         pnPePdtmp = stateVars.pnPePd;
-         }
-        // 20s -> 40s, perform loop, give target coordinates two secs in the future
-        if(time >= tstart && time <= tend) 
-        {
-            pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
-            
-            //calculate the deisred path "L"
+            /*	// Path Control
+                // use two points before loop to decide direction
+                if (time <tstart){     //
+                trajectory_refgnd.x = 6;
+                trajectory_refgnd.y = 80;
+                 trajectory_refgnd.z = -10;
+                }
+                if (time >= (tstart - 1500000) && time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
+                pnPePdtmp0 = stateVars.pnPePd;
+                }
+                 if(time >= (tstart - 5000000) && time <= tstart) { // coordinate just before loop
+                 pnPePdtmp = stateVars.pnPePd;
+                 }
+                // 20s -> 40s, perform loop, give target coordinates two secs in the future
+                if(time >= tstart && time <= tend)
+                {
+                    pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
+
+                    //calculate the deisred path "L"
+                    trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
+                    trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
+                    trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;
+                }
+            */
+
+            // Testwise desired Trajectory
+            if (firstLoop){
+                pathned.x = stateVars.pnPePd.x;
+                pathned.y = stateVars.pnPePd.y;
+                pathned.z = stateVars.pnPePd.z;
+                firstLoop = 0;
+            }
+            if (time<30e6){
+                pathned.x += 0 * PERIOD/1e6;
+                pathned.y += 15 * PERIOD/1e6;
+                pathned.z += 3 * PERIOD/1e6;
+            }else{
+                pathned.x += 0 * PERIOD/1e6;
+                pathned.y += 15 * PERIOD/1e6;
+                pathned.z += 0 * PERIOD/1e6;
+            }
+
+            // Calculating differential Trajectory
             trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
             trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
-            trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;      
-        }
+            trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;
 
-        // Place code here for calculating the desired Trajectory at time t_k <-----------
-        aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
-			
-		// Access the control structure
-		aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
-		gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
-		stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,phiRef,aerobatOn,eulerDesired);
-		
+            // Calculating Delta L
+            float desiredL = 10;    // Testwise (could depend from velocity)
+            deltaL = desiredL - NormVector(trajectory_refgnd);
+
+            // Calculating the Acceleration out of
+            aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
+
+            // Access the control structure
+            aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
+            gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
+            stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,phiRef,aerobatOn,eulerDesired);
+
 			
 		
         // Constrain all control surface outputs to the range -1 to 1
@@ -213,9 +243,9 @@ void loop()
         float elevatorR = constrain(stSig.elevator, -1, 1);
         float throttle = constrain(stSig.throttle, -1, 1);
 
-		#define SERVO_MIN 1000 // Minimum duty cycle
-		#define SERVO_MID 1500 // Mid duty cycle
-		#define SERVO_MAX 2000 // Maximum duty cycle
+        #define SERVO_MIN 1000 // Minimum duty cycle
+        #define SERVO_MID 1500 // Mid duty cycle
+        #define SERVO_MAX 2000 // Maximum duty cycle
         // Compute duty cycle for PWM output from generic control
         int16_t aileronLOut = ((aileronL+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
         int16_t aileronROut = ((aileronR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
