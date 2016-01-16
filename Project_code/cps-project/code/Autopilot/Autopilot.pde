@@ -205,7 +205,7 @@ void loop()
                 pathned.x = stateVars.pnPePd.x;
                 pathned.y = stateVars.pnPePd.y;
                 pathned.z = stateVars.pnPePd.z;
-                firstLoop = 0;
+                //firstLoop = 0; Switched off down at printing!
             }
             if (time<30e6){
                 pathned.x += 0 * PERIOD/1e6;
@@ -252,16 +252,26 @@ void loop()
         int16_t elevatorLOut = ((elevatorL+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
         int16_t elevatorROut = ((elevatorR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
         int16_t throttleOut = ((throttle+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
+
+        // Printing in 20mx cycle
+        if (firstLoop){
+            hal.console->printf("L_is.x,L_is.y,L_is.z,Delta_L,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,Throttle,Aileron,Rudder,Elevator\n");
+            firstLoop = 0; //Switch off at temp path when this here is removed!
+        }
+        hal.console->printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,deltaL,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,stSig.throttle,stSig.aileron,stSig.rudder,stSig.elevator);
+
+        // Printing in 1 sec cycle
         if(time >= nextPrint) {
             // Print some status
             nextPrint += 1000000;
-            hal.console->printf("** PERIOD **\r\n");
+            //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
 	
 		//hal.console->printf("\naCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
-		hal.console->printf("Position: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+                //hal.console->printf("Position: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
 		//hal.console->printf("\naCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
         }
+
         // Output PWM
         hal.rcout->write(0, throttleOut);
         hal.rcout->write(1, elevatorLOut);
