@@ -130,7 +130,7 @@ class StandardController {
 
 			// Compute speed PID
 			out.throttle = PID.Speed.update(target.speed - groundSpeed,groundSpeedDot);
-    hal.console->printf("%f\t%f\t%f\t%f\t%f\t%f\n",-target.altitude + pnPePd.z,altitudePIDOut,altitudePIDOut + pnPePdDot.z,climbRatePIDOut,climbRatePIDOut - phiThetaPsi.y,out.elevator);			
+    //hal.console->printf("%f\t%f\t%f\t%f\t%f\t%f\n",-target.altitude + pnPePd.z,altitudePIDOut,altitudePIDOut + pnPePdDot.z,climbRatePIDOut,climbRatePIDOut - phiThetaPsi.y,out.elevator);
 			return(out);
 		
 		}

@@ -115,10 +115,13 @@ struct SteeringSignals stSig;
 // Construct the Aerobatic Trajectory Controller
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
 
+// Variables for reading the hal.console  <------- Testwise!
+uint8_t consoleInRaw[21];   // limit to 20 characters
+
 // setup: called once at boot
 void setup()
 {
-    hal.console->printf("\r\n\r\nStarting up\r\n\r\n");
+    //hal.console->printf("\r\n\r\nStarting up\r\n\r\n");
     Wire.begin(); // Begin I2C communcation
     int i;
     // Initialize dataSample to all 0
@@ -159,7 +162,15 @@ void loop()
             dataSample.data.raw[i] = Wire.read();
             i++;
         }
-		
+
+        // Read console data from COM-PORT. Only 20 characters allowed
+        /*i = 0;
+        while(hal.console->available() && i<20) {
+            consoleInRaw[i] = hal.console->read();
+            i++;
+        }
+        consoleInRaw[20] = '\0';
+        */
 		
             // Updating the StandardController
             //stSig = stdCTRL.update(dataSample, target, hardBound);
@@ -221,7 +232,7 @@ void loop()
             // Calculating differential Trajectory
             trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
             trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
-            trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;
+            trajectory_refgnd.z = pathned.z - stateVars.pnPePd.z;
 
             // Calculating Delta L
             float desiredL = 10;    // Testwise (could depend from velocity)
@@ -269,6 +280,9 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
+
+                // Testwise printing the console-read variables
+                //hal.console->printf("Read from COM-PORT: %s\n",consoleInRaw);
 	
 		//hal.console->printf("\naCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
                 //hal.console->printf("Position: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
