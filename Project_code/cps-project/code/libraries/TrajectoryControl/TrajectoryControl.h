@@ -125,7 +125,7 @@ class TrajectoryController {
 			
 			
 		// Update Routine
-		struct SteeringSignals update (float DeltaL, struct vector aCMDb, struct vector gCMDb, const float PhiRef = 0, const int8_t aerobatOn = 0, struct vector eulerDesired = {0,0,0}) { 
+                struct SteeringSignals update (float DeltaL, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef = 0, const int8_t aerobatOn = 0, struct vector eulerDesired = {0,0,0}) {
 			
 			struct SteeringSignals t_cOut;
 			struct vector t_vaCMDbYZ, t_veRoll, aCMDbSubG, t_vAileronCalc;
@@ -160,10 +160,11 @@ class TrajectoryController {
 				t_vAileronCalc = CrossProduct(t_veRoll,t_vaCMDbYZ);
 				t_fAileronPID = t_vAileronCalc.x;
 				// Take the arcsin of the x-component of the cross product
+                                t_fAileronPID = constrain(t_fAileronPID,-1,1);
 				t_fAileronPID = asin(t_fAileronPID);
-                       //hal.console->printf("%f,",t_fAileronPID);
+
 				// Give the error of the Aileron to the Aileron-PID
-				t_cOut.aileron = m_cPIDs[Aileron]->update(t_fAileronPID);
+                                t_cOut.aileron = m_cPIDs[Aileron]->update(-stateVars.phiThetaPsi.x/*t_fAileronPID*/);
 				
 				// Rudder
 				// Subtract gravity from acceleration
@@ -173,8 +174,7 @@ class TrajectoryController {
 				// Choose the y-Component
 				t_fRudderPID = aCMDbSubG.y;
 				// Give the error of the Rudder to the Rudder-PID
-				t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
-				
+                                t_cOut.rudder = m_cPIDs[Rudder]->update(-stateVars.phiThetaPsi.z/*t_fRudderPID*/);
 				// Elevator
 				// Choose the z-component of the acceleration subtracted by gravity
 				t_fElevatorPID = aCMDbSubG.z;
@@ -235,25 +235,25 @@ class TrajectoryController {
 // Variables for the Trajectory Controller
 #define CO_Freq_LPF 0	// Cut-off frequency for the low-pass-filter of the derivatives
 
-#define Kp_Throttle 0.2
+#define Kp_Throttle 1
 #define Ki_Throttle 0
 #define Kd_Throttle 0
 #define IntLim_Throttle 100
 #define Casc_Throttle 1
 
-#define Kp_Aileron 0.2
+#define Kp_Aileron 1
 #define Ki_Aileron 0
 #define Kd_Aileron 0
 #define IntLim_Aileron 100
 #define Casc_Aileron 1
 
-#define Kp_Rudder 0.2
+#define Kp_Rudder 0.02
 #define Ki_Rudder 0
 #define Kd_Rudder 0
 #define IntLim_Rudder 100
 #define Casc_Rudder 1
 
-#define Kp_Elevator 0.2
+#define Kp_Elevator 0.01
 #define Ki_Elevator 0
 #define Kd_Elevator 0
 #define IntLim_Elevator 100
