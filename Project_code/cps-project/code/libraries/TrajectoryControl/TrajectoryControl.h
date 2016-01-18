@@ -168,9 +168,9 @@ class TrajectoryController {
 				
 				// Rudder
 				// Subtract gravity from acceleration
-				aCMDbSubG.x = aCMDb.x - gCMDb.x;
-				aCMDbSubG.y = aCMDb.y - gCMDb.y;
-				aCMDbSubG.z = aCMDb.z - gCMDb.z;
+                                aCMDbSubG.x = aCMDb.x + gCMDb.x;
+                                aCMDbSubG.y = aCMDb.y + gCMDb.y;
+                                aCMDbSubG.z = aCMDb.z + gCMDb.z;
 				// Choose the y-Component
 				t_fRudderPID = aCMDbSubG.y;
 				// Give the error of the Rudder to the Rudder-PID
@@ -253,7 +253,7 @@ class TrajectoryController {
 #define IntLim_Rudder 100
 #define Casc_Rudder 1
 
-#define Kp_Elevator 0.01
+#define Kp_Elevator 1
 #define Ki_Elevator 0
 #define Kd_Elevator 0
 #define IntLim_Elevator 100

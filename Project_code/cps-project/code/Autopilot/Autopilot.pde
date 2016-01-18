@@ -245,6 +245,25 @@ void loop()
             // Access the control structure
             aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
             gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
+
+            aCMD_refbody.x = 0;
+            aCMD_refbody.y = 0;
+            if(time<6e6){
+                aCMD_refbody.z = 0.1;
+            }else if (time<10e6){
+                aCMD_refbody.z = 0.05;
+            }else if (time<15e6){
+                aCMD_refbody.z = 0.0;
+            }else if (time<20e6){
+                aCMD_refbody.z = 1.0;
+            }else{
+                aCMD_refbody.z = 0.0;
+            }
+            deltaL = 1;
+
+            aCMD_refbody.x -= gCMD_refbody.x;
+            aCMD_refbody.y -= gCMD_refbody.y;
+            aCMD_refbody.z -= gCMD_refbody.z;
             stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
 
 
@@ -284,10 +303,10 @@ void loop()
                 //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
 
                 // Testwise printing the console-read variables
-                hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
-	
-                hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
-                hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
+                //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
+                hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
+                //hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
+                //hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
                 //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
                 //hal.console->printf("deltaL: %f, traj: (%f,%f,%f)\n\n",deltaL,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
