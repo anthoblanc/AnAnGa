@@ -140,7 +140,7 @@ void setup()
     hal.rcout->enable_ch(1);
     hal.rcout->enable_ch(2);
     hal.rcout->enable_ch(3);
-    //hal.rcout->enable_ch(5); // Enabling the rudder
+    hal.rcout->enable_ch(5); // Enabling the rudder
 
     // Set next times for PWM output, serial output, and target change
     nextWrite = hal.scheduler->micros() + PERIOD;
@@ -174,7 +174,7 @@ void loop()
 		
             // Updating the StandardController
             //stSig = stdCTRL.update(dataSample, target, hardBound);
-		
+            //stSig.rudder=0;
 		
             // Updating the Aerobatic Trajectory Controller
             float deltaL, phiRef=0;
@@ -220,13 +220,13 @@ void loop()
                 //firstLoop = 0; Switched off down at printing!
             }
             if (time<30e6){
-                pathned.x += 0 * PERIOD/1e6;
-                pathned.y += 15 * PERIOD/1e6;
-                pathned.z += 3 * PERIOD/1e6;
+                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.y += 10.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.z += -1.0 * static_cast<float>(PERIOD) /1e6;
             }else{
-                pathned.x += 0 * PERIOD/1e6;
-                pathned.y += 15 * PERIOD/1e6;
-                pathned.z += 0 * PERIOD/1e6;
+                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
             }
 
             // Calculating differential Trajectory
@@ -236,7 +236,7 @@ void loop()
 
             // Calculating Delta L
             float desiredL = 10;    // Testwise (could depend from velocity)
-            deltaL = desiredL - NormVector(trajectory_refgnd);
+            deltaL = NormVector(trajectory_refgnd) - desiredL;
 
             // Calculating the Acceleration out of
             aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
@@ -246,7 +246,7 @@ void loop()
             gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
             stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,phiRef,aerobatOn,eulerDesired);
 
-			
+
 		
         // Constrain all control surface outputs to the range -1 to 1
         float aileronL = -1 * constrain(stSig.aileron, -1, 1);
@@ -280,13 +280,15 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
+                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
 
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %s\n",consoleInRaw);
 	
-		//hal.console->printf("\naCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
+                //hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
                 //hal.console->printf("Position: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
-		//hal.console->printf("\naCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
+                //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
+                //hal.console->printf("deltaL: %f, traj: (%f,%f,%f)\n\n",deltaL,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
         }
 
         // Output PWM
@@ -294,7 +296,7 @@ void loop()
         hal.rcout->write(1, elevatorLOut);
         hal.rcout->write(2, aileronROut);
         hal.rcout->write(3, aileronLOut);
-        //hal.rcout->write(5, rudderOut);   // Rudder output
+        hal.rcout->write(5, rudderOut);   // Rudder output
     }
 }
 

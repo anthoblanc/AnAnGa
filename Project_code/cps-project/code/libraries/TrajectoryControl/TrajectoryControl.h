@@ -161,6 +161,7 @@ class TrajectoryController {
 				t_fAileronPID = t_vAileronCalc.x;
 				// Take the arcsin of the x-component of the cross product
 				t_fAileronPID = asin(t_fAileronPID);
+                       //hal.console->printf("%f,",t_fAileronPID);
 				// Give the error of the Aileron to the Aileron-PID
 				t_cOut.aileron = m_cPIDs[Aileron]->update(t_fAileronPID);
 				

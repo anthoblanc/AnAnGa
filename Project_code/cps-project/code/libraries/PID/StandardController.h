@@ -3,7 +3,7 @@
 
 // Set the gains for all PIDS
 // Gains for pidHeading
-#define Kp_Heading 1.5
+#define Kp_Heading 1
 #define Ki_Heading 0.0001
 #define Kd_Heading 0.1
 #define Casc_Heading 3
@@ -123,7 +123,7 @@ class StandardController {
 			float climbRatePIDOut = PID.ClimbRate.update(altitudePIDOut + pnPePdDot.z,0);
 
 			// Constrain output of climb rate PID such that it is a valid target pitch
-			climbRatePIDOut = constrain (climbRatePIDOut,-hardBound.maxPitch, +hardBound.maxPitch);
+                        climbRatePIDOut = constrain (climbRatePIDOut,-hardBound.maxPitch/4, +hardBound.maxPitch);
 
 			// Compute pitch PID
 			out.elevator = PID.Pitch.update(climbRatePIDOut - phiThetaPsi.y, phiThetaPsiDot.y);
