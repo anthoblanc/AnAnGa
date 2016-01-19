@@ -102,6 +102,7 @@ float constrain(float val, float min, float max)
 #include <StandardController.h>
 #include <Path.h>
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"
+#include <Interface.hpp>
 
 struct vector trajectory_refgnd; //contain the direction of the path "L"
 
@@ -171,6 +172,10 @@ void loop()
             i++;
         }
         consoleInRaw[20] = '\0';
+        // go to the Interface-Handler
+        /*if (consoleInRaw[0]!='\0'){
+            interface.update(consoleInRaw);
+        }*/
 
 		
             // Updating the StandardController
