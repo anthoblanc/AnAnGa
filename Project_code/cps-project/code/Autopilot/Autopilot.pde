@@ -269,7 +269,7 @@ void loop()
             aCMD_refbody.x -= gCMD_refbody.x;
             aCMD_refbody.y -= gCMD_refbody.y;
             aCMD_refbody.z -= gCMD_refbody.z;
-            stSig = trCTRL.update(deltaL,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
+            stSig = trCTRL.update(time,deltaL,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
 
 
 		
@@ -309,7 +309,7 @@ void loop()
 
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
-                hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
+                //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
                 //hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
                 //hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
                 //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);

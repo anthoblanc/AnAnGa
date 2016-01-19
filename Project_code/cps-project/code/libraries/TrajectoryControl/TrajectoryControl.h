@@ -125,7 +125,7 @@ class TrajectoryController {
 			
 			
 		// Update Routine
-                struct SteeringSignals update (float DeltaL, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef = 0, const int8_t aerobatOn = 0, struct vector eulerDesired = {0,0,0}) {
+                struct SteeringSignals update (uint32_t time, float DeltaL, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef = 0, const int8_t aerobatOn = 0, struct vector eulerDesired = {0,0,0}) {
 			
 			struct SteeringSignals t_cOut;
 			struct vector t_vaCMDbYZ, t_veRoll, aCMDbSubG, t_vAileronCalc;
@@ -141,7 +141,7 @@ class TrajectoryController {
 				// Throttle
 				// Hand error of Throttle-PID to the controller and pass signal to output struct.
 				t_cOut.throttle = m_cPIDs[Throttle]->update(DeltaL);
-				
+
 				// Aileron
 				// Acceleration in y-z-Plane
 				t_vaCMDbYZ.x = 0;
@@ -164,7 +164,7 @@ class TrajectoryController {
 				t_fAileronPID = asin(t_fAileronPID);
 
 				// Give the error of the Aileron to the Aileron-PID
-                                t_cOut.aileron = m_cPIDs[Aileron]->update(-stateVars.phiThetaPsi.x/*t_fAileronPID*/);
+                                t_cOut.aileron = m_cPIDs[Aileron]->update(t_fAileronPID);
 				
 				// Rudder
 				// Subtract gravity from acceleration
@@ -180,6 +180,10 @@ class TrajectoryController {
 				t_fElevatorPID = aCMDbSubG.z;
 				// Give the error of the Elevator to the Elevator-PID
 				t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
+
+                                if (time >= nextPrint){
+                                    hal.console->printf("is: (%f,%f), desired: (%f,%f)\nerror: %f, out:%f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID,t_cOut.aileron);
+                                }
 				
 			}
 			// Aerobatic control mode (Euler Angles)
@@ -238,25 +242,25 @@ class TrajectoryController {
 #define Kp_Throttle 1
 #define Ki_Throttle 0
 #define Kd_Throttle 0
-#define IntLim_Throttle 100
+#define IntLim_Throttle 1
 #define Casc_Throttle 1
 
-#define Kp_Aileron 1
+#define Kp_Aileron 0.3
 #define Ki_Aileron 0
 #define Kd_Aileron 0
-#define IntLim_Aileron 100
+#define IntLim_Aileron 1
 #define Casc_Aileron 1
 
-#define Kp_Rudder 0.02
+#define Kp_Rudder 1
 #define Ki_Rudder 0
 #define Kd_Rudder 0
-#define IntLim_Rudder 100
+#define IntLim_Rudder 1
 #define Casc_Rudder 1
 
 #define Kp_Elevator 1
 #define Ki_Elevator 0
 #define Kd_Elevator 0
-#define IntLim_Elevator 100
+#define IntLim_Elevator 1
 #define Casc_Elevator 1
 
 void setupTrCTRL (TrajectoryController& trCTRL) {
