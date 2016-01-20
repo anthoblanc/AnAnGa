@@ -77,15 +77,17 @@ struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaP
 	float sinPhiSinTheta = sinPhi * sinTheta;
 	float cosPhiSinTheta = cosPhi * sinTheta;
 	
-	body.x = cosTheta*cosPsi*ned.x + 
-		cosTheta*sinPsi*ned.y +
-		-sinTheta*ned.z;
-	body.y = (sinPhiSinTheta*cosPsi - cosPhi*sinPsi)*ned.x +
-		(sinPhiSinTheta*sinPsi + cosPhi*cosPsi)*ned.y +
-		sinPhi*cosTheta*ned.z;
-	body.z = (cosPhiSinTheta*cosPsi + sinPhi*sinPsi)*ned.x + 
-		(cosPhiSinTheta*sinPsi - sinPhi*cosPsi)*ned.y +
-		cosPhi*cosTheta*ned.z;	
+	//source: http://www.es.ele.tue.nl/education/5HC99/wiki/images/4/42/RigidBodyDynamics.pdf
+	body.x = (cosTheta*cosPsi) * ned.x + 
+		(cosTheta*sinPsi)  * ned.y +
+		-sinTheta          * ned.z;
+	body.y = (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * ned.x +
+		(sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * ned.y +
+		sinPhi*cosTheta                          * ned.z;
+	body.z = (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * ned.x + 
+		(cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * ned.y +
+		cosPhi*cosTheta                          * ned.z;	
+
 	return(body);
 
 }
