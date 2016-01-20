@@ -220,15 +220,19 @@ void loop()
 
             // Testwise desired Trajectory
             if (firstLoop){
-                pathned.x = stateVars.pnPePd.x;
-                pathned.y = stateVars.pnPePd.y;
-                pathned.z = stateVars.pnPePd.z;
+                pathned.x = -365;
+                pathned.y = -400;
+                pathned.z = -0.87;
                 //firstLoop = 0; Switched off down at printing!
             }
             if (time<30e6){
                 pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.y += 10.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.z += -1.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.y += 5.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
+            }else if (time<60e6){
+                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
+                pathned.z += -0.5 * static_cast<float>(PERIOD) /1e6;
             }else{
                 pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
                 pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
@@ -244,27 +248,28 @@ void loop()
             float desiredL = 10;    // Testwise (could depend from velocity)
             deltaL = NormVector(trajectory_refgnd) - desiredL;
 
+        /*if (time<10e6){
+                trajectory_refgnd.x = 0.0;
+                trajectory_refgnd.y = 100.0;
+                trajectory_refgnd.z = -5.0;
+	}else{
+                trajectory_refgnd.x = 0.0;
+                trajectory_refgnd.y = 100.0;
+                trajectory_refgnd.z = 0.0;
+        }*/
+	deltaL = 0.5;
+			
             // Calculating the Acceleration out of
             aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
 
             // Access the control structure
             aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
             gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
-
-            aCMD_refbody.x = 0;
-            aCMD_refbody.y = 0;
-            if(time<6e6){
-                aCMD_refbody.z = 0.1;
-            }else if (time<10e6){
-                aCMD_refbody.z = 0.05;
-            }else if (time<15e6){
-                aCMD_refbody.z = 0.0;
-            }else if (time<20e6){
-                aCMD_refbody.z = 1.0;
-            }else{
-                aCMD_refbody.z = 0.0;
-            }
-            deltaL = 1;
+			
+			// Restricting the max acceleration to ~|1|, because of gains. Divide all by 30 -> max 3G acceleration???????????
+            aCMD_refbody.x = aCMD_refbody.x / 10;
+            aCMD_refbody.y = aCMD_refbody.y / 10;
+            aCMD_refbody.z = aCMD_refbody.z / -10;
 
             aCMD_refbody.x -= gCMD_refbody.x;
             aCMD_refbody.y -= gCMD_refbody.y;
@@ -294,10 +299,10 @@ void loop()
 
         // Printing in 20mx cycle
         if (firstLoop){
-            hal.console->printf("P_des.x,P_des.y,P_des.z,L_is.x,L_is.y,L_is.z,Delta_L,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,Throttle,Aileron,Rudder,Elevator\n");
+            hal.console->printf("errorAileron,errorRudder,errorElevator,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z,Throttle\n");
             firstLoop = 0; //Switch off at temp path when this here is removed!
         }
-        //hal.console->printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,deltaL,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,stSig.throttle,stSig.aileron,stSig.rudder,stSig.elevator);
+        hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
 
         // Printing in 1 sec cycle
         if(time >= nextPrint) {
@@ -315,6 +320,7 @@ void loop()
                 //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
                 //hal.console->printf("deltaL: %f, traj: (%f,%f,%f)\n\n",deltaL,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
+                //hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
         }
 
         // Output PWM

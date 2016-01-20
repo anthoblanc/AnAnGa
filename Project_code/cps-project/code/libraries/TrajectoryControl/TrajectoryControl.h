@@ -174,15 +174,15 @@ class TrajectoryController {
 				// Choose the y-Component
 				t_fRudderPID = aCMDbSubG.y;
 				// Give the error of the Rudder to the Rudder-PID
-                                t_cOut.rudder = m_cPIDs[Rudder]->update(-stateVars.phiThetaPsi.z/*t_fRudderPID*/);
-				// Elevator
+                                t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
+                                // Elevator
 				// Choose the z-component of the acceleration subtracted by gravity
 				t_fElevatorPID = aCMDbSubG.z;
 				// Give the error of the Elevator to the Elevator-PID
 				t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
-
+hal.console->printf("%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID);
                                 if (time >= nextPrint){
-                                    hal.console->printf("is: (%f,%f), desired: (%f,%f)\nerror: %f, out:%f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID,t_cOut.aileron);
+                                    //hal.console->printf("error: %f, out:%f\n\n",t_fRudderPID,t_cOut.rudder);
                                 }
 				
 			}
