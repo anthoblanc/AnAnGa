@@ -180,7 +180,7 @@ class TrajectoryController {
 				t_fElevatorPID = aCMDbSubG.z;
 				// Give the error of the Elevator to the Elevator-PID
 				t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
-hal.console->printf("%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID);
+//hal.console->printf("%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID);
                                 if (time >= nextPrint){
                                     //hal.console->printf("error: %f, out:%f\n\n",t_fRudderPID,t_cOut.rudder);
                                 }
