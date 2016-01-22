@@ -6,6 +6,19 @@
 /*##########################################################################################
                                    General Math Operations  
   ########################################################################################## */
+
+//Vector Addition
+struct vector addVector (const struct vector x, const struct vector y){
+
+        struct vector z;
+
+        z.x = x.x+y.x;
+        z.y = x.y+y.y;
+        z.z = x.z+y.z;
+
+        return(z);
+}
+
 // Cross Product
 struct vector CrossProduct (const struct vector x, const struct vector y) {
 	
