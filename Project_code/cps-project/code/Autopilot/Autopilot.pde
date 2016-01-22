@@ -98,11 +98,11 @@ float constrain(float val, float min, float max)
 // Own Libraries
 #include <PID.h>
 #include <formulasForStateVariables.h>
-#include <TrajectoryControl.h>
+#include "../libraries/TrajectoryControl/TrajectoryControl.h"
 #include <StandardController.h>
 #include <Path.h>
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"
-#include <Interface.hpp>
+#include "../libraries/Interface/Interface.hpp"
 
 struct vector trajectory_refgnd; //contain the direction of the path "L"
 
@@ -116,8 +116,8 @@ struct SteeringSignals stSig;
 // Construct the Aerobatic Trajectory Controller
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
 
-// Variables for reading the hal.console  <------- Testwise!
-char consoleInRaw[21];   // limit to 20 characters
+// Interface
+Interface intface();
 
 // setup: called once at boot
 void setup()
@@ -165,14 +165,14 @@ void loop()
         }
 
         // Read console data from COM-PORT. Only 20 characters allowed
-        i = 0;
+        /*i = 0;
         consoleInRaw[0] = '\0';
         while(hal.console->available() && i<20) {
             consoleInRaw[i] = hal.console->read();
             i++;
         }
         consoleInRaw[20] = '\0';
-        // go to the Interface-Handler
+        */// go to the Interface-Handler
         /*if (consoleInRaw[0]!='\0'){
             interface.update(consoleInRaw);
         }*/

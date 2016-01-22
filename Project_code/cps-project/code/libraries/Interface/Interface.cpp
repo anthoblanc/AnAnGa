@@ -1,5 +1,8 @@
 #include <Interface.hpp>
 
-Interface::Interface(AP_HAL::HAL& hal){}
+Interface::Interface(){
+
+
+}
 
 void Interface::update(char inputString){}
