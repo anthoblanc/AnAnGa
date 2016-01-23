@@ -53,7 +53,7 @@ struct SteeringSignals stSig;
 // Construct the Aerobatic Trajectory Controller
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
 float deltaL, phiRef=0;
-struct vector aCMD_refin, gCMD_refin = {0,0,-9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
+struct vector aCMD_refin, gCMD_refin = {0,0,9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
 int8_t aerobatOn = 0;
 struct StateVariables stateVars;
 
