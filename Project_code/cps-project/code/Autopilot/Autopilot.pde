@@ -117,7 +117,7 @@ struct SteeringSignals stSig;
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
 
 // Interface
-Interface intface();
+Interface intface(hal);
 
 // setup: called once at boot
 void setup()

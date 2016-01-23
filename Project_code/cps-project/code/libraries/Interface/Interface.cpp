@@ -1,7 +1,6 @@
-#include <Interface.hpp>
 
-Interface::Interface(){
 
+Interface::Interface(const AP_HAL::HAL& hal) : m_rHAL(hal) {
 
 }
 
