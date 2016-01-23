@@ -39,6 +39,26 @@
 #define Kd_Speed 0
 #define Casc_Speed 1
 
+// Control Target
+#define TargetHeading 100.0
+#define TargetSpeed 15.0
+#define TargetAltitude -100.0
+
+// Control Bounds
+#define MaxPitch 30.0
+#define MaxRoll 30.0
+
+
+// Control targets
+struct ControlTargets {
+        float heading, altitude, speed;
+};
+
+// Hard bounds on the pitch and roll of the plane
+struct HardBounds {
+        float maxPitch, maxRoll;
+};
+
 
 // Declare PIDs
 struct PIDs {
@@ -61,10 +81,10 @@ public:
         StandardController( const AP_HAL::HAL& hal );
 
         // Instructions for the setup routine
-        void setup(struct ControlTargets& target, struct HardBounds& hardBound);
+        void setup();
 
         // Update Routine in the Main-Function
-        struct SteeringSignals update (const struct sample dataSample, const struct ControlTargets target, const struct HardBounds hardBound);
+        struct SteeringSignals update (const struct sample dataSample);
 
         // Getting values of the state variables of the plane
         struct vector getVector (const enum States x);
@@ -97,6 +117,9 @@ private:
         struct vector pnPePdDot;
         float groundSpeed;
         float groundSpeedDot;
+
+        struct ControlTargets target;
+        struct HardBounds hardBound;
 
 };
 

@@ -16,25 +16,25 @@ StandardController::StandardController( const AP_HAL::HAL& hal ) : m_rHAL(hal) {
 }
 
 // Instructions for the setup routine
-void StandardController::setup(struct ControlTargets& target, struct HardBounds& hardBound) {
+void StandardController::setup() {
         // Initial flight control targets, note altitude is down.
-        target.heading = 100.0*(M_PI/180.0);
-        target.speed = 15;
-        target.altitude = -100;
+        target.heading = TargetHeading*(M_PI/180.0);
+        target.speed = TargetSpeed;
+        target.altitude = TargetAltitude;
 
         // Compute error in heading, ensuring it is in the range -Pi to Pi
         if(target.heading>M_PI){target.heading = target.heading - 2*M_PI;}
         if(target.heading<-M_PI){target.heading = target.heading + 2*M_PI;}
 
         // Set maximum pitch and roll to 30 degrees.
-        hardBound.maxPitch = 30.0*(M_PI/180.0);
-        hardBound.maxRoll = 30.0*(M_PI/180.0);
+        hardBound.maxPitch = MaxPitch*(M_PI/180.0);
+        hardBound.maxRoll = MaxRoll*(M_PI/180.0);
 
         return;
 }
 
 // Update Routine in the Main-Function
-struct SteeringSignals StandardController::update (const struct sample dataSample, const struct ControlTargets target, const struct HardBounds hardBound){
+struct SteeringSignals StandardController::update (const struct sample dataSample){
 
         struct SteeringSignals out;
         struct StateVariables stateVars;
