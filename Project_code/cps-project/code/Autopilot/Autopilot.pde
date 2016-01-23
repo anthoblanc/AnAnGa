@@ -99,8 +99,8 @@ float constrain(float val, float min, float max)
 #include "../libraries/PID/PID.h"
 #include "../libraries/PID/formulasForStateVariables.h"
 #include "../libraries/TrajectoryControl/TrajectoryControl.h"
-#include "../libraries/PID/StandardController.h"
-#include <Path.h>
+#include "../libraries/StandardController/StandardController.h"
+#include "../libraries/Path/Path.h"
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"
 #include "../libraries/Interface/Interface.hpp"
 
