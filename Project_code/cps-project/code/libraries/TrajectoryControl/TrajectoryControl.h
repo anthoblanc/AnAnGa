@@ -82,7 +82,7 @@ private:
 #define IntLim_Aileron 1
 #define Casc_Aileron 1
 
-#define Kp_Rudder 1
+#define Kp_Rudder 0.00
 #define Ki_Rudder 0
 #define Kd_Rudder 0
 #define IntLim_Rudder 1

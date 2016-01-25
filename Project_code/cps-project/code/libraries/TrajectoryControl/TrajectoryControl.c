@@ -140,8 +140,8 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float DeltaL
                 // Aileron
                 // Acceleration in y-z-Plane
                 t_vaCMDbYZ.x = 0;
-                t_vaCMDbYZ.y = aCMDb.y;
-                t_vaCMDbYZ.z = aCMDb.z;
+                t_vaCMDbYZ.y = -aCMDb.y;
+                t_vaCMDbYZ.z = -aCMDb.z;
                 // Find suitable eRoll: Calculate eRoll,1
                 t_veRoll.x = 0;
                 t_veRoll.y = - sin(m_fPhiRef);
@@ -172,12 +172,13 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float DeltaL
                 t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
                 // Elevator
                 // Choose the z-component of the acceleration subtracted by gravity
-                t_fElevatorPID = aCMDbSubG.z;
+                t_fElevatorPID = -aCMDbSubG.z;
                 // Give the error of the Elevator to the Elevator-PID
                 t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
 //hal.console->printf("%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID);
                 if (time >= nextPrint){
-                    //hal.console->printf("error: %f, out:%f\n\n",t_fRudderPID,t_cOut.rudder);
+                    //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
+                    hal.console->printf("error: %f\n\n",t_fRudderPID);
                 }
 
         }
