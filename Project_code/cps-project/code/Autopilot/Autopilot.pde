@@ -212,17 +212,17 @@ void loop()
             deltaL = 0.5;
                 trajectory_refgnd.x = 0.0;
                 trajectory_refgnd.y = 100.0;
-                trajectory_refgnd.z = -10.0;
+                trajectory_refgnd.z = -30.0;
         }else{
             deltaL = 0.5;
                 trajectory_refgnd.x = 0.0;
-                trajectory_refgnd.y = 10.0;
-                trajectory_refgnd.z = 0.0;
+                trajectory_refgnd.y = 100.0;
+                trajectory_refgnd.z = -30.0;
         }
 
 
         // Calculating the Acceleration out of
-        aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
+        aCMD_refin = Get_Acc_straigth(hal,stateVars.pnPePdDot,trajectory_refgnd);
 
         // Access the control structure
         aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
@@ -243,7 +243,7 @@ void loop()
 
         // Printing in 20ms cycle
         if (firstLoop){
-            hal.console->printf("errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
+            hal.console->printf("VxL.x,VxL.y,VxL.z,normL,errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
             firstLoop = 0; //Switch off at temp path when this here is removed!
         }
         hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);

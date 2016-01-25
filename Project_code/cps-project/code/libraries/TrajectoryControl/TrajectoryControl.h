@@ -70,7 +70,7 @@ private:
 // Variables for the Trajectory Controller
 #define CO_Freq_LPF 0	// Cut-off frequency for the low-pass-filter of the derivatives
 
-#define Kp_Throttle 0.2
+#define Kp_Throttle 0.5
 #define Ki_Throttle 0
 #define Kd_Throttle 0
 #define IntLim_Throttle 1
@@ -88,7 +88,7 @@ private:
 #define IntLim_Rudder 1
 #define Casc_Rudder 1
 
-#define Kp_Elevator 1
+#define Kp_Elevator 0.2
 #define Ki_Elevator 0
 #define Kd_Elevator 0
 #define IntLim_Elevator 1
