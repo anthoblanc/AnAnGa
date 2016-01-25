@@ -132,6 +132,8 @@ void loop()
             interface.update(consoleInRaw);
         }*/
 
+
+
         // Updating the StandardController
         //stSig = stdCTRL.update(dataSample);
         //stSig.rudder=0;
@@ -173,7 +175,7 @@ void loop()
         */
 
         // Testwise desired Trajectory
-        if (firstLoop){
+/*        if (firstLoop){
             pathned.x = -365;
             pathned.y = -400;
             pathned.z = -0.87;
@@ -192,7 +194,7 @@ void loop()
             pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
-
+*/
 
         //***************************************************
         // Path Processing
@@ -206,17 +208,19 @@ void loop()
         float desiredL = 10;    // Testwise (could depend from velocity)
         deltaL = NormVector(trajectory_refgnd) - desiredL;
 
-        /*if (time<10e6){
+         if (time<10e6){
+            deltaL = 0.5;
                 trajectory_refgnd.x = 0.0;
                 trajectory_refgnd.y = 100.0;
-                trajectory_refgnd.z = -5.0;
-	}else{
+                trajectory_refgnd.z = -10.0;
+        }else{
+            deltaL = 0.5;
                 trajectory_refgnd.x = 0.0;
-                trajectory_refgnd.y = 100.0;
+                trajectory_refgnd.y = 10.0;
                 trajectory_refgnd.z = 0.0;
-        }*/
-	deltaL = 0.5;
-			
+        }
+
+
         // Calculating the Acceleration out of
         aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
 
@@ -227,21 +231,6 @@ void loop()
 
         //***************************************************
         // Controller
-
-        if (time<10e6){
-                aCMD_refbody.x = 0.0;
-                aCMD_refbody.y = 0.0;
-                aCMD_refbody.z = 0.0;
-        }else{
-                aCMD_refbody.x = 0.0;
-                aCMD_refbody.y = -1;
-                aCMD_refbody.z = -0.1;
-        }
-
-        // Restricting the max acceleration to ~|1|, because of gains. Divide all by 30 -> max 3G acceleration???????????
-        //aCMD_refbody.x = aCMD_refbody.x / 10;
-        //aCMD_refbody.y = aCMD_refbody.y / 10;
-        //aCMD_refbody.z = aCMD_refbody.z / -10;
 
         aCMD_refbody.x -= gCMD_refbody.x;
         aCMD_refbody.y -= gCMD_refbody.y;
@@ -254,10 +243,10 @@ void loop()
 
         // Printing in 20ms cycle
         if (firstLoop){
-            hal.console->printf("errorAileron,errorRudder,errorElevator,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z,Throttle\n");
+            hal.console->printf("errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
             firstLoop = 0; //Switch off at temp path when this here is removed!
         }
-        //hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
+        hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
 
         // Printing in 1 sec cycle
         if(time >= nextPrint) {
@@ -271,7 +260,7 @@ void loop()
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
                 //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
                 //hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
-                hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
+                //hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
                 //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
                 //hal.console->printf("deltaL: %f, traj: (%f,%f,%f)\n\n",deltaL,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);

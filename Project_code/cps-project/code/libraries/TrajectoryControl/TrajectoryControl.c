@@ -167,7 +167,7 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float DeltaL
                 aCMDbSubG.y = aCMDb.y + gCMDb.y;
                 aCMDbSubG.z = aCMDb.z + gCMDb.z;
                 // Choose the y-Component
-                t_fRudderPID = aCMDbSubG.y;
+                t_fRudderPID = -aCMDbSubG.y;
                 // Give the error of the Rudder to the Rudder-PID
                 t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
                 // Elevator
@@ -175,10 +175,11 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float DeltaL
                 t_fElevatorPID = -aCMDbSubG.z;
                 // Give the error of the Elevator to the Elevator-PID
                 t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
-//hal.console->printf("%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID);
+
+                hal.console->printf("%f,%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID,DeltaL);
                 if (time >= nextPrint){
                     //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
-                    hal.console->printf("error: %f\n\n",t_fRudderPID);
+                    //hal.console->printf("error: %f\n\n",t_fRudderPID);
                 }
 
         }

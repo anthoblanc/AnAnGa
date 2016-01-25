@@ -70,19 +70,19 @@ private:
 // Variables for the Trajectory Controller
 #define CO_Freq_LPF 0	// Cut-off frequency for the low-pass-filter of the derivatives
 
-#define Kp_Throttle 1
+#define Kp_Throttle 0.2
 #define Ki_Throttle 0
 #define Kd_Throttle 0
 #define IntLim_Throttle 1
 #define Casc_Throttle 1
 
-#define Kp_Aileron 0.3
+#define Kp_Aileron 0.2
 #define Ki_Aileron 0
 #define Kd_Aileron 0
 #define IntLim_Aileron 1
 #define Casc_Aileron 1
 
-#define Kp_Rudder 0.00
+#define Kp_Rudder 0.01
 #define Ki_Rudder 0
 #define Kd_Rudder 0
 #define IntLim_Rudder 1
