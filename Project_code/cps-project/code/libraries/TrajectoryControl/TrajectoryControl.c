@@ -176,7 +176,7 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float DeltaL
                 // Give the error of the Elevator to the Elevator-PID
                 t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
 
-                hal.console->printf("%f,%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID,DeltaL);
+                //hal.console->printf("%f,%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID,DeltaL);
                 if (time >= nextPrint){
                     //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
                     //hal.console->printf("error: %f\n\n",t_fRudderPID);

@@ -183,15 +183,15 @@ void loop()
         }
         if (time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 5.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 1.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
         }else if (time<60e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += -0.5 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 5.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += -0.1 * static_cast<float>(PERIOD) /1e6;
         }else{
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 5.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
 */
@@ -204,22 +204,21 @@ void loop()
         trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
         trajectory_refgnd.z = pathned.z - stateVars.pnPePd.z;
 
-        // Calculating Delta L
-        float desiredL = 10;    // Testwise (could depend from velocity)
-        deltaL = NormVector(trajectory_refgnd) - desiredL;
-
-         if (time<10e6){
-            deltaL = 0.5;
+        /*if (time<10e6){
+                    deltaL = 0;
                 trajectory_refgnd.x = 0.0;
-                trajectory_refgnd.y = 100.0;
+                trajectory_refgnd.y= 100.0;
                 trajectory_refgnd.z = -30.0;
         }else{
-            deltaL = 0.5;
+            deltaL = 0;
                 trajectory_refgnd.x = 0.0;
                 trajectory_refgnd.y = 100.0;
                 trajectory_refgnd.z = -30.0;
-        }
+        }*/
 
+        // Calculating Delta L
+        float desiredL = 100;    // Testwise (could depend from velocity)
+        deltaL = NormVector(trajectory_refgnd) - desiredL;
 
         // Calculating the Acceleration out of
         aCMD_refin = Get_Acc_straigth(hal,stateVars.pnPePdDot,trajectory_refgnd);
@@ -243,10 +242,10 @@ void loop()
 
         // Printing in 20ms cycle
         if (firstLoop){
-            hal.console->printf("VxL.x,VxL.y,VxL.z,normL,errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
+            //hal.console->printf("VxL.x,VxL.y,VxL.z,normL,errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
             firstLoop = 0; //Switch off at temp path when this here is removed!
         }
-        hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
+        //hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
 
         // Printing in 1 sec cycle
         if(time >= nextPrint) {
@@ -254,17 +253,17 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+                hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
 
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
                 //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
                 //hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
-                //hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
+                hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
                 //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
                 //hal.console->printf("deltaL: %f, traj: (%f,%f,%f)\n\n",deltaL,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
-                //hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
+                hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
         }
 
 

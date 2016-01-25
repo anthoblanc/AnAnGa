@@ -15,7 +15,7 @@ struct vector Get_Acc_straigth(const AP_HAL::HAL& hal,struct vector velocity_ref
         norm_L_squared = 2/ScalarProduct(trajectory_refgnd,trajectory_refgnd);
 	
         acc_cmd = CrossProduct(velocity_refgnd,trajectory_refgnd);
-    hal.console->printf("%f,%f,%f,%f,",acc_cmd.x,acc_cmd.y,acc_cmd.z,norm_L_squared);
+    //hal.console->printf("%f,%f,%f,%f,",acc_cmd.x,acc_cmd.y,acc_cmd.z,norm_L_squared);
         acc_cmd=CrossProduct(acc_cmd,velocity_refgnd); // V*L*V
 	
 	//product with a scalar

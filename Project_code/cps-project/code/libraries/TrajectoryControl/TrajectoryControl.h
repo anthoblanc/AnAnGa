@@ -71,7 +71,7 @@ private:
 #define CO_Freq_LPF 0	// Cut-off frequency for the low-pass-filter of the derivatives
 
 #define Kp_Throttle 0.5
-#define Ki_Throttle 0
+#define Ki_Throttle 0.2
 #define Kd_Throttle 0
 #define IntLim_Throttle 1
 #define Casc_Throttle 1
@@ -88,9 +88,9 @@ private:
 #define IntLim_Rudder 1
 #define Casc_Rudder 1
 
-#define Kp_Elevator 0.2
-#define Ki_Elevator 0
-#define Kd_Elevator 0
+#define Kp_Elevator 0.1
+#define Ki_Elevator 0.05
+#define Kd_Elevator 0.0
 #define IntLim_Elevator 1
 #define Casc_Elevator 1
 
