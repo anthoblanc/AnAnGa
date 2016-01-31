@@ -12,7 +12,7 @@ PIDcontroller::PIDcontroller (const float Kp, const float Ki, const float Kd, co
         m_fIntegralLimit = 100;
         m_fPrevUpdateError = 0;
         m_fPrevDerivative = 0;
-        m_fAlpha = 0;
+        m_fAlpha = 1;
 
         if( m_iDt == 0) {
                 //Fehlerroutine
@@ -33,7 +33,7 @@ void PIDcontroller::setIntegralLimit (const float integralLimit) {
 
 // Setting the Low-Pass-Filter cut-off-frequency
 void PIDcontroller::setLPFfrequency (const float RC) {
-        m_fAlpha = static_cast<float>(m_iDt) / (RC + static_cast<float>(m_iDt) );
+        m_fAlpha = static_cast<float>(m_iDt)/1e6 / (RC + static_cast<float>(m_iDt)/1e6 );
         return;
 }
 

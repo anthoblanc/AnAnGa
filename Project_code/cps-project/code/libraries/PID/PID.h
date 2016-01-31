@@ -1,6 +1,8 @@
 #ifndef PID_H
 #define PID_H
 
+//using namespace std;	// Delete, when in Linux, activate, when in Windows
+
 float rollPIDOut = 0;
 float pitchPIDOut = 0;
 float speedPIDOut = 0;
