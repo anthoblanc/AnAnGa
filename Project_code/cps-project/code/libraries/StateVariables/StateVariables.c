@@ -1,12 +1,3 @@
-#ifndef FORMULASFORSTATEVARIABLES_H
-#define FORMULASFORSTATEVARIABLES_H
-
-
-// Declaration of a 3-dimensional vector
-struct vector {
-    float x,y,z;
-};
-
 
 // Formulas for calculating derivatives of the state variables
 struct vector derivativeAngularRate( struct vector pqr, struct vector phiThetaPsi ){
@@ -93,11 +84,6 @@ struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaP
 }
 
 // From the measured data of the plane, calculate all necessary state variables.
-struct StateVariables {
-	struct vector uvw, uvwDot ,pqr, phiThetaPsi, phiThetaPsiDot, pnPePd, pnPePdDot;
-	float groundSpeed, groundSpeedDot;
-};
-
 struct StateVariables calculateStateVariables (const struct sample dataSample) {
 	
 	struct StateVariables out;
@@ -131,5 +117,3 @@ struct StateVariables calculateStateVariables (const struct sample dataSample) {
 	
 	return(out);
 }
-
-#endif

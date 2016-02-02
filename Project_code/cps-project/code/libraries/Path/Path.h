@@ -1,7 +1,7 @@
 #ifndef __PATH_H__
 #define __PATH_H__
 
-#include "../PID/formulasForStateVariables.h"
+
 // problem: desired y - current y = negative
 
 struct vector traj_initialize (struct vector current_location) { // initialize positions of the plane

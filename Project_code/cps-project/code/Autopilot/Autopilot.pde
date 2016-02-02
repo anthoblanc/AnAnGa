@@ -1,10 +1,11 @@
-/// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil 
+/// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil
 #define THISFIRMWARE "CPS-Autopilot-Project"
 
-/* ######################
-         Library
-   ###################### */
+//***************************************************
+// Libraries
+//***************************************************
 
+// All standard configurations
 #include <AP_Common.h>
 #include <AP_HAL.h>
 #include <AP_HAL_AVR.h>
@@ -17,126 +18,52 @@
 #include <AP_Notify.h>
 #include <AP_Curve.h>
 
+#include <StandardConfiguration.h>
 
-/* ######################
-        Define Vaue
-   ###################### */
-
-// Loop period in microseconds
-#define PERIOD 20000
-
-// Hardware Abstraction Layer
-const AP_HAL::HAL& hal = AP_HAL_BOARD_DRIVER;
-
-// Number of data points sent by the simulator
-#define DATAPOINTS 15
-
-// Indices into array of data. Example: sample.data.f[I_PSI] gives you
-// the heading.
-#define I_AX 0
-#define I_AY 1
-#define I_AZ 2
-#define I_P 3
-#define I_Q 4
-#define I_R 5
-#define I_PHI 6
-#define I_THETA 7
-#define I_PSI 8
-#define I_LAT 9
-#define I_LON 10
-#define I_ALT 11
-#define I_VX 12
-#define I_VY 13
-#define I_VZ 14
-
-#define SERVO_MIN 1000 // Minimum duty cycle for PWM output from generic control
-#define SERVO_MID 1500 // Mid duty cycle for PWM output from generic control
-#define SERVO_MAX 2000 // Maximum duty cycle for PWM output from generic control
-
-
-
-/* ######################
-            Data
-   ###################### */
-
-// Data structure for each data sample. The data union is an array
-// that can be accessed by bytes or by floats. Float access is for
-// actually using data points. Byte access is for use by I2C code.
-struct sample {
-    union {
-        float f[DATAPOINTS];
-        uint8_t raw[DATAPOINTS * sizeof(float)];
-    } data;
-};
-
-// Data storage
-struct sample dataSample;
-
-// Control targets
-struct ControlTargets {
-	float heading, altitude, speed;
-};
-struct ControlTargets target;
-
-// Hard bounds on the pitch and roll of the plane
-struct HardBounds {
-	float maxPitch, maxRoll;
-};
-struct HardBounds hardBound;
-
-// Time of next PWM output
-uint32_t nextWrite;
-
-// Time of next serial output
-uint32_t nextPrint;
-
-// mod ensures that val is between min and max. This is mostly used
-// for ensuring that angles are within the range -Pi to Pi.
-
-// Path start end time
-uint32_t tstart = 30000000; // path starting time
-uint32_t tend = 50000000; // path ending time
-
-// constrain bounds val to at least min and at most max.
-float constrain(float val, float min, float max)
-{
-    if(val < min) {
-        return min;
-    } else if(val > max) {
-        return max;
-    } else {
-        return val;
-    }
-}
 
 // Own Libraries
-#include <PID.h>
-#include <formulasForStateVariables.h>
-#include <TrajectoryControl.h>
-#include <StandardController.h>
-#include <Path.h>
+#include "../libraries/PID/PID.h"
+#include "../libraries/StateVariables/StateVariables.h"
+#include "../libraries/TrajectoryControl/TrajectoryControl.h"
+#include "../libraries/StandardController/StandardController.h"
+#include "../libraries/Path/Path.h"
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"
-#include <Interface.hpp>
+#include "../libraries/Interface/Interface.hpp"
+#include "generateOutSignals.h"
+
+
+//***************************************************
+// Variable Declaration
+//***************************************************
 
 struct vector trajectory_refgnd; //contain the direction of the path "L"
+
+// Path start end time
+uint32_t tstart = 20e6; // path starting time
+uint32_t tend = 30e6; // path ending time
 
 // temporary variables
 uint8_t firstLoop = 1;
 
 // Construct Standard Controller
-StandardController stdCTRL(hal);
+//StandardController stdCTRL(hal);
+
 struct SteeringSignals stSig;
 
 // Construct the Aerobatic Trajectory Controller
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
+float deltaL, phiRef=0;
+struct vector aCMD_refin, gCMD_refin = {0,0,9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
+int8_t aerobatOn = 0;
+struct StateVariables stateVars;
 
-// Variables for reading the hal.console  <------- Testwise!
-char consoleInRaw[21];   // limit to 20 characters
+// Interface
+Interface intface(hal);
 
 
-/* ######################
-            Setup
-   ###################### */
+//***************************************************
+// Setup cycle
+//***************************************************
 
 // setup: called once at boot
 void setup()
@@ -148,12 +75,12 @@ void setup()
     for(i = 0; i < DATAPOINTS; i++) {
         dataSample.data.f[i] = 0.0;
     }
-	
-	// Set Constrains to flight manouvers and define Flight directions
-	stdCTRL.setup(target, hardBound);
-	
-	// Make all settings for the Aerobatic Trajectory Controller
-	setupTrCTRL(trCTRL);
+
+    // StandardController: Set Constrains to flight manouvers and define Flight directions
+    //stdCTRL.setup();
+
+    // Trajectory Controller: Make all settings for the Aerobatic Trajectory Controller
+    setupTrCTRL(trCTRL);
 
     // Enable PWM output on channels 0 to 3
     hal.rcout->enable_ch(0);
@@ -165,12 +92,13 @@ void setup()
     // Set next times for PWM output, serial output, and target change
     nextWrite = hal.scheduler->micros() + PERIOD;
     nextPrint = hal.scheduler->micros() + 1000000;
-    
+
 }
 
-/* ######################
-            Loop
-   ###################### */
+
+//***************************************************
+// Loop Cycle
+//***************************************************
 
 // loop: called repeatedly in a loop
 void loop()
@@ -187,143 +115,167 @@ void loop()
             i++;
         }
 
+
+        //***************************************************
+        // Interface
+
         // Read console data from COM-PORT. Only 20 characters allowed
-        i = 0;
+        /*i = 0;
         consoleInRaw[0] = '\0';
         while(hal.console->available() && i<20) {
             consoleInRaw[i] = hal.console->read();
             i++;
         }
         consoleInRaw[20] = '\0';
-        // go to the Interface-Handler
+        */// go to the Interface-Handler
         /*if (consoleInRaw[0]!='\0'){
             interface.update(consoleInRaw);
         }*/
 
-		
-            // Updating the StandardController
-            //stSig = stdCTRL.update(dataSample, target, hardBound);
-            //stSig.rudder=0;
-		
-            // Updating the Aerobatic Trajectory Controller
-            float deltaL, phiRef=0;
-            struct vector aCMD_refin, gCMD_refin = {0,0,-9.81}, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
-            int8_t aerobatOn = 0;
 
-            // From the measured data of the plane, calculate all necessary state variables.
-            struct StateVariables stateVars;
-            stateVars = calculateStateVariables (dataSample);
-			
-			
-			
-            /*	// Path Control
-                // use two points before loop to decide direction
-                if (time <tstart){     //
-                trajectory_refgnd.x = 6;
-                trajectory_refgnd.y = 80;
-                 trajectory_refgnd.z = -10;
-                }
-                if (time >= (tstart - 1500000) && time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
-                pnPePdtmp0 = stateVars.pnPePd;
-                }
-                 if(time >= (tstart - 5000000) && time <= tstart) { // coordinate just before loop
-                 pnPePdtmp = stateVars.pnPePd;
-                 }
-                // 20s -> 40s, perform loop, give target coordinates two secs in the future
-                if(time >= tstart && time <= tend)
-                {
-                    pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
 
-                    //calculate the deisred path "L"
-                    trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
-                    trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
-                    trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;
-                }
-            */
+        // Updating the StandardController
+        //stSig = stdCTRL.update(dataSample);
+        //stSig.rudder=0;
 
-            // Testwise desired Trajectory
-            if (firstLoop){
-                pathned.x = -365;
-                pathned.y = -400;
-                pathned.z = -0.87;
+
+        //***************************************************
+        // Measurements of the plane
+
+        // From the measured data of the plane, calculate all necessary state variables.
+        stateVars = calculateStateVariables (dataSample);
+
+
+        //***************************************************
+        // Path Generation
+
+        /*	// Path Control
+            // use two points before loop to decide direction
+            if (time <tstart){     //
+            trajectory_refgnd.x = 6;
+            trajectory_refgnd.y = 80;
+             trajectory_refgnd.z = -10;
+            }
+            if (time >= (tstart - 1500000) && time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
+            pnPePdtmp0 = stateVars.pnPePd;
+            }
+             if(time >= (tstart - 5000000) && time <= tstart) { // coordinate just before loop
+             pnPePdtmp = stateVars.pnPePd;
+             }
+            // 20s -> 40s, perform loop, give target coordinates two secs in the future
+            if(time >= tstart && time <= tend)
+            {
+                pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
+
+                //calculate the deisred path "L"
+                trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
+                trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
+                trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;
+            }
+        */
+        if (firstLoop){
+                pathned = traj_initialize(stateVars.pnPePd);
+
                 //firstLoop = 0; Switched off down at printing!
             }
-            if (time<30e6){
-                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.y += 5.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
-            }else if (time<60e6){
-                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.z += -0.5 * static_cast<float>(PERIOD) /1e6;
-            }else{
-                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
-                pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
+          if (time<10e6){
+            pathned.x += 0.0 *  static_cast<float>(PERIOD) /1e6;
+            pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z -= 20.0 * static_cast<float>(PERIOD) /1e6;
+
+                trajectory_refgnd = traj_takeoff(pathned, stateVars.pnPePd, stateVars.pnPePd);
+                }else if (time<20e6){
+                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.x * static_cast<float>(PERIOD) /1e6;
+                pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.y * static_cast<float>(PERIOD) /1e6;
+                pathned.z -= 40.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.z * static_cast<float>(PERIOD) /1e6;
+
+                trajectory_refgnd = traj_climbup(pathned, stateVars.pnPePd, stateVars.pnPePd);
+                }
+
+            else if (time<30e6){
+                trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, time, tstart, tend);
+            }
+            else {
+            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.x * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.y * static_cast<float>(PERIOD) /1e6;
+            pathned.z -= 40.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.z * static_cast<float>(PERIOD) /1e6;
+
+            trajectory_refgnd = traj_climbup(pathned, stateVars.pnPePd, stateVars.pnPePdDot);
             }
 
-            // Calculating differential Trajectory
-            trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
-            trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
-            trajectory_refgnd.z = pathned.z - stateVars.pnPePd.z;
+        // Testwise desired Trajectory
+/*        if (firstLoop){
+            pathned.x = -365;
+            pathned.y = -400;
+            pathned.z = -0.87;
+            //firstLoop = 0; Switched off down at printing!
+        }
+        if (time<30e6){
+            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 5.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
+        }else if (time<60e6){
+            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += -0.5 * static_cast<float>(PERIOD) /1e6;
+        }else{
+            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
+        }
 
-            // Calculating Delta L
-            float desiredL = 10;    // Testwise (could depend from velocity)
-            deltaL = NormVector(trajectory_refgnd) - desiredL;
 
-        /*if (time<10e6){
+        //***************************************************
+        // Path Processing
+
+        // Calculating differential Trajectory
+        trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
+        trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
+        trajectory_refgnd.z = pathned.z - stateVars.pnPePd.z;
+*/
+        // Calculating Delta L
+        float desiredL = 100;    // Testwise (could depend from velocity)
+        deltaL = NormVector(trajectory_refgnd) - desiredL;
+
+  /*      if (time<10e6){
+            deltaL = 0.5;
                 trajectory_refgnd.x = 0.0;
                 trajectory_refgnd.y = 100.0;
-                trajectory_refgnd.z = -5.0;
-	}else{
+                trajectory_refgnd.z = -30.0;
+        }else{
+            deltaL = 0.5;
                 trajectory_refgnd.x = 0.0;
                 trajectory_refgnd.y = 100.0;
-                trajectory_refgnd.z = 0.0;
-        }*/
-	deltaL = 0.5;
-			
-            // Calculating the Acceleration out of
-            aCMD_refin = Get_Acc_straigth(stateVars.pnPePdDot,trajectory_refgnd);
+                trajectory_refgnd.z = -30.0;
+        }
+*/
 
-            // Access the control structure
-            aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
-            gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
-			
-			// Restricting the max acceleration to ~|1|, because of gains. Divide all by 30 -> max 3G acceleration???????????
-            aCMD_refbody.x = aCMD_refbody.x / 10;
-            aCMD_refbody.y = aCMD_refbody.y / 10;
-            aCMD_refbody.z = aCMD_refbody.z / -10;
+        // Calculating the Acceleration out of
+        aCMD_refin = Get_Acc_straigth(hal,stateVars.pnPePdDot,trajectory_refgnd);
 
-            aCMD_refbody.x -= gCMD_refbody.x;
-            aCMD_refbody.y -= gCMD_refbody.y;
-            aCMD_refbody.z -= gCMD_refbody.z;
-            stSig = trCTRL.update(time,deltaL,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
+        // Access the control structure
+        aCMD_refbody = NEDtoBODY (aCMD_refin, stateVars.phiThetaPsi);
+        gCMD_refbody = NEDtoBODY (gCMD_refin, stateVars.phiThetaPsi);
 
 
-		
-        // Constrain all control surface outputs to the range -1 to 1
-        float aileronL = -1 * constrain(stSig.aileron, -1, 1);
-        float aileronR = constrain(stSig.aileron, -1, 1);
-        float elevatorL = constrain(stSig.elevator, -1, 1);
-        float elevatorR = constrain(stSig.elevator, -1, 1);
-        float throttle = constrain(stSig.throttle, -1, 1);
-        float rudder = constrain(stSig.rudder, -1, 1);
+        //***************************************************
+        // Controller
+
+        aCMD_refbody.x -= gCMD_refbody.x;
+        aCMD_refbody.y -= gCMD_refbody.y;
+        aCMD_refbody.z -= gCMD_refbody.z;
+        stSig = trCTRL.update(time,deltaL,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
 
 
-        // Compute duty cycle for PWM output from generic control
-        int16_t aileronLOut = ((aileronL+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
-        int16_t aileronROut = ((aileronR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
-        int16_t elevatorLOut = ((elevatorL+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
-        int16_t elevatorROut = ((elevatorR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
-        int16_t throttleOut = ((throttle+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
-        int16_t rudderOut = ((rudder+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
+        //***************************************************
+        // Print to Console
 
-        // Printing in 20mx cycle
+        // Printing in 20ms cycle
         if (firstLoop){
-            hal.console->printf("errorAileron,errorRudder,errorElevator,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z,Throttle\n");
+            hal.console->printf("VxL.x,VxL.y,VxL.z,normL,errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
             firstLoop = 0; //Switch off at temp path when this here is removed!
         }
-        hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
+        //hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
 
         // Printing in 1 sec cycle
         if(time >= nextPrint) {
@@ -331,7 +283,7 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+                hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
 
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
@@ -341,8 +293,15 @@ void loop()
                 //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
                 //hal.console->printf("deltaL: %f, traj: (%f,%f,%f)\n\n",deltaL,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
-                //hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
+                hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
         }
+
+
+        //***************************************************
+        // Generate and Send output signals
+
+        //generate Outupt signals
+        generateOutSignals(stSig, aileronLOut,aileronROut,elevatorLOut,elevatorROut,throttleOut,rudderOut);
 
         // Output PWM
         hal.rcout->write(0, throttleOut);
