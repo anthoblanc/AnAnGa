@@ -1,5 +1,18 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil
+
+
+//***************************************************
+// Define
+//***************************************************
 #define THISFIRMWARE "CPS-Autopilot-Project"
+
+
+//zeros time space zone
+#define zero_space_size 5
+#define center_zero_space_x 0
+#define center_zero_space_y 0.6
+#define center_zero_space_z -0.06
+
 
 //***************************************************
 // Libraries
@@ -31,7 +44,6 @@
 #include "../libraries/Interface/Interface.hpp"
 #include "generateOutSignals.h"
 
-
 //***************************************************
 // Variable Declaration
 //***************************************************
@@ -60,6 +72,10 @@ struct StateVariables stateVars;
 // Interface
 Interface intface(hal);
 
+//time management
+uint32_t relative_time=hal.scheduler->micros(); //time from the last initialisation
+uint32_t zero_time=hal.scheduler->micros(); //time of the last initialisation
+uint32_t hardware_time = hal.scheduler->micros(); // real hadware time
 
 //***************************************************
 // Setup cycle
@@ -92,7 +108,6 @@ void setup()
     // Set next times for PWM output, serial output, and target change
     nextWrite = hal.scheduler->micros() + PERIOD;
     nextPrint = hal.scheduler->micros() + 1000000;
-
 }
 
 
@@ -103,8 +118,21 @@ void setup()
 // loop: called repeatedly in a loop
 void loop()
 {
-    uint32_t time = hal.scheduler->micros();
-    if(time >= nextWrite) {
+    hardware_time = hal.scheduler->micros(); // real hadware time 
+    relative_time=hardware_time-zero_time;
+
+    /* zero space time:
+    Manage the plane crash or reinitialsiation*/
+    if( ( fabs(stateVars.pnPePd.x-center_zero_space_x) < zero_space_size )
+    &&  ( fabs(stateVars.pnPePd.y-center_zero_space_y) < zero_space_size )
+    &&  ( fabs(stateVars.pnPePd.z-center_zero_space_z) < zero_space_size ) )
+    {
+        relative_time = 0;
+        zero_time=hal.scheduler->micros();
+    }
+    //----//
+
+    if(hardware_time >= nextWrite) {
         nextWrite += PERIOD;
 
         // Read sensor data from emulation adapter
@@ -151,21 +179,21 @@ void loop()
 
         /*	// Path Control
             // use two points before loop to decide direction
-            if (time <tstart){     //
+            if (hardware_time <tstart){     //
             trajectory_refgnd.x = 6;
             trajectory_refgnd.y = 80;
              trajectory_refgnd.z = -10;
             }
-            if (time >= (tstart - 1500000) && time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
+            if (hardware_time >= (tstart - 1500000) && hardware_time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
             pnPePdtmp0 = stateVars.pnPePd;
             }
-             if(time >= (tstart - 5000000) && time <= tstart) { // coordinate just before loop
+             if(hardware_time >= (tstart - 5000000) && hardware_time <= tstart) { // coordinate just before loop
              pnPePdtmp = stateVars.pnPePd;
              }
             // 20s -> 40s, perform loop, give target coordinates two secs in the future
-            if(time >= tstart && time <= tend)
+            if(hardware_time >= tstart && hardware_time <= tend)
             {
-                pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
+                pathned = pathloop ( pnPePdtmp0, pnPePdtmp, hardware_time, tstart, tend );
                 //calculate the deisred path "L"
                 trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
                 trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
@@ -177,13 +205,13 @@ void loop()
 
                 //firstLoop = 0; Switched off down at printing!
             }
-          if (time<10e6){
+          if (hardware_time<10e6){
             pathned.x += 0.0 *  static_cast<float>(PERIOD) /1e6;
             pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z -= 20.0 * static_cast<float>(PERIOD) /1e6;
 
                 trajectory_refgnd = traj_takeoff(pathned, stateVars.pnPePd, stateVars.pnPePd);
-                }else if (time<20e6){
+                }else if (hardware_time<20e6){
                 pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.x * static_cast<float>(PERIOD) /1e6;
                 pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.y * static_cast<float>(PERIOD) /1e6;
                 pathned.z -= 40.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.z * static_cast<float>(PERIOD) /1e6;
@@ -191,8 +219,8 @@ void loop()
                 trajectory_refgnd = traj_climbup(pathned, stateVars.pnPePd, stateVars.pnPePd);
                 }
 
-            else if (time<30e6){
-                trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, time, tstart, tend);
+            else if (hardware_time<30e6){
+                trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, hardware_time, tstart, tend);
             }
             else {
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.x * static_cast<float>(PERIOD) /1e6;
@@ -209,11 +237,11 @@ void loop()
             pathned.z = -0.87;
             //firstLoop = 0; Switched off down at printing!
         }
-        if (time<30e6){
+        if (hardware_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 5.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
-        }else if (time<60e6){
+        }else if (hardware_time<60e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -0.5 * static_cast<float>(PERIOD) /1e6;
@@ -233,7 +261,7 @@ void loop()
         float desiredL = 100;    // Testwise (could depend from velocity)
         deltaL = NormVector(trajectory_refgnd) - desiredL;
 
-  /*      if (time<10e6){
+  /*      if (hardware_time<10e6){
             deltaL = 0.5;
                 trajectory_refgnd.x = 0.0;
                 trajectory_refgnd.y = 100.0;
@@ -260,7 +288,7 @@ void loop()
         aCMD_refbody.x -= gCMD_refbody.x;
         aCMD_refbody.y -= gCMD_refbody.y;
         aCMD_refbody.z -= gCMD_refbody.z;
-        stSig = trCTRL.update(time,deltaL,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
+        stSig = trCTRL.update(hardware_time,deltaL,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
 
 
         //***************************************************
@@ -274,7 +302,7 @@ void loop()
         //hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
 
         // Printing in 1 sec cycle
-        if(time >= nextPrint) {
+        if(hardware_time >= nextPrint) {
             // Print some status
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
