@@ -166,7 +166,6 @@ void loop()
             if(time >= tstart && time <= tend)
             {
                 pathned = pathloop ( pnPePdtmp0, pnPePdtmp, time, tstart, tend );
-
                 //calculate the deisred path "L"
                 trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
                 trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
@@ -223,11 +222,8 @@ void loop()
             pathned.y += 15.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
-
-
         //***************************************************
         // Path Processing
-
         // Calculating differential Trajectory
         trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
         trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
