@@ -37,7 +37,7 @@ class StateVariables {
 public:
 	struct vector uvw, uvwDot ,pqr, phiThetaPsi, phiThetaPsiDot, pnPePd, pnPePdDot;
 	float groundSpeed, groundSpeedDot;
-        struct vector pnPePdDotDot;
+        struct vector pnPePdDotDot, accelerationBodyFrame;
 
         // Copies the state variables from the given class reference
         void importData (StateVariables refStateVars);

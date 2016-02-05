@@ -50,6 +50,16 @@ struct vector derivativeVelocity( struct vector uvw, struct vector phiThetaPsi )
 	return(out);
 }
 
+struct vector derivativeBodyVelocity( struct vector pqr, struct vector uvw, struct vector acc){
+
+    struct vector out;
+    out.x = pqr.z*uvw.y - pqr.y*uvw.z + acc.x;
+    out.y = pqr.x*uvw.z - pqr.z*uvw.x + acc.y;
+    out.z = pqr.y*uvw.x - pqr.x*uvw.y + acc.z;
+
+    return(out);
+}
+
 
 // Formulas for calculating the vehicle-velocity plus the vehicle-acceleration
 float velocity( struct vector uvw ){
@@ -135,6 +145,8 @@ void StateVariables::importData (StateVariables refStateVars){
     pnPePdDot.importVector(refStateVars.pnPePdDot);
     groundSpeed = refStateVars.groundSpeed;
     groundSpeedDot = refStateVars.groundSpeedDot;
+    pnPePdDotDot.importVector(refStateVars.pnPePdDotDot);
+    accelerationBodyFrame.importVector(refStateVars.accelerationBodyFrame);
 
 }
 
@@ -148,9 +160,9 @@ struct StateVariables calculateStateVariables (const struct sample dataSample) {
 	out.uvw.y = dataSample.data.f[I_VY];
 	out.uvw.z = dataSample.data.f[I_VZ];
 
-	out.uvwDot.x = dataSample.data.f[I_AX];
-	out.uvwDot.y = dataSample.data.f[I_AY];
-	out.uvwDot.z = dataSample.data.f[I_AZ];
+        out.accelerationBodyFrame.x = dataSample.data.f[I_AX];
+        out.accelerationBodyFrame.y = dataSample.data.f[I_AY];
+        out.accelerationBodyFrame.z = dataSample.data.f[I_AZ];
 
 	out.pqr.x = dataSample.data.f[I_P];
 	out.pqr.y = dataSample.data.f[I_Q];
@@ -167,6 +179,7 @@ struct StateVariables calculateStateVariables (const struct sample dataSample) {
 	// Calculate the missing state variables
 	out.phiThetaPsiDot = derivativeAngularRate( out.pqr, out.phiThetaPsi );
 	out.pnPePdDot = derivativeVelocity( out.uvw, out.phiThetaPsi );
+        out.uvwDot = derivativeBodyVelocity( out.pqr, out.uvw, out.accelerationBodyFrame);
 	out.groundSpeed = velocity( out.uvw );
 	out.groundSpeedDot = acceleration ( out.uvw, out.uvwDot );
 	
