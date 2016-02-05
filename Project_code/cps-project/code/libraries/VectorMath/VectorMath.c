@@ -139,3 +139,15 @@ float NormVector(const struct vector v) {
         norm=sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
         return(norm);
 }
+
+// temporary....
+struct vector radiusCoefficientMatrix ( struct vector in ){
+
+    struct vector out;
+
+    out.x = 1.0*in.x + 0.0*in.y + 0.0*in.z;
+    out.y = 0.0*in.x + 1.0*in.y + 0.0*in.z;
+    out.z = 0.0*in.x + 0.0*in.y + 1.0*in.z;
+
+    return(out);
+}

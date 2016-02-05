@@ -14,17 +14,13 @@ int SignalCheckGPS (vector Euler, float lossAngle_Degrees){
     return(signal);
 }
 
-
-
 void estimateStateVars (StateVariables& newVars, StateVariables oldVars){
 
     newVars.phiThetaPsiDot = derivativeAngularRate (newVars.pqr,oldVars.phiThetaPsi);
 
     newVars.phiThetaPsi = addVector( multiplyScalarToVector( addVector(newVars.phiThetaPsiDot,oldVars.phiThetaPsiDot), 0.5*PERIOD/1e6 ), oldVars.phiThetaPsi );
 
-    // 3. xDotDot? is this maybe uvwDot?
-    oldVars.pnPePdDotDot = BODYtoNED(oldVars.uvwDot,oldVars.phiThetaPsi);
-    newVars.pnPePdDotDot = BODYtoNED(newVars.uvwDot,newVars.phiThetaPsi);
+    newVars.pnPePdDotDot = addVector( addVector( BODYtoNED(newVars.accelerationBodyFrame,newVars.phiThetaPsi), GRAVITY_NED ), radiusCoefficientMatrix(CrossProduct(newVars.pqr,oldVars.uvw)) );
 
     newVars.pnPePdDot = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDotDot,oldVars.pnPePdDotDot), 0.5*PERIOD/1e6 ), oldVars.pnPePdDot );
 

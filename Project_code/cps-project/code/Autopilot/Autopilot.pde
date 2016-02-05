@@ -35,6 +35,7 @@
 
 
 // Own Libraries
+#include "../libraries/VectorMath/VectorMath.h"
 #include "../libraries/PID/PID.h"
 #include "../libraries/StateVariables/StateVariables.h"
 #include "../libraries/TrajectoryControl/TrajectoryControl.h"
@@ -66,7 +67,7 @@ struct SteeringSignals stSig;
 // Construct the Aerobatic Trajectory Controller
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
 float phiRef=0;
-struct vector aCMD_refin, gCMD_refin = {0,0,32.185}/*[ft/s]*/, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
+struct vector aCMD_refin, gCMD_refin = GRAVITY_NED, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
 int8_t aerobatOn = 0;
 struct StateVariables stateVars, prevStateVars;
 

@@ -11,6 +11,5 @@ int SignalCheckGPS (vector Euler, float lossAngle_Degrees);
 void estimateStateVars (StateVariables& newVars, StateVariables oldVars);
 
 
-
 #include "StateVariablesEstimation.c"
 #endif

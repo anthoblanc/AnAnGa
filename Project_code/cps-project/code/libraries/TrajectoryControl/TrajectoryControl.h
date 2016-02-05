@@ -1,27 +1,7 @@
 #ifndef TRAJECTORYCONTROL_H
 #define TRAJECTORYCONTROL_H
 
-/*##########################################################################################
-                                   General Math Operations  
-  ########################################################################################## */
 
-//Vector Addition x+y
-struct vector addVector (const struct vector x, const struct vector y);
-
-// Vector Subratction x-y
-struct vector subtractVector (const struct vector x, const struct vector y);
-
-//Vector multiplied by scalar c*x
-struct vector multiplyScalarToVector (const struct vector x, float c);
-
-// Cross Product
-struct vector CrossProduct (const struct vector x, const struct vector y);
-
-// Scalar Product
-float ScalarProduct (const struct vector x, const struct vector y);
-
-//Euclidian norm for 3D Vector
-float NormVector(const struct vector v);
 
 
 /*##########################################################################################

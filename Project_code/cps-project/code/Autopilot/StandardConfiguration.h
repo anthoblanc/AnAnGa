@@ -1,6 +1,9 @@
 #ifndef STDCONFIG_H
 #define STDCONFIG_H
 
+// Gravity Constant in NED-frame
+#define GRAVITY_NED {0,0,32.185}   //[ft/s^2]
+
 // Loop period in microseconds
 #define PERIOD 20000
 

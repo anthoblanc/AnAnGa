@@ -46,6 +46,12 @@ float ScalarProduct (const struct vector x, const struct vector y);
 float NormVector(const struct vector v);
 
 
+
+
+// temporary...
+struct vector radiusCoefficientMatrix ( struct vector input );
+
+
 #include "VectorMath.c"
 
 #endif

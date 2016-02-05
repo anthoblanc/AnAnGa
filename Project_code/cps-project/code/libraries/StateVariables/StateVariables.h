@@ -2,15 +2,7 @@
 #define FORMULASFORSTATEVARIABLES_H
 
 
-// Declaration of a 3-dimensional vector
-class vector {
 
-public:
-    float x,y,z;
-
-    // Copy Function
-    void importVector (vector refVector);
-};
 
 
 // Formulas for calculating derivatives of the state variables
@@ -22,13 +14,6 @@ struct vector derivativeVelocity( struct vector uvw, struct vector phiThetaPsi )
 float velocity( struct vector uvw );
 float acceleration ( struct vector uvw, struct vector uvwDot );
 
-
-// Transformation from NED-frame to Body-frame
-struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaPsi );
-
-// Transformation from Body-frame to NED-frame
-// STILL HAVE TO VERIFY IF INVERSE OF BODYTONED IS JUST THE TRANSPOSE
-struct vector BODYtoNED ( const struct vector body, const struct vector phiThetaPsi );
 
 
 // Container for all state Variables of the plane with copy function.

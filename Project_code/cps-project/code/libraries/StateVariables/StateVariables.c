@@ -1,11 +1,5 @@
 
-void vector::importVector (vector refVector){
 
-    x = refVector.x;
-    y = refVector.y;
-    z = refVector.z;
-
-}
 
 // Formulas for calculating derivatives of the state variables
 struct vector derivativeAngularRate( struct vector pqr, struct vector phiThetaPsi ){
@@ -71,67 +65,6 @@ float acceleration ( struct vector uvw, struct vector uvwDot ){
     }
 	
 
-// Transformation from NED-frame to Body-frame
-struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaPsi ) {
-
-	struct vector body;
-	
-	float sinPhi = sin(phiThetaPsi.x);
-	float sinTheta = sin(phiThetaPsi.y);
-	float sinPsi = sin(phiThetaPsi.z);
-	float cosPhi = cos(phiThetaPsi.x);
-	float cosTheta = cos(phiThetaPsi.y);
-	float cosPsi = cos(phiThetaPsi.z);
-
-	float sinPhiSinTheta = sinPhi * sinTheta;
-	float cosPhiSinTheta = cosPhi * sinTheta;
-	
-	//source: http://www.es.ele.tue.nl/education/5HC99/wiki/images/4/42/RigidBodyDynamics.pdf
-	body.x = (cosTheta*cosPsi) * ned.x + 
-		(cosTheta*sinPsi)  * ned.y +
-		-sinTheta          * ned.z;
-	body.y = (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * ned.x +
-		(sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * ned.y +
-		sinPhi*cosTheta                          * ned.z;
-	body.z = (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * ned.x + 
-		(cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * ned.y +
-		cosPhi*cosTheta                          * ned.z;	
-
-	return(body);
-
-}
-
-// Transformation from Body-frame to NED-frame
-// STILL HAVE TO VERIFY IF INVERSE OF BODYTONED IS JUST THE TRANSPOSE
-struct vector BODYtoNED ( const struct vector body, const struct vector phiThetaPsi ) {
-
-        struct vector ned;
-
-        float sinPhi = sin(phiThetaPsi.x);
-        float sinTheta = sin(phiThetaPsi.y);
-        float sinPsi = sin(phiThetaPsi.z);
-        float cosPhi = cos(phiThetaPsi.x);
-        float cosTheta = cos(phiThetaPsi.y);
-        float cosPsi = cos(phiThetaPsi.z);
-
-        float sinPhiSinTheta = sinPhi * sinTheta;
-        float cosPhiSinTheta = cosPhi * sinTheta;
-
-        ned.x = (cosTheta*cosPsi) * body.x +
-                (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * body.y +
-                (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * body.z;
-
-        ned.y = (cosTheta*sinPsi)  * body.x +
-                (sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * body.y +
-                (cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * body.z;
-
-        ned.z = -sinTheta * body.x +
-                sinPhi*cosTheta * body.y +
-                cosPhi*cosTheta * body.z;
-
-        return(ned);
-
-}
 
 
 void StateVariables::importData (StateVariables refStateVars){
@@ -182,6 +115,9 @@ struct StateVariables calculateStateVariables (const struct sample dataSample) {
         out.uvwDot = derivativeBodyVelocity( out.pqr, out.uvw, out.accelerationBodyFrame);
 	out.groundSpeed = velocity( out.uvw );
 	out.groundSpeedDot = acceleration ( out.uvw, out.uvwDot );
+
+        out.pnPePdDotDot = addVector( addVector( BODYtoNED(out.accelerationBodyFrame,out.phiThetaPsi), GRAVITY_NED ), radiusCoefficientMatrix(CrossProduct(out.pqr,out.uvw)) );
+
 	
 	return(out);
 }
