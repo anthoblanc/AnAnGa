@@ -5,8 +5,14 @@
                                    General Math Operations  
   ########################################################################################## */
 
-//Vector Addition
+//Vector Addition x+y
 struct vector addVector (const struct vector x, const struct vector y);
+
+// Vector Subratction x-y
+struct vector subtractVector (const struct vector x, const struct vector y);
+
+//Vector multiplied by scalar c*x
+struct vector multiplyScalarToVector (const struct vector x, float c);
 
 // Cross Product
 struct vector CrossProduct (const struct vector x, const struct vector y);
@@ -70,9 +76,9 @@ private:
 // Variables for the Trajectory Controller
 #define CO_Freq_LPF 0	// Cut-off frequency for the low-pass-filter of the derivatives
 
-#define Kp_Throttle 0.5
-#define Ki_Throttle 0.2
-#define Kd_Throttle 0
+#define Kp_Throttle 0.015
+#define Ki_Throttle 0.0
+#define Kd_Throttle 0.0
 #define IntLim_Throttle 1
 #define Casc_Throttle 1
 
