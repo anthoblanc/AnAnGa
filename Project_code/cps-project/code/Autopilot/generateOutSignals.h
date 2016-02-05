@@ -9,7 +9,7 @@ void generateOutSignals(const struct SteeringSignals stSig, int16_t &aileronLOut
     float aileronR = constrain(stSig.aileron, -1, 1);
     float elevatorL = constrain(stSig.elevator, -1, 1);
     float elevatorR = constrain(stSig.elevator, -1, 1);
-    float throttle = constrain(stSig.throttle, -1, 1);
+    float throttle = constrain(stSig.throttle, 0, 1);
     float rudder = constrain(stSig.rudder, -1, 1);
 
     #define SERVO_MIN 1000 // Minimum duty cycle
@@ -20,7 +20,7 @@ void generateOutSignals(const struct SteeringSignals stSig, int16_t &aileronLOut
     aileronROut = ((aileronR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
     elevatorLOut = ((elevatorL+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
     elevatorROut = ((elevatorR+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
-    throttleOut = ((throttle+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
+    throttleOut = ((throttle)*(SERVO_MAX-SERVO_MIN)) + SERVO_MIN;
     rudderOut = ((rudder+1.0)*(SERVO_MAX-SERVO_MIN)/2.0) + SERVO_MIN;
 
 }
