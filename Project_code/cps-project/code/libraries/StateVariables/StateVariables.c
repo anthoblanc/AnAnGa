@@ -1,4 +1,12 @@
 
+void vector::importVector (vector refVector){
+
+    x = refVector.x;
+    y = refVector.y;
+    z = refVector.z;
+
+}
+
 // Formulas for calculating derivatives of the state variables
 struct vector derivativeAngularRate( struct vector pqr, struct vector phiThetaPsi ){
     
@@ -83,7 +91,54 @@ struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaP
 
 }
 
-// From the measured data of the plane, calculate all necessary state variables.
+// Transformation from Body-frame to NED-frame
+// STILL HAVE TO VERIFY IF INVERSE OF BODYTONED IS JUST THE TRANSPOSE
+struct vector BODYtoNED ( const struct vector body, const struct vector phiThetaPsi ) {
+
+        struct vector ned;
+
+        float sinPhi = sin(phiThetaPsi.x);
+        float sinTheta = sin(phiThetaPsi.y);
+        float sinPsi = sin(phiThetaPsi.z);
+        float cosPhi = cos(phiThetaPsi.x);
+        float cosTheta = cos(phiThetaPsi.y);
+        float cosPsi = cos(phiThetaPsi.z);
+
+        float sinPhiSinTheta = sinPhi * sinTheta;
+        float cosPhiSinTheta = cosPhi * sinTheta;
+
+        ned.x = (cosTheta*cosPsi) * body.x +
+                (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * body.y +
+                (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * body.z;
+
+        ned.y = (cosTheta*sinPsi)  * body.x +
+                (sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * body.y +
+                (cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * body.z;
+
+        ned.z = -sinTheta * body.x +
+                sinPhi*cosTheta * body.y +
+                cosPhi*cosTheta * body.z;
+
+        return(ned);
+
+}
+
+
+void StateVariables::importData (StateVariables refStateVars){
+
+    uvw.importVector(refStateVars.uvw);
+    uvwDot.importVector(refStateVars.uvwDot);
+    pqr.importVector(refStateVars.pqr);
+    phiThetaPsi.importVector(refStateVars.phiThetaPsi);
+    phiThetaPsiDot.importVector(refStateVars.phiThetaPsiDot);
+    pnPePd.importVector(refStateVars.pnPePd);
+    pnPePdDot.importVector(refStateVars.pnPePdDot);
+    groundSpeed = refStateVars.groundSpeed;
+    groundSpeedDot = refStateVars.groundSpeedDot;
+
+}
+
+
 struct StateVariables calculateStateVariables (const struct sample dataSample) {
 	
 	struct StateVariables out;
