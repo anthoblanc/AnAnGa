@@ -1,20 +1,20 @@
 
-int SignalCheckGPS (vector Euler, float lossAngle_Degrees){
+int NoSignalAvailableGPS (vector Euler, float lossAngle_Degrees){
 
-    int signal = 0;
+    int noSignal = 1;
     float angle = lossAngle_Degrees * M_PI / 180;
 
     // Checking for Pitch
     if ( (Euler.y>=-angle && Euler.y<=angle) || (Euler.y>=360-angle && Euler.y<=360) ) {
         if ( (Euler.x>=-angle && Euler.x<=angle) || (Euler.x>=360-angle && Euler.x<=360) ) {
-            signal = 1;
+            noSignal = 0;
         }
     }
 
-    return(signal);
+    return(noSignal);
 }
 
-void estimateStateVars (StateVariables& newVars, StateVariables oldVars){
+void estimateStateVars (uint32_t hardware_time,const AP_HAL::HAL& hal,StateVariables& newVars, StateVariables oldVars){
 
     newVars.phiThetaPsiDot = derivativeAngularRate (newVars.pqr,oldVars.phiThetaPsi);
 
@@ -28,4 +28,7 @@ void estimateStateVars (StateVariables& newVars, StateVariables oldVars){
 
     newVars.pnPePd = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDot,oldVars.pnPePdDot), 0.5*PERIOD/1e6 ), oldVars.pnPePd );
 
+    if(hardware_time>=nextPrint){
+    hal.console->printf("est: (%f,%f,%f)\n",newVars.pnPePd.x,newVars.pnPePd.y,newVars.pnPePd.z);
+    }
 }
