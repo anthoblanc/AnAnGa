@@ -8,7 +8,7 @@
 // Formulas for calculating derivatives of the state variables
 struct vector derivativeAngularRate( struct vector pqr, struct vector phiThetaPsi );
 struct vector derivativeVelocity( struct vector uvw, struct vector phiThetaPsi );
-
+struct vector derivativeBodyVelocity( struct vector pqr, struct vector uvw, struct vector acc);
 
 // Formulas for calculating the vehicle-velocity plus the vehicle-acceleration
 float velocity( struct vector uvw );

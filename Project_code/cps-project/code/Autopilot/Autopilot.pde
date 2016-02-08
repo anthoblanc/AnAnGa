@@ -196,17 +196,23 @@ void loop()
         // Process a loss of GPS-signal: If (ideal) Euler angles indicate a loss of GPS signal, stateVars will be overwritten by iterative estimating method as long as (ideal) Euler angles are in a GPS-losing position.
 
         // Check for GPS-signal loss
+    StateVariables copyOfStateVars,temp;
+    copyOfStateVars.importData(stateVars);
         if ( ~SignalCheckGPS(stateVars.phiThetaPsi, 60) ) {
                 // If signal loss, process new state variables with iteration method
-                //estimateStateVars (stateVars, prevStateVars);	// Because stateVars already contains the ideal values, only "real measured" data will be taken. The rest will be overwritten by estimating method.
+                estimateStateVars (stateVars, prevStateVars);	// Because stateVars already contains the ideal values, only "real measured" data will be taken. The rest will be overwritten by estimating method.
         }
         // Save stateVars for possible iteration in next time step
         prevStateVars.importData(stateVars);
+        
+    temp.importData(stateVars);
+    stateVars.importData(copyOfStateVars);
+    copyOfStateVars.importData(temp);
 
         //***************************************************
         // Path Generation
 
-        /*	// Path Control
+/*        	// Path Control
             // use two points before loop to decide direction
             if (hardware_time <tstart){     //
             trajectory_refgnd.x = 6;
@@ -228,8 +234,8 @@ void loop()
                 trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
                 trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;
             }
-        */
-/*        if (firstLoop){
+
+        if (firstLoop){
                 pathned = traj_initialize(stateVars.pnPePd);
             }
           if (hardware_time<10e6){
@@ -263,11 +269,11 @@ void loop()
             pathned.y = -400;
             pathned.z = -0.87;
         }
-        if (hardware_time<30e6){
+        if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -5.0 * static_cast<float>(PERIOD) /1e6;
-        }else if (hardware_time<50e6){
+        }else if (relative_time<50e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
@@ -276,6 +282,7 @@ void loop()
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
+
         //***************************************************
         // Path Processing
         // Calculating differential Trajectory
@@ -330,7 +337,13 @@ void loop()
                 //hal.console->printf("PID-In: %f, PID-Throttle out: %f, error-term: %f\n",inputThrottlePID,stSig.throttle,inputThrottlePID+stateVars.groundSpeed);
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
                 //hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
-                hal.console->printf("%f\t%f\t%f\n",inputThrottlePID-stateVars.groundSpeed,inputThrottlePID,stateVars.groundSpeed);
+                //hal.console->printf("%f\t%f\t%f\n",inputThrottlePID-stateVars.groundSpeed,inputThrottlePID,stateVars.groundSpeed);
+                //hal.console->printf("in_velocity: %f\tbo_velocity: %f\n",velocity(stateVars.pnPePdDot),stateVars.groundSpeed);
+                //hal.console->printf("uvw: (%f,%f,%f)\tpos_in: (%f,%f,%f)\n\n",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+                //hal.console->printf("acc: (%f,%f,%f)\n",stateVars.accelerationBodyFrame.x,stateVars.accelerationBodyFrame.y,stateVars.accelerationBodyFrame.z);
+
+            hal.console->printf("is _xyz: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+            hal.console->printf("est_xyz: (%f,%f,%f)\n",copyOfStateVars.pnPePd.x,copyOfStateVars.pnPePd.y,copyOfStateVars.pnPePd.z);
         }
 
 

@@ -62,15 +62,15 @@ private:
 #define IntLim_Throttle 1
 #define Casc_Throttle 1
 
-#define Kp_Aileron 0.05
-#define Ki_Aileron 0
+#define Kp_Aileron 0.09
+#define Ki_Aileron 0.0
 #define Kd_Aileron 0.01
-#define IntLim_Aileron 1
+#define IntLim_Aileron 0.1
 #define Casc_Aileron 1
 
-#define Kp_Rudder 0.01
+#define Kp_Rudder 0.1
 #define Ki_Rudder 0
-#define Kd_Rudder 0
+#define Kd_Rudder 0.02
 #define IntLim_Rudder 1
 #define Casc_Rudder 1
 
