@@ -71,6 +71,9 @@ struct vector aCMD_refin, gCMD_refin = GRAVITY_NED, aCMD_refbody, gCMD_refbody, 
 int8_t aerobatOn = 0;
 struct StateVariables stateVars, prevStateVars;
 
+//temp for test
+StateVariables copyOfStateVars,temp;
+
 // Variables for Throttle error computation
 struct vector prevPathNED = {-365,-400,0.87};
 struct vector pathVelocity;
@@ -99,15 +102,6 @@ void setup()
         dataSample.data.f[i] = 0.0;
     }
 	
-    // Initial filling of state variables plus previous state variables
-    // Read sensor data from emulation adapter
-    while(Wire.available()) {
-            dataSample.data.raw[i] = Wire.read();
-            i++;
-    }
-    stateVars = calculateStateVariables (dataSample);
-    prevStateVars.importData (stateVars);
-
     // StandardController: Set Constrains to flight manouvers and define Flight directions
     //stdCTRL.setup();
 
@@ -196,11 +190,13 @@ void loop()
         // Process a loss of GPS-signal: If (ideal) Euler angles indicate a loss of GPS signal, stateVars will be overwritten by iterative estimating method as long as (ideal) Euler angles are in a GPS-losing position.
 
         // Check for GPS-signal loss
-    StateVariables copyOfStateVars,temp;
+        if(firstLoop){
+            prevStateVars.importData(stateVars);
+        }
     copyOfStateVars.importData(stateVars);
-        if ( ~SignalCheckGPS(stateVars.phiThetaPsi, 60) ) {
+        if (1/* NoSignalAvailableGPS(stateVars.phiThetaPsi, 60)*/ ) {
                 // If signal loss, process new state variables with iteration method
-                estimateStateVars (stateVars, prevStateVars);	// Because stateVars already contains the ideal values, only "real measured" data will be taken. The rest will be overwritten by estimating method.
+                estimateStateVars (hardware_time,hal,stateVars, prevStateVars);	// Because stateVars already contains the ideal values, only "real measured" data will be taken. The rest will be overwritten by estimating method.
         }
         // Save stateVars for possible iteration in next time step
         prevStateVars.importData(stateVars);
@@ -212,57 +208,6 @@ void loop()
         //***************************************************
         // Path Generation
 
-/*        	// Path Control
-            // use two points before loop to decide direction
-            if (hardware_time <tstart){     //
-            trajectory_refgnd.x = 6;
-            trajectory_refgnd.y = 80;
-             trajectory_refgnd.z = -10;
-            }
-            if (hardware_time >= (tstart - 1500000) && hardware_time <= (tstart - 1000000) ){     //coordinate 1 sec before loop
-            pnPePdtmp0 = stateVars.pnPePd;
-            }
-             if(hardware_time >= (tstart - 5000000) && hardware_time <= tstart) { // coordinate just before loop
-             pnPePdtmp = stateVars.pnPePd;
-             }
-            // 20s -> 40s, perform loop, give target coordinates two secs in the future
-            if(hardware_time >= tstart && hardware_time <= tend)
-            {
-                pathned = pathloop ( pnPePdtmp0, pnPePdtmp, hardware_time, tstart, tend );
-                //calculate the deisred path "L"
-                trajectory_refgnd.x = pathned.x - stateVars.pnPePd.x;
-                trajectory_refgnd.y = pathned.y - stateVars.pnPePd.y;
-                trajectory_refgnd.z = pathned.z- stateVars.pnPePd.z;
-            }
-
-        if (firstLoop){
-                pathned = traj_initialize(stateVars.pnPePd);
-            }
-          if (hardware_time<10e6){
-            pathned.x += 0.0 *  static_cast<float>(PERIOD) /1e6;
-            pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z -= 20.0 * static_cast<float>(PERIOD) /1e6;
-
-                trajectory_refgnd = traj_takeoff(pathned, stateVars.pnPePd, stateVars.pnPePd);
-                }else if (hardware_time<20e6){
-                pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.x * static_cast<float>(PERIOD) /1e6;
-                pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.y * static_cast<float>(PERIOD) /1e6;
-                pathned.z -= 40.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.z * static_cast<float>(PERIOD) /1e6;
-
-                trajectory_refgnd = traj_climbup(pathned, stateVars.pnPePd, stateVars.pnPePd);
-                }
-
-            else if (hardware_time<30e6){
-                trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, hardware_time, tstart, tend);
-            }
-            else {
-            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.x * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 100.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.y * static_cast<float>(PERIOD) /1e6;
-            pathned.z -= 40.0 * static_cast<float>(PERIOD) /1e6;//* inertial_velocity.z * static_cast<float>(PERIOD) /1e6;
-
-            trajectory_refgnd = traj_climbup(pathned, stateVars.pnPePd, stateVars.pnPePdDot);
-            }
-*/
         // Testwise desired Trajectory
         if (firstLoop){
             pathned.x = -365;
@@ -342,8 +287,7 @@ void loop()
                 //hal.console->printf("uvw: (%f,%f,%f)\tpos_in: (%f,%f,%f)\n\n",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
                 //hal.console->printf("acc: (%f,%f,%f)\n",stateVars.accelerationBodyFrame.x,stateVars.accelerationBodyFrame.y,stateVars.accelerationBodyFrame.z);
 
-            hal.console->printf("is _xyz: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
-            hal.console->printf("est_xyz: (%f,%f,%f)\n",copyOfStateVars.pnPePd.x,copyOfStateVars.pnPePd.y,copyOfStateVars.pnPePd.z);
+            hal.console->printf("ist: (%f,%f,%f)\nGPS?:%i\n\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,NoSignalAvailableGPS(stateVars.phiThetaPsi,60));
         }
 
 
