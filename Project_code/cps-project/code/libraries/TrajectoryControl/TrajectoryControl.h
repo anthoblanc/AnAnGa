@@ -58,13 +58,13 @@ private:
 
 #define Kp_Throttle 0.015
 #define Ki_Throttle 0.0
-#define Kd_Throttle 0.0
+#define Kd_Throttle 0.04
 #define IntLim_Throttle 1
 #define Casc_Throttle 1
 
-#define Kp_Aileron 0.2
+#define Kp_Aileron 0.05
 #define Ki_Aileron 0
-#define Kd_Aileron 0
+#define Kd_Aileron 0.01
 #define IntLim_Aileron 1
 #define Casc_Aileron 1
 
@@ -76,7 +76,7 @@ private:
 
 #define Kp_Elevator 0.1
 #define Ki_Elevator 0.05
-#define Kd_Elevator 0.0
+#define Kd_Elevator 0.01
 #define IntLim_Elevator 1
 #define Casc_Elevator 1
 
