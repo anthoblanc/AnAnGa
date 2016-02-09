@@ -24,6 +24,8 @@ typedef int           BOOL;
 #define center_zero_space_y -400
 #define center_zero_space_z -0.87
 
+// Look Ahead Distance (Desired Length) [feet]
+#define LookAheadDistance 50
 
 //***************************************************
 // Libraries
@@ -56,6 +58,7 @@ typedef int           BOOL;
 #include "../libraries/Interface/Interface.hpp"
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
+#include "../libraries/PathDelay/PathDelay.h"
 
 //***************************************************
 // Variable Declaration
@@ -84,9 +87,9 @@ StateVariables copyOfStateVars, temp;
 int firstLoop=1;
 
 // Variables for Throttle error computation
-struct vector prevPathNED = {-365,-400,0.87};
-struct vector pathVelocity;
-float inputThrottlePID;
+PathDelay pathDly;
+float desiredL = LookAheadDistance;
+float errorThrottle;
 
 // Interface
 Interface intface(hal);
@@ -147,7 +150,7 @@ void loop()
     &&  ( fabs(stateVars.pnPePd.z-center_zero_space_z) < zero_space_size )
     &&  ( relative_time > 10e6 ) )
     {
-         //initialisation of the path origine
+         //initialisation of the path origin
          pathned.x = -365;
          pathned.y = -400;
          pathned.z = -0.87;
@@ -244,13 +247,8 @@ void loop()
         trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
         // Calculating controller input for throttle
-        float desiredL = 50;    // [ft] Testwise (could depend from velocity)
-        pathVelocity = multiplyScalarToVector ( subtractVector(pathned,prevPathNED), 1/(1.0*PERIOD/1e6) );
-        inputThrottlePID = ScalarProduct(pathVelocity,trajectory_refgnd) / NormVector(pathVelocity);
-        inputThrottlePID -= desiredL;
-        inputThrottlePID *= 1.0/2.0;
-        inputThrottlePID += stateVars.groundSpeed;
-        prevPathNED.importVector(pathned);
+        errorThrottle = pathDly.update(pathned,trajectory_refgnd);
+        errorThrottle -= desiredL;
 
         // Calculating the Acceleration out of Position Difference L
         aCMD_refin = Get_Acc_straigth(hal,stateVars.pnPePdDot,trajectory_refgnd);
@@ -264,7 +262,7 @@ void loop()
         // Controller
 
         aCMD_refbody = subtractVector(aCMD_refbody,gCMD_refbody);
-        stSig = trCTRL.update(hardware_time,inputThrottlePID,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
+        stSig = trCTRL.update(hardware_time,errorThrottle,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
 
 
         //***************************************************

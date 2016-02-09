@@ -35,7 +35,7 @@ public:
         void setPhiRef (const float PhiRef);
 
         // Update Routine
-        struct SteeringSignals update (uint32_t time, float DeltaL, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef = 0, const int8_t aerobatOn = 0, struct vector eulerDesired = {0,0,0});
+        struct SteeringSignals update (uint32_t time, float errorThrottle, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef = 0, const int8_t aerobatOn = 0, struct vector eulerDesired = {0,0,0});
 
         // Access to the PIDs
         // const is for denying any change in the PIDs
@@ -55,6 +55,8 @@ private:
 
 // Variables for the Trajectory Controller
 #define CO_Freq_LPF 0	// Cut-off frequency for the low-pass-filter of the derivatives
+
+#define errorThrottlePreGain 1.0/2.0
 
 #define Kp_Throttle 0.015
 #define Ki_Throttle 0.0

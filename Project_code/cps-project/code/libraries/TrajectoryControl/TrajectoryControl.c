@@ -77,7 +77,7 @@ void TrajectoryController::setPhiRef (const float PhiRef) {
 
 
 // Update Routine
-struct SteeringSignals TrajectoryController::update (uint32_t time, float DeltaL, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef, const int8_t aerobatOn, struct vector eulerDesired) {
+struct SteeringSignals TrajectoryController::update (uint32_t time, float errorThrottle, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef, const int8_t aerobatOn, struct vector eulerDesired) {
 
         struct SteeringSignals t_cOut;
         struct vector t_vaCMDbYZ, t_veRoll, aCMDbSubG, t_vAileronCalc;
@@ -92,7 +92,9 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float DeltaL
 
                 // Throttle
                 // Hand error of Throttle-PID to the controller and pass signal to output struct.
-                t_cOut.throttle = m_cPIDs[Throttle]->update(DeltaL);
+                errorThrottle *= errorThrottlePreGain;
+                errorThrottle += stateVars.groundSpeed;
+                t_cOut.throttle = m_cPIDs[Throttle]->update(errorThrottle);
 
                 // Aileron
                 // Acceleration in y-z-Plane
