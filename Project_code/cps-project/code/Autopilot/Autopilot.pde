@@ -78,8 +78,7 @@ struct SteeringSignals stSig;
 // Construct the Aerobatic Trajectory Controller
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
 float phiRef=0;
-struct vector aCMD_refin, gCMD_refin = GRAVITY_NED, aCMD_refbody, gCMD_refbody, eulerDesired = {0,0,0};
-int8_t aerobatOn = 0;
+struct vector aCMD_refin, gCMD_refin = GRAVITY_NED, aCMD_refbody, gCMD_refbody;
 struct StateVariables stateVars, prevStateVars;
 
 //temp for test
@@ -262,7 +261,7 @@ void loop()
         // Controller
 
         aCMD_refbody = subtractVector(aCMD_refbody,gCMD_refbody);
-        stSig = trCTRL.update(hardware_time,errorThrottle,aCMD_refbody,gCMD_refbody,stateVars,phiRef,aerobatOn,eulerDesired);
+        stSig = trCTRL.update(hardware_time,errorThrottle,aCMD_refbody,gCMD_refbody,stateVars,phiRef);
 
 
         //***************************************************

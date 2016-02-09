@@ -77,7 +77,7 @@ void TrajectoryController::setPhiRef (const float PhiRef) {
 
 
 // Update Routine
-struct SteeringSignals TrajectoryController::update (uint32_t time, float errorThrottle, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef, const int8_t aerobatOn, struct vector eulerDesired) {
+struct SteeringSignals TrajectoryController::update (uint32_t time, float errorThrottle, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef) {
 
         struct SteeringSignals t_cOut;
         struct vector t_vaCMDbYZ, t_veRoll, aCMDbSubG, t_vAileronCalc;
@@ -86,65 +86,55 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
         // Processing input variables
         m_fPhiRef = M_PI / 180.0 * PhiRef;
 
-        // switch the mode of trajectories: Normal or aerobatic mode (Euler Angles)
-        if (~aerobatOn) {
-        // Normal mode
+        // Throttle
+        // Hand error of Throttle-PID to the controller and pass signal to output struct.
+        errorThrottle *= errorThrottlePreGain;
+        errorThrottle += stateVars.groundSpeed;
+        t_cOut.throttle = m_cPIDs[Throttle]->update(errorThrottle);
 
-                // Throttle
-                // Hand error of Throttle-PID to the controller and pass signal to output struct.
-                errorThrottle *= errorThrottlePreGain;
-                errorThrottle += stateVars.groundSpeed;
-                t_cOut.throttle = m_cPIDs[Throttle]->update(errorThrottle);
-
-                // Aileron
-                // Acceleration in y-z-Plane
-                t_vaCMDbYZ.x = 0;
-                t_vaCMDbYZ.y = -aCMDb.y;
-                t_vaCMDbYZ.z = -aCMDb.z;
-                // Find suitable eRoll: Calculate eRoll,1
-                t_veRoll.x = 0;
-                t_veRoll.y = - sin(m_fPhiRef);
-                t_veRoll.z = - cos(m_fPhiRef);
-                // Decide, whether eRoll,1 or eRoll,2 = -eRoll,1
-                if (ScalarProduct(t_veRoll,t_vaCMDbYZ) < 0) {
-                        t_veRoll.y = -t_veRoll.y;
-                        t_veRoll.z = -t_veRoll.z;
-                }
-                // Build Cross Product and take x-component
-                t_vAileronCalc = CrossProduct(t_veRoll,t_vaCMDbYZ);
-                t_fAileronPID = t_vAileronCalc.x;
-                // Take the arcsin of the x-component of the cross product
-                t_fAileronPID = constrain(t_fAileronPID,-1,1);
-                t_fAileronPID = asin(t_fAileronPID);
-
-                // Give the error of the Aileron to the Aileron-PID
-                t_cOut.aileron = m_cPIDs[Aileron]->update(t_fAileronPID);
-
-                // Rudder
-                // Subtract gravity from acceleration
-                aCMDbSubG.x = aCMDb.x + gCMDb.x;
-                aCMDbSubG.y = aCMDb.y + gCMDb.y;
-                aCMDbSubG.z = aCMDb.z + gCMDb.z;
-                // Choose the y-Component
-                t_fRudderPID = -aCMDbSubG.y;
-                // Give the error of the Rudder to the Rudder-PID
-                t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
-                // Elevator
-                // Choose the z-component of the acceleration subtracted by gravity
-                t_fElevatorPID = -aCMDbSubG.z;
-                // Give the error of the Elevator to the Elevator-PID
-                t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
-
-                //hal.console->printf("%f,%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID,DeltaL);
-                if (time >= nextPrint){
-                    //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
-                    //hal.console->printf("error: %f\n\n",t_fRudderPID);
-                }
-
+        // Aileron
+        // Acceleration in y-z-Plane
+        t_vaCMDbYZ.x = 0;
+        t_vaCMDbYZ.y = -aCMDb.y;
+        t_vaCMDbYZ.z = -aCMDb.z;
+        // Find suitable eRoll: Calculate eRoll,1
+        t_veRoll.x = 0;
+        t_veRoll.y = - sin(m_fPhiRef);
+        t_veRoll.z = - cos(m_fPhiRef);
+        // Decide, whether eRoll,1 or eRoll,2 = -eRoll,1
+        if (ScalarProduct(t_veRoll,t_vaCMDbYZ) < 0) {
+                t_veRoll.y = -t_veRoll.y;
+                t_veRoll.z = -t_veRoll.z;
         }
-        // Aerobatic control mode (Euler Angles)
-        else {
+        // Build Cross Product and take x-component
+        t_vAileronCalc = CrossProduct(t_veRoll,t_vaCMDbYZ);
+        t_fAileronPID = t_vAileronCalc.x;
+        // Take the arcsin of the x-component of the cross product
+        t_fAileronPID = constrain(t_fAileronPID,-1,1);
+        t_fAileronPID = asin(t_fAileronPID);
 
+        // Give the error of the Aileron to the Aileron-PID
+        t_cOut.aileron = m_cPIDs[Aileron]->update(t_fAileronPID);
+
+        // Rudder
+        // Subtract gravity from acceleration
+        aCMDbSubG.x = aCMDb.x + gCMDb.x;
+        aCMDbSubG.y = aCMDb.y + gCMDb.y;
+        aCMDbSubG.z = aCMDb.z + gCMDb.z;
+        // Choose the y-Component
+        t_fRudderPID = -aCMDbSubG.y;
+        // Give the error of the Rudder to the Rudder-PID
+        t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
+        // Elevator
+        // Choose the z-component of the acceleration subtracted by gravity
+        t_fElevatorPID = -aCMDbSubG.z;
+        // Give the error of the Elevator to the Elevator-PID
+        t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
+
+        //hal.console->printf("%f,%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID,DeltaL);
+        if (time >= nextPrint){
+            //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
+            //hal.console->printf("error: %f\n\n",t_fRudderPID);
         }
 
         return(t_cOut);

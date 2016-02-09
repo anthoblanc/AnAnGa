@@ -35,7 +35,7 @@ public:
         void setPhiRef (const float PhiRef);
 
         // Update Routine
-        struct SteeringSignals update (uint32_t time, float errorThrottle, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef = 0, const int8_t aerobatOn = 0, struct vector eulerDesired = {0,0,0});
+        struct SteeringSignals update (uint32_t time, float errorThrottle, struct vector aCMDb, struct vector gCMDb, const struct StateVariables stateVars, const float PhiRef = 0);
 
         // Access to the PIDs
         // const is for denying any change in the PIDs
