@@ -4,8 +4,19 @@
 //***************************************************
 // Define
 //***************************************************
-#define THISFIRMWARE "CPS-Autopilot-Project"
 
+
+//Writing style more readable
+typedef int           BOOL;
+
+#define FALSE         0
+#define TRUE          1
+#define NOT           !
+#define AND           &&
+#define OR            ||
+
+
+#define THISFIRMWARE "CPS-Autopilot-Project"
 
 //zeros time space zone
 #define zero_space_size 0.5
