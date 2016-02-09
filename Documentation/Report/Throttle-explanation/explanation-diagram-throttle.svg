@@ -1,0 +1,1144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="125mm"
+   height="120mm"
+   viewBox="0 0 442.91338 425.19681"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="explanation-diagram-throttle.svg">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path6836"
+         style="fill:#6791e7;fill-opacity:1;fill-rule:evenodd;stroke:#6791e7;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lstart"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path6833"
+         style="fill:#6791e7;fill-opacity:1;fill-rule:evenodd;stroke:#6791e7;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(1.1,0,0,1.1,1.1,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       orient="auto"
+       id="DistanceX"
+       style="overflow:visible"
+       refX="0"
+       refY="0">
+      <path
+         id="path5026"
+         d="M 3,-3 -3,3 M 0,-5 0,5"
+         style="stroke:#000000;stroke-width:0.5"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <pattern
+       id="Hatch"
+       x="0"
+       y="0"
+       patternUnits="userSpaceOnUse"
+       width="8"
+       height="8">
+      <path
+         id="path5029"
+         d="M8 4 l-4,4"
+         stroke-width="0.25"
+         stroke="#000000"
+         linecap="square" />
+      <path
+         id="path5031"
+         d="M6 2 l-4,4"
+         stroke-width="0.25"
+         stroke="#000000"
+         linecap="square" />
+      <path
+         id="path5033"
+         d="M4 0 l-4,4"
+         stroke-width="0.25"
+         stroke="#000000"
+         linecap="square" />
+    </pattern>
+    <symbol
+       id="*Model_Space" />
+    <symbol
+       id="*Paper_Space" />
+    <symbol
+       id="*Paper_Space0" />
+    <marker
+       orient="auto"
+       id="DistanceX-4"
+       style="overflow:visible"
+       refX="0"
+       refY="0">
+      <path
+         id="path5903"
+         d="M 3,-3 -3,3 M 0,-5 0,5"
+         style="stroke:#000000;stroke-width:0.5"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <pattern
+       id="Hatch-1"
+       x="0"
+       y="0"
+       patternUnits="userSpaceOnUse"
+       width="8"
+       height="8">
+      <path
+         id="path5906"
+         d="M8 4 l-4,4"
+         stroke-width="0.25"
+         stroke="#000000"
+         linecap="square" />
+      <path
+         id="path5908"
+         d="M6 2 l-4,4"
+         stroke-width="0.25"
+         stroke="#000000"
+         linecap="square" />
+      <path
+         id="path5910"
+         d="M4 0 l-4,4"
+         stroke-width="0.25"
+         stroke="#000000"
+         linecap="square" />
+    </pattern>
+    <symbol
+       id="*Model_Space-3" />
+    <symbol
+       id="*Paper_Space-4" />
+    <symbol
+       id="*Paper_Space0-2" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="332.0345"
+     inkscape:cy="139.8173"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     height="209mm"
+     inkscape:window-width="1680"
+     inkscape:window-height="1028"
+     inkscape:window-x="1358"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-627.16541)">
+    <g
+       id="g6490"
+       transform="translate(284.63429,-52.074893)">
+      <g
+         id="g5915"
+         inkscape:label="0" />
+      <g
+         id="g5917"
+         inkscape:label="Layer1">
+        <path
+           id="path5919"
+           d="m -212.59842,1034.6457 0.53086,-0.7825 0.53086,-0.7825 0.53085,-0.7824 0.53084,-0.7822 0.53084,-0.7821 0.53082,-0.7818 0.5308,-0.7815 0.53079,-0.7811 0.53076,-0.7809 0.53074,-0.7803 0.53071,-0.7799 0.53068,-0.7794 0.53065,-0.7788 0.53061,-0.7782 0.53058,-0.7775 0.53053,-0.7768 0.5305,-0.7761 0.53044,-0.7752 0.5304,-0.7744 0.53034,-0.7735 0.53029,-0.7725 0.53023,-0.7715 0.53018,-0.7705 0.53011,-0.7694 0.53004,-0.7682 0.52998,-0.7671 0.5299,-0.7658 0.52983,-0.7645 0.52976,-0.7632 0.52968,-0.7618 0.52959,-0.7604 0.52951,-0.7589 0.52943,-0.7574 0.52933,-0.7559 0.52924,-0.7542 0.52915,-0.7525 0.52905,-0.7509 0.52895,-0.749 0.52884,-0.7473 0.52874,-0.7454 0.52863,-0.7435 0.52852,-0.7416 0.5284,-0.7395 0.52829,-0.7375 0.52816,-0.7355 0.52805,-0.73324 0.52791,-0.73109 0.5278,-0.72886 0.52766,-0.72657 0.52752,-0.72424 0.52739,-0.72186 0.52725,-0.71944 0.52711,-0.71696 0.52697,-0.71444 0.52682,-0.71187 0.52667,-0.70926 0.52652,-0.70659 0.52636,-0.70388 0.5262,-0.70112 0.52604,-0.69832 0.52588,-0.69546 0.52572,-0.69256 0.52554,-0.68961 0.52538,-0.68661 0.5252,-0.68357 0.52502,-0.68048 0.52484,-0.67733 0.52466,-0.67415 0.52448,-0.67092 0.52428,-0.66763 0.5241,-0.6643 0.5239,-0.66093 0.52371,-0.6575 0.52351,-0.65402 0.52331,-0.65051 0.5231,-0.64694 0.5229,-0.64332 0.52269,-0.63967 0.52247,-0.63594 0.52226,-0.6322 0.52204,-0.62839 0.52182,-0.62453 0.5216,-0.62063 0.52137,-0.61669 0.52115,-0.61268 0.52091,-0.60865 0.52068,-0.60455 0.52044,-0.60042 0.5202,-0.59623 0.51996,-0.59199 0.51971,-0.58772 0.51947,-0.58338 0.51921,-0.57901 0.51897,-0.57459 0.5187,-0.57011 0.51845,-0.5656 0.51819,-0.56102 0.51792,-0.55641 0.51766,-0.55176 0.51739,-0.54704 0.51711,-0.54228 0.51684,-0.5375 0.51659,-0.53272 0.51633,-0.52797 0.5161,-0.52327 0.51588,-0.51859 0.51567,-0.51395 0.51548,-0.50932 0.5153,-0.50475 0.51513,-0.50019 0.51498,-0.49567 0.51484,-0.49118 0.51472,-0.48672 0.5146,-0.48229 0.51451,-0.47791 0.51442,-0.47353 0.51435,-0.46921 0.5143,-0.4649 0.51425,-0.46064 0.51422,-0.45639 0.51421,-0.4522 0.5142,-0.44801 0.51421,-0.44388 0.51424,-0.43976 0.51427,-0.43569 0.51433,-0.43163 0.51439,-0.42762 0.51448,-0.42363 0.51456,-0.41968 0.51467,-0.41575 0.51479,-0.41187 0.51492,-0.408 0.51507,-0.40418 0.51524,-0.40038 0.5154,-0.39662 0.51559,-0.39288 0.5158,-0.38918 0.51601,-0.38551 0.51624,-0.38187 0.51648,-0.37827 0.51673,-0.37468 0.51701,-0.37115 0.51729,-0.36763 0.51758,-0.36415 0.5179,-0.3607 0.51822,-0.35728 0.51856,-0.35389 0.5189,-0.35054 0.51928,-0.34722 0.51965,-0.34392 0.52004,-0.34066 0.52045,-0.33744 0.52087,-0.33423 0.5213,-0.33107 0.52175,-0.32793 0.52221,-0.32484 0.52268,-0.32175 0.52317,-0.31872 0.52367,-0.31571 0.52418,-0.31273 0.52471,-0.30979 0.52526,-0.30687 0.52581,-0.30399 0.52637,-0.30114 0.52696,-0.29832 0.52756,-0.29553 0.52817,-0.29277 0.52879,-0.29005 0.52942,-0.28735 0.53008,-0.2847 0.53074,-0.28206 0.53142,-0.27946 0.53211,-0.27689 0.53282,-0.27436 0.53353,-0.27186 0.53427,-0.26938 0.53501,-0.26694 0.53577,-0.26453 0.53655,-0.26214 0.53733,-0.25981 0.53813,-0.25748 0.53895,-0.25521 0.53977,-0.25295 0.54062,-0.25073 0.54147,-0.24853 0.54233,-0.24639 0.54322,-0.24425 0.54412,-0.24216 0.54502,-0.24009 0.54595,-0.23807 0.54688,-0.23606 0.54784,-0.2341 0.54879,-0.23215 0.54978,-0.23025 0.55076,-0.22838 0.55177,-0.22653 0.55279,-0.22472 0.55382,-0.22294 0.55487,-0.22119 0.55592,-0.21948 0.557,-0.21779 0.55808,-0.21613 0.55917,-0.21451 0.56023,-0.2129 0.56126,-0.2113 0.56224,-0.20971 0.56319,-0.20813 0.5641,-0.20656 0.56496,-0.20501 0.56579,-0.20347 0.56659,-0.20193 0.56734,-0.20041 0.56805,-0.1989 0.568731,-0.1974 0.569368,-0.19591 0.569967,-0.19443 0.570528,-0.19297 0.57105,-0.19151 0.571535,-0.19007 0.57198,-0.18864 0.572386,-0.18722 0.572755,-0.1858 0.573085,-0.18441 0.573377,-0.18302 0.573629,-0.18164 0.573844,-0.18028 0.57402,-0.17893 0.574158,-0.17758 0.574256,-0.17625 0.574317,-0.17493 0.574339,-0.17362 0.574322,-0.17232 0.574268,-0.17103 0.574174,-0.16976 0.574042,-0.1685 0.573872,-0.16724 0.573663,-0.166 0.573415,-0.16476 0.57313,-0.16355 0.572805,-0.16234 0.572442,-0.16114 0.572041,-0.15996 0.571601,-0.15878 0.571123,-0.15761 0.570606,-0.15647 0.57005,-0.15532 0.569457,-0.15419 0.568824,-0.15308 0.568154,-0.15196 0.567445,-0.15087 0.566696,-0.14978 0.565911,-0.14871 0.565085,-0.14764 0.564223,-0.1466 0.56332,-0.14555 0.562381,-0.14452 0.561402,-0.14351 0.560384,-0.14249 0.559329,-0.1415 0.558235,-0.14052 0.557102,-0.13954 0.555931,-0.13858 0.554721,-0.13763 0.553474,-0.13669 0.552186,-0.13576 0.550862,-0.13484 0.549497,-0.13393 0.548096,-0.13304 0.546655,-0.13216 0.545177,-0.13128 0.543658,-0.13042 0.542103,-0.12957 0.540508,-0.12873 0.538875,-0.1279 0.537203,-0.12709 0.535494,-0.12628 0.533745,-0.12548 0.531958,-0.1247 0.530133,-0.12393 0.528268,-0.12317 0.526366,-0.12242 0.524426,-0.12168 0.522445,-0.12095 0.520428,-0.12023 0.518372,-0.11953 0.516276,-0.11884 0.514144,-0.11815 0.511971,-0.11748 0.509761,-0.11682 0.507512,-0.11617 0.505225,-0.11554 0.502899,-0.1149 0.500535,-0.11429 0.498132,-0.11369 0.49569,-0.11309 0.493211,-0.11251 0.490692,-0.11194 0.488136,-0.11138 0.485541,-0.11083 0.482906,-0.1103 0.480235,-0.10976 0.477524,-0.10926 0.474774,-0.10875 0.472003,-0.10826 0.469273,-0.10779 0.466601,-0.10736 0.463987,-0.10694 0.461429,-0.10657 0.458932,-0.10621 0.45649,-0.10588 0.454107,-0.10559 0.451781,-0.10531 0.449514,-0.10507 0.447304,-0.10485 0.445152,-0.10467 0.443057,-0.1045 0.441021,-0.10437 0.439042,-0.10427 0.437122,-0.10419 0.435258,-0.10413 0.433452,-0.10412 0.431705,-0.10412 0.430016,-0.10415 0.428383,-0.10421 0.426809,-0.10431 0.425292,-0.10441 0.423834,-0.10456 0.422432,-0.10473 0.42109,-0.10494 0.419804,-0.10515 0.418577,-0.10541 0.417406,-0.10569 0.416295,-0.106 0.415241,-0.10634 0.414244,-0.10671 0.413305,-0.10709 0.412425,-0.10752 0.411601,-0.10796 0.410836,-0.10844 0.410129,-0.10894 0.409479,-0.10947 0.408886,-0.11003 0.408353,-0.11062 0.407876,-0.11122 0.407458,-0.11188 0.407096,-0.11254 0.406794,-0.11323 0.406548,-0.11396 0.406361,-0.11471 0.406231,-0.11549 0.406159,-0.1163 0.406145,-0.11713 0.406189,-0.118 0.40629,-0.11888 0.406449,-0.11981 0.406666,-0.12074 0.406941,-0.12172 0.407274,-0.12273 0.407663,-0.12375 0.408112,-0.1248 0.408618,-0.12589 0.409181,-0.127 0.409803,-0.12814 0.410482,-0.12931 0.411219,-0.1305 0.412014,-0.13172 0.412866,-0.13297 0.413777,-0.13425 0.414745,-0.13556 0.415771,-0.13688 0.416854,-0.13825 0.417996,-0.13964 0.419195,-0.14104 0.420453,-0.1425 0.421767,-0.14396 0.42314,-0.14546 0.42457,-0.14699 0.426058,-0.14855 0.427604,-0.15012 0.429208,-0.15173 0.43087,-0.15337 0.432588,-0.15503 0.434366,-0.15673 0.436201,-0.15844 0.438093,-0.1602 0.440044,-0.16196 0.442052,-0.16377 0.444118,-0.16561 0.446242,-0.16745 0.448423,-0.16935 0.450663,-0.17125 0.45296,-0.1732 0.455314,-0.17517 0.457728,-0.17716 0.460198,-0.17919 0.462726,-0.18124 0.465312,-0.18331 0.467956,-0.18543 0.470657,-0.18755 0.473417,-0.18973 0.476234,-0.19191 0.479109,-0.19412 0.482042,-0.19638 0.485032,-0.19864 0.488069,-0.20094 0.491102,-0.20324 0.494121,-0.20553 0.497125,-0.20781 0.500114,-0.21009 0.50309,-0.21236 0.506049,-0.21464 0.508995,-0.2169 0.511926,-0.21916 0.514841,-0.22142 0.517743,-0.22367 0.52063,-0.22591 0.523501,-0.22815 0.526359,-0.23039 0.529201,-0.23261 0.532029,-0.23484 0.534842,-0.23707 0.537641,-0.23927 0.540424,-0.24149 0.543193,-0.24368 0.545948,-0.24589 0.548687,-0.24809 0.551412,-0.25027 0.554123,-0.25246 0.556818,-0.25463 0.559498,-0.25681 0.562165,-0.25898 0.564817,-0.26115 0.567453,-0.2633 0.570075,-0.26546 0.572682,-0.2676 0.575276,-0.26975 0.577853,-0.27189 0.580416,-0.27402 0.582965,-0.27616 0.585499,-0.27827 0.588018,-0.2804 0.590522,-0.2825 0.593012,-0.28462 0.595488,-0.28672 0.597947,-0.28882 0.600393,-0.29091 0.602825,-0.293 0.60524,-0.29509 0.607642,-0.29716 0.610029,-0.29924 0.612401,-0.3013 0.614759,-0.30337 0.617101,-0.30542 0.61943,-0.30748 0.621743,-0.30953 0.624041,-0.31157 0.626326,-0.31361 0.628595,-0.31564 0.630849,-0.31767 0.63309,-0.31969 0.635314,-0.32171 0.637525,-0.32373 0.639721,-0.32573 0.641902,-0.32773 0.644068,-0.32973 0.646221,-0.33173 0.648357,-0.33371 0.650479,-0.33569 0.652587,-0.33767 0.65468,-0.33965 0.656758,-0.34161 0.658822,-0.34357 0.660871,-0.34553 0.662904,-0.34749 0.664924,-0.34943 0.666929,-0.35137 0.668919,-0.35331 0.670894,-0.35524 0.672855,-0.35717 0.674801,-0.35909 0.676732,-0.36101 0.678648,-0.36292 0.680551,-0.36483 0.682437,-0.36673 0.68431,-0.36862 0.686168,-0.37052 0.688011,-0.3724 0.689839,-0.37429 0.691653,-0.37616 0.693451,-0.37803 0.695237,-0.37991 0.697005,-0.38176 0.698761,-0.38362 0.7005,-0.38546 0.702226,-0.38732 0.703937,-0.38916 0.705633,-0.39099 0.707314,-0.39283 0.708981,-0.39465 0.710633,-0.39647 0.712271,-0.39829 0.713893,-0.4001 0.7155,-0.4019 0.717094,-0.40371 0.718673,-0.4055 0.720224,-0.40729 0.721703,-0.40904 0.723098,-0.41075 0.724406,-0.41242 0.72563,-0.41406 0.726768,-0.41566 0.727823,-0.41721 0.728792,-0.41873 0.729676,-0.4202 0.730475,-0.42165 0.731189,-0.42304 0.731818,-0.42441 0.732363,-0.42572 0.732821,-0.42701 0.733196,-0.42825 0.733485,-0.42946 0.733689,-0.43062 0.733808,-0.43175 0.733843,-0.43283 0.733792,-0.43388 0.733657,-0.4349 0.733436,-0.43586 0.733131,-0.43678 0.732739,-0.43769 0.732265,-0.43853 0.731704,-0.43935 0.731058,-0.44012 0.730329,-0.44085 0.729512,-0.44155 0.728613,-0.44221 0.727627,-0.44283 0.726557,-0.4434 0.725401,-0.44394 0.724162,-0.44444 0.722836,-0.44491 0.721426,-0.44532 0.719931,-0.44571 0.71835,-0.44605 0.716686,-0.44636 0.714936,-0.44662 0.7131,-0.44685 0.711181,-0.44703 0.709176,-0.44719 0.707085,-0.44729 0.704911,-0.44736 0.702651,-0.44739 0.700306,-0.44739 0.697877,-0.44734 0.695361,-0.44725 0.692762,-0.44712 0.690077,-0.44696 0.687308,-0.44676 0.684452,-0.44651 0.681513,-0.44623 0.678489,-0.44591 0.675379,-0.44555 0.672184,-0.44515 0.668905,-0.44471 0.665541,-0.44423 0.662091,-0.44372 0.658556,-0.44316 0.654937,-0.44256 0.651233,-0.44194 0.647441,-0.44125 0.64357,-0.44055 0.63961,-0.43979 0.63557,-0.439 0.63143,-0.43818 0.62723,-0.4373 0.62292,-0.4364 0.61854,-0.43545 0.61407,-0.43446 0.60951,-0.43344 0.60488,-0.43237 0.60015,-0.43127 0.59535,-0.43013 0.59045,-0.42894 0.58547,-0.42773 0.58041,-0.42646 0.57525,-0.42517 0.57003,-0.42383 0.5647,-0.42245 0.55931,-0.42103 0.55381,-0.41958 0.54824,-0.41808 0.54258,-0.41655 0.53684,-0.41498 0.53101,-0.41336 0.52509,-0.41171 0.5191,-0.41003 0.51301,-0.40829 0.50684,-0.40652 0.50059,-0.40472 0.49426,-0.40287 0.48783,-0.40099 0.48132,-0.39906 0.47472,-0.39709 0.46805,-0.3951 0.46129,-0.39305 0.45444,-0.39096 0.4475,-0.38885 0.44051,-0.3867 0.43356,-0.38456 0.42669,-0.38245 0.41987,-0.38035 0.41314,-0.37827 0.40646,-0.37622 0.39986,-0.37419 0.39333,-0.37218 0.38687,-0.37019 0.38047,-0.36823 0.37416,-0.36628 0.36789,-0.36435 0.36172,-0.36245 0.3556,-0.36057 0.34955,-0.35871 0.34358,-0.35687 0.33767,-0.35505 0.33183,-0.35326 0.32607,-0.35148 0.32037,-0.34973 0.31474,-0.348 0.30918,-0.34629 0.30369,-0.34459 0.29827,-0.34293 0.29292,-0.34128 0.28764,-0.33966 0.28243,-0.33806 0.27729,-0.33647 0.27221,-0.33491 0.26721,-0.33337 0.26228,-0.33185 0.25741,-0.33036 0.25262,-0.32888 0.24789,-0.32743 0.24324,-0.32599 0.23865,-0.32458 0.23414,-0.3232 0.22969,-0.32182 0.22531,-0.32048 0.221,-0.31915 0.21676,-0.31785 0.2126,-0.31656 0.20849,-0.31531 0.20446,-0.31406 0.20051,-0.31284 0.19661,-0.31165 0.19279,-0.31047 0.18904,-0.30932 0.18535,-0.30818 0.18175,-0.30707 0.17819,-0.30598 0.17473,-0.30491 0.17132,-0.30386 0.16798,-0.30284 0.16472,-0.30183 0.16152,-0.30085 0.15839,-0.29989 0.15534,-0.29894 0.15235,-0.29803 0.14943,-0.29713 0.14658,-0.29625 0.1438,-0.2954 0.14109,-0.29456 0.13845,-0.29375 0.13588,-0.29295 0.13338,-0.29219 0.13095,-0.29144 0.12858,-0.29072 0.1263,-0.29 0.12406,-0.28933 0.12192,-0.28866 0.11982,-0.28802 0.11782,-0.2874 0.11587,-0.2868 0.11399,-0.28622 0.11218,-0.28567 0.11045,-0.28513 0.10878,-0.28462 0.10718,-0.28413 0.10566,-0.28365 0.10419,-0.28321 0.10281,-0.28278 0.10148,-0.28238 0.10023,-0.28199 0.0991,-0.28162 0.0979,-0.28129 0.0969,-0.28096 0.0959,-0.28066 0.095,-0.28039 0.0942,-0.28013 0.0934,-0.27989 0.0927,-0.27968 0.0921,-0.27949 0.0915,-0.27931 0.0911,-0.27917 0.0907,-0.27904 0.0903,-0.27893 0.09,-0.27885 0.0898,-0.27878 0.0897,-0.27874 0.0896,-0.27871"
+           style="fill:none;stroke:#000000;stroke-width:4.30000019;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5921"
+           d="m -108.71723,930.7688 a 3.543307,3.543307 0 1 0 -7.08661,0 3.543307,3.543307 0 1 0 7.08661,0 z"
+           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5923"
+           d="m -151.24219,956.19389 7.08662,0"
+           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5925"
+           d="m -144.15557,956.19389 0,-7.08661"
+           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5927"
+           d="m -144.15557,949.10728 -7.08662,0"
+           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5929"
+           d="m -151.24219,949.10728 0,7.08661"
+           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5931"
+           d="m -147.69888,952.65058 35.43834,-21.88178"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5933"
+           d="m -112.26054,930.7688 35.438345,-21.88178"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5935"
+           d="m -76.822195,908.88702 35.438342,-21.88178"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5937"
+           d="M -41.383853,887.00524 -5.945511,865.12346"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5939"
+           d="M -5.945511,865.12346 29.492831,843.24167"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5941"
+           d="M 29.492831,843.24167 64.931173,821.35989"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5943"
+           d="m -183.13722,974.53237 35.43834,-21.88179"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5945"
+           d="m -218.57556,996.41415 35.43834,-21.88178"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5947"
+           d="M -151.04851,1094.3433 A 141.73228,141.73228 0 1 0 -276.57583,893.66947"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-dasharray:1.7717, 0.8858"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5949"
+           d="M -27.103288,878.18755 90.609308,1068.8274"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-dasharray:1.7717, 0.8858"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5951"
+           d="M -144.81588,687.54773 -27.103288,878.18755"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-dasharray:1.7717, 0.8858"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5953"
+           d="m -45.84668,733.32824 -3.769524,-6.25636"
+           style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5955"
+           d="m -49.616204,727.07188 -7.302927,0.13633"
+           style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5957"
+           d="m -56.919131,727.20821 -3.533402,6.39268"
+           style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5959"
+           d="m -60.452533,733.60089 3.769524,6.25636"
+           style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5961"
+           d="m -56.683009,739.85725 7.302927,-0.13633"
+           style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5963"
+           d="m -49.380082,739.72092 3.533402,-6.39268"
+           style="fill:none;stroke:#000000;stroke-width:3.5;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5965"
+           d="M -53.149606,733.46457 -147.69888,952.65058"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-linecap:round"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path5967"
+           d="M -53.149606,733.46457 18.73496,849.88423"
+           style="fill:none;stroke:#000000;stroke-width:1.20000005;stroke-dasharray:0.5, 0.8858"
+           inkscape:connector-curvature="0" />
+      </g>
+      <g
+         id="g5969"
+         inkscape:label="Layer2" />
+      <g
+         id="g5971"
+         inkscape:label="Layer3" />
+      <g
+         id="g5973"
+         inkscape:label="Layer4" />
+      <g
+         id="g5975"
+         inkscape:label="Layer5" />
+      <g
+         id="g5977"
+         inkscape:label="Layer6" />
+      <g
+         id="g5979"
+         inkscape:label="Layer7" />
+      <g
+         id="g5981"
+         inkscape:label="Layer8" />
+      <g
+         id="g5983"
+         inkscape:label="Layer9" />
+      <g
+         id="g5985"
+         inkscape:label="Layer10" />
+      <g
+         id="g5987"
+         inkscape:label="Layer11" />
+      <g
+         id="g5989"
+         inkscape:label="Layer12" />
+      <g
+         id="g5991"
+         inkscape:label="Layer13" />
+      <g
+         id="g5993"
+         inkscape:label="Layer14" />
+      <g
+         id="g5995"
+         inkscape:label="Layer15" />
+      <g
+         id="g5997"
+         inkscape:label="Layer16" />
+      <g
+         id="g5999"
+         inkscape:label="Layer17" />
+      <g
+         id="g6001"
+         inkscape:label="Layer18" />
+      <g
+         id="g6003"
+         inkscape:label="Layer19" />
+      <g
+         id="g6005"
+         inkscape:label="Layer20" />
+      <g
+         id="g6007"
+         inkscape:label="Layer21" />
+      <g
+         id="g6009"
+         inkscape:label="Layer22" />
+      <g
+         id="g6011"
+         inkscape:label="Layer23" />
+      <g
+         id="g6013"
+         inkscape:label="Layer24" />
+      <g
+         id="g6015"
+         inkscape:label="Layer25" />
+      <g
+         id="g6017"
+         inkscape:label="Layer26" />
+      <g
+         id="g6019"
+         inkscape:label="Layer27" />
+      <g
+         id="g6021"
+         inkscape:label="Layer28" />
+      <g
+         id="g6023"
+         inkscape:label="Layer29" />
+      <g
+         id="g6025"
+         inkscape:label="Layer30" />
+      <g
+         id="g6027"
+         inkscape:label="Layer31" />
+      <g
+         id="g6029"
+         inkscape:label="Layer32" />
+      <g
+         id="g6031"
+         inkscape:label="Layer33" />
+      <g
+         id="g6033"
+         inkscape:label="Layer34" />
+      <g
+         id="g6035"
+         inkscape:label="Layer35" />
+      <g
+         id="g6037"
+         inkscape:label="Layer36" />
+      <g
+         id="g6039"
+         inkscape:label="Layer37" />
+      <g
+         id="g6041"
+         inkscape:label="Layer38" />
+      <g
+         id="g6043"
+         inkscape:label="Layer39" />
+      <g
+         id="g6045"
+         inkscape:label="Layer40" />
+      <g
+         id="g6047"
+         inkscape:label="Layer41" />
+      <g
+         id="g6049"
+         inkscape:label="Layer42" />
+      <g
+         id="g6051"
+         inkscape:label="Layer43" />
+      <g
+         id="g6053"
+         inkscape:label="Layer44" />
+      <g
+         id="g6055"
+         inkscape:label="Layer45" />
+      <g
+         id="g6057"
+         inkscape:label="Layer46" />
+      <g
+         id="g6059"
+         inkscape:label="Layer47" />
+      <g
+         id="g6061"
+         inkscape:label="Layer48" />
+      <g
+         id="g6063"
+         inkscape:label="Layer49" />
+      <g
+         id="g6065"
+         inkscape:label="Layer50" />
+      <g
+         id="g6067"
+         inkscape:label="Layer51" />
+      <g
+         id="g6069"
+         inkscape:label="Layer52" />
+      <g
+         id="g6071"
+         inkscape:label="Layer53" />
+      <g
+         id="g6073"
+         inkscape:label="Layer54" />
+      <g
+         id="g6075"
+         inkscape:label="Layer55" />
+      <g
+         id="g6077"
+         inkscape:label="Layer56" />
+      <g
+         id="g6079"
+         inkscape:label="Layer57" />
+      <g
+         id="g6081"
+         inkscape:label="Layer58" />
+      <g
+         id="g6083"
+         inkscape:label="Layer59" />
+      <g
+         id="g6085"
+         inkscape:label="Layer60" />
+      <g
+         id="g6087"
+         inkscape:label="Layer61" />
+      <g
+         id="g6089"
+         inkscape:label="Layer62" />
+      <g
+         id="g6091"
+         inkscape:label="Layer63" />
+      <g
+         id="g6093"
+         inkscape:label="Layer64" />
+      <g
+         id="g6095"
+         inkscape:label="Layer65" />
+      <g
+         id="g6097"
+         inkscape:label="Layer66" />
+      <g
+         id="g6099"
+         inkscape:label="Layer67" />
+      <g
+         id="g6101"
+         inkscape:label="Layer68" />
+      <g
+         id="g6103"
+         inkscape:label="Layer69" />
+      <g
+         id="g6105"
+         inkscape:label="Layer70" />
+      <g
+         id="g6107"
+         inkscape:label="Layer71" />
+      <g
+         id="g6109"
+         inkscape:label="Layer72" />
+      <g
+         id="g6111"
+         inkscape:label="Layer73" />
+      <g
+         id="g6113"
+         inkscape:label="Layer74" />
+      <g
+         id="g6115"
+         inkscape:label="Layer75" />
+      <g
+         id="g6117"
+         inkscape:label="Layer76" />
+      <g
+         id="g6119"
+         inkscape:label="Layer77" />
+      <g
+         id="g6121"
+         inkscape:label="Layer78" />
+      <g
+         id="g6123"
+         inkscape:label="Layer79" />
+      <g
+         id="g6125"
+         inkscape:label="Layer80" />
+      <g
+         id="g6127"
+         inkscape:label="Layer81" />
+      <g
+         id="g6129"
+         inkscape:label="Layer82" />
+      <g
+         id="g6131"
+         inkscape:label="Layer83" />
+      <g
+         id="g6133"
+         inkscape:label="Layer84" />
+      <g
+         id="g6135"
+         inkscape:label="Layer85" />
+      <g
+         id="g6137"
+         inkscape:label="Layer86" />
+      <g
+         id="g6139"
+         inkscape:label="Layer87" />
+      <g
+         id="g6141"
+         inkscape:label="Layer88" />
+      <g
+         id="g6143"
+         inkscape:label="Layer89" />
+      <g
+         id="g6145"
+         inkscape:label="Layer90" />
+      <g
+         id="g6147"
+         inkscape:label="Layer91" />
+      <g
+         id="g6149"
+         inkscape:label="Layer92" />
+      <g
+         id="g6151"
+         inkscape:label="Layer93" />
+      <g
+         id="g6153"
+         inkscape:label="Layer94" />
+      <g
+         id="g6155"
+         inkscape:label="Layer95" />
+      <g
+         id="g6157"
+         inkscape:label="Layer96" />
+      <g
+         id="g6159"
+         inkscape:label="Layer97" />
+      <g
+         id="g6161"
+         inkscape:label="Layer98" />
+      <g
+         id="g6163"
+         inkscape:label="Layer99" />
+      <g
+         id="g6165"
+         inkscape:label="Layer100" />
+      <g
+         id="g6167"
+         inkscape:label="Layer101" />
+      <g
+         id="g6169"
+         inkscape:label="Layer102" />
+      <g
+         id="g6171"
+         inkscape:label="Layer103" />
+      <g
+         id="g6173"
+         inkscape:label="Layer104" />
+      <g
+         id="g6175"
+         inkscape:label="Layer105" />
+      <g
+         id="g6177"
+         inkscape:label="Layer106" />
+      <g
+         id="g6179"
+         inkscape:label="Layer107" />
+      <g
+         id="g6181"
+         inkscape:label="Layer108" />
+      <g
+         id="g6183"
+         inkscape:label="Layer109" />
+      <g
+         id="g6185"
+         inkscape:label="Layer110" />
+      <g
+         id="g6187"
+         inkscape:label="Layer111" />
+      <g
+         id="g6189"
+         inkscape:label="Layer112" />
+      <g
+         id="g6191"
+         inkscape:label="Layer113" />
+      <g
+         id="g6193"
+         inkscape:label="Layer114" />
+      <g
+         id="g6195"
+         inkscape:label="Layer115" />
+      <g
+         id="g6197"
+         inkscape:label="Layer116" />
+      <g
+         id="g6199"
+         inkscape:label="Layer117" />
+      <g
+         id="g6201"
+         inkscape:label="Layer118" />
+      <g
+         id="g6203"
+         inkscape:label="Layer119" />
+      <g
+         id="g6205"
+         inkscape:label="Layer120" />
+      <g
+         id="g6207"
+         inkscape:label="Layer121" />
+      <g
+         id="g6209"
+         inkscape:label="Layer122" />
+      <g
+         id="g6211"
+         inkscape:label="Layer123" />
+      <g
+         id="g6213"
+         inkscape:label="Layer124" />
+      <g
+         id="g6215"
+         inkscape:label="Layer125" />
+      <g
+         id="g6217"
+         inkscape:label="Layer126" />
+      <g
+         id="g6219"
+         inkscape:label="Layer127" />
+      <g
+         id="g6221"
+         inkscape:label="Layer128" />
+      <g
+         id="g6223"
+         inkscape:label="Layer129" />
+      <g
+         id="g6225"
+         inkscape:label="Layer130" />
+      <g
+         id="g6227"
+         inkscape:label="Layer131" />
+      <g
+         id="g6229"
+         inkscape:label="Layer132" />
+      <g
+         id="g6231"
+         inkscape:label="Layer133" />
+      <g
+         id="g6233"
+         inkscape:label="Layer134" />
+      <g
+         id="g6235"
+         inkscape:label="Layer135" />
+      <g
+         id="g6237"
+         inkscape:label="Layer136" />
+      <g
+         id="g6239"
+         inkscape:label="Layer137" />
+      <g
+         id="g6241"
+         inkscape:label="Layer138" />
+      <g
+         id="g6243"
+         inkscape:label="Layer139" />
+      <g
+         id="g6245"
+         inkscape:label="Layer140" />
+      <g
+         id="g6247"
+         inkscape:label="Layer141" />
+      <g
+         id="g6249"
+         inkscape:label="Layer142" />
+      <g
+         id="g6251"
+         inkscape:label="Layer143" />
+      <g
+         id="g6253"
+         inkscape:label="Layer144" />
+      <g
+         id="g6255"
+         inkscape:label="Layer145" />
+      <g
+         id="g6257"
+         inkscape:label="Layer146" />
+      <g
+         id="g6259"
+         inkscape:label="Layer147" />
+      <g
+         id="g6261"
+         inkscape:label="Layer148" />
+      <g
+         id="g6263"
+         inkscape:label="Layer149" />
+      <g
+         id="g6265"
+         inkscape:label="Layer150" />
+      <g
+         id="g6267"
+         inkscape:label="Layer151" />
+      <g
+         id="g6269"
+         inkscape:label="Layer152" />
+      <g
+         id="g6271"
+         inkscape:label="Layer153" />
+      <g
+         id="g6273"
+         inkscape:label="Layer154" />
+      <g
+         id="g6275"
+         inkscape:label="Layer155" />
+      <g
+         id="g6277"
+         inkscape:label="Layer156" />
+      <g
+         id="g6279"
+         inkscape:label="Layer157" />
+      <g
+         id="g6281"
+         inkscape:label="Layer158" />
+      <g
+         id="g6283"
+         inkscape:label="Layer159" />
+      <g
+         id="g6285"
+         inkscape:label="Layer160" />
+      <g
+         id="g6287"
+         inkscape:label="Layer161" />
+      <g
+         id="g6289"
+         inkscape:label="Layer162" />
+      <g
+         id="g6291"
+         inkscape:label="Layer163" />
+      <g
+         id="g6293"
+         inkscape:label="Layer164" />
+      <g
+         id="g6295"
+         inkscape:label="Layer165" />
+      <g
+         id="g6297"
+         inkscape:label="Layer166" />
+      <g
+         id="g6299"
+         inkscape:label="Layer167" />
+      <g
+         id="g6301"
+         inkscape:label="Layer168" />
+      <g
+         id="g6303"
+         inkscape:label="Layer169" />
+      <g
+         id="g6305"
+         inkscape:label="Layer170" />
+      <g
+         id="g6307"
+         inkscape:label="Layer171" />
+      <g
+         id="g6309"
+         inkscape:label="Layer172" />
+      <g
+         id="g6311"
+         inkscape:label="Layer173" />
+      <g
+         id="g6313"
+         inkscape:label="Layer174" />
+      <g
+         id="g6315"
+         inkscape:label="Layer175" />
+      <g
+         id="g6317"
+         inkscape:label="Layer176" />
+      <g
+         id="g6319"
+         inkscape:label="Layer177" />
+      <g
+         id="g6321"
+         inkscape:label="Layer178" />
+      <g
+         id="g6323"
+         inkscape:label="Layer179" />
+      <g
+         id="g6325"
+         inkscape:label="Layer180" />
+      <g
+         id="g6327"
+         inkscape:label="Layer181" />
+      <g
+         id="g6329"
+         inkscape:label="Layer182" />
+      <g
+         id="g6331"
+         inkscape:label="Layer183" />
+      <g
+         id="g6333"
+         inkscape:label="Layer184" />
+      <g
+         id="g6335"
+         inkscape:label="Layer185" />
+      <g
+         id="g6337"
+         inkscape:label="Layer186" />
+      <g
+         id="g6339"
+         inkscape:label="Layer187" />
+      <g
+         id="g6341"
+         inkscape:label="Layer188" />
+      <g
+         id="g6343"
+         inkscape:label="Layer189" />
+      <g
+         id="g6345"
+         inkscape:label="Layer190" />
+      <g
+         id="g6347"
+         inkscape:label="Layer191" />
+      <g
+         id="g6349"
+         inkscape:label="Layer192" />
+      <g
+         id="g6351"
+         inkscape:label="Layer193" />
+      <g
+         id="g6353"
+         inkscape:label="Layer194" />
+      <g
+         id="g6355"
+         inkscape:label="Layer195" />
+      <g
+         id="g6357"
+         inkscape:label="Layer196" />
+      <g
+         id="g6359"
+         inkscape:label="Layer197" />
+      <g
+         id="g6361"
+         inkscape:label="Layer198" />
+      <g
+         id="g6363"
+         inkscape:label="Layer199" />
+      <g
+         id="g6365"
+         inkscape:label="Layer200" />
+      <g
+         id="g6367"
+         inkscape:label="Layer201" />
+      <g
+         id="g6369"
+         inkscape:label="Layer202" />
+      <g
+         id="g6371"
+         inkscape:label="Layer203" />
+      <g
+         id="g6373"
+         inkscape:label="Layer204" />
+      <g
+         id="g6375"
+         inkscape:label="Layer205" />
+      <g
+         id="g6377"
+         inkscape:label="Layer206" />
+      <g
+         id="g6379"
+         inkscape:label="Layer207" />
+      <g
+         id="g6381"
+         inkscape:label="Layer208" />
+      <g
+         id="g6383"
+         inkscape:label="Layer209" />
+      <g
+         id="g6385"
+         inkscape:label="Layer210" />
+      <g
+         id="g6387"
+         inkscape:label="Layer211" />
+      <g
+         id="g6389"
+         inkscape:label="Layer212" />
+      <g
+         id="g6391"
+         inkscape:label="Layer213" />
+      <g
+         id="g6393"
+         inkscape:label="Layer214" />
+      <g
+         id="g6395"
+         inkscape:label="Layer215" />
+      <g
+         id="g6397"
+         inkscape:label="Layer216" />
+      <g
+         id="g6399"
+         inkscape:label="Layer217" />
+      <g
+         id="g6401"
+         inkscape:label="Layer218" />
+      <g
+         id="g6403"
+         inkscape:label="Layer219" />
+      <g
+         id="g6405"
+         inkscape:label="Layer220" />
+      <g
+         id="g6407"
+         inkscape:label="Layer221" />
+      <g
+         id="g6409"
+         inkscape:label="Layer222" />
+      <g
+         id="g6411"
+         inkscape:label="Layer223" />
+      <g
+         id="g6413"
+         inkscape:label="Layer224" />
+      <g
+         id="g6415"
+         inkscape:label="Layer225" />
+      <g
+         id="g6417"
+         inkscape:label="Layer226" />
+      <g
+         id="g6419"
+         inkscape:label="Layer227" />
+      <g
+         id="g6421"
+         inkscape:label="Layer228" />
+      <g
+         id="g6423"
+         inkscape:label="Layer229" />
+      <g
+         id="g6425"
+         inkscape:label="Layer230" />
+      <g
+         id="g6427"
+         inkscape:label="Layer231" />
+      <g
+         id="g6429"
+         inkscape:label="Layer232" />
+      <g
+         id="g6431"
+         inkscape:label="Layer233" />
+      <g
+         id="g6433"
+         inkscape:label="Layer234" />
+      <g
+         id="g6435"
+         inkscape:label="Layer235" />
+      <g
+         id="g6437"
+         inkscape:label="Layer236" />
+      <g
+         id="g6439"
+         inkscape:label="Layer237" />
+      <g
+         id="g6441"
+         inkscape:label="Layer238" />
+      <g
+         id="g6443"
+         inkscape:label="Layer239" />
+      <g
+         id="g6445"
+         inkscape:label="Layer240" />
+      <g
+         id="g6447"
+         inkscape:label="Layer241" />
+      <g
+         id="g6449"
+         inkscape:label="Layer242" />
+      <g
+         id="g6451"
+         inkscape:label="Layer243" />
+      <g
+         id="g6453"
+         inkscape:label="Layer244" />
+      <g
+         id="g6455"
+         inkscape:label="Layer245" />
+      <g
+         id="g6457"
+         inkscape:label="Layer246" />
+      <g
+         id="g6459"
+         inkscape:label="Layer247" />
+      <g
+         id="g6461"
+         inkscape:label="Layer248" />
+      <g
+         id="g6463"
+         inkscape:label="Layer249" />
+      <g
+         id="g6465"
+         inkscape:label="Layer250" />
+      <g
+         id="g6467"
+         inkscape:label="Layer251" />
+      <g
+         id="g6469"
+         inkscape:label="Layer252" />
+      <g
+         id="g6471"
+         inkscape:label="Layer253" />
+      <g
+         id="g6473"
+         inkscape:label="Layer254" />
+      <g
+         id="g6475"
+         inkscape:label="Layer255" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="208.57143"
+       y="666.64795"
+       id="text6785"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6787"
+         x="208.57143"
+         y="666.64795"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Airplane</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:13.75px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="80.714279"
+       y="753.79083"
+       id="text6789"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6791"
+         x="80.714279"
+         y="753.79083"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,  Italic'">L<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:64.99999762%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,  Italic';baseline-shift:sub"
+   id="tspan6793">desired</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,  Italic';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="145"
+       y="917.36224"
+       id="text6795"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6797"
+         x="145"
+         y="917.36224">P<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:64.99999762%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,  Italic';baseline-shift:sub"
+   id="tspan6799">des</tspan>(t)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,  Italic';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="177.85715"
+       y="890.21942"
+       id="text6801"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6803"
+         x="177.85715"
+         y="890.21942">P<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:64.99999762%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,  Italic';baseline-shift:sub"
+   id="tspan6805">des</tspan>(t-1)</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#6791e7;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2Lstart);marker-end:url(#Arrow2Lend)"
+       d="m 297.95664,790.72821 -41.87267,27.13527"
+       id="path6807"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';letter-spacing:0px;word-spacing:0px;fill:#6791e7;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="262.01202"
+       y="800.14203"
+       id="text7561"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan7563"
+         x="262.01202"
+         y="800.14203">Δ𝐿</tspan></text>
+  </g>
+</svg>
