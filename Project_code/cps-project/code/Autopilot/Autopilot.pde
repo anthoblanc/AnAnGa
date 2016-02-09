@@ -8,7 +8,7 @@
 
 
 //zeros time space zone
-#define zero_space_size 5
+#define zero_space_size 0.5
 #define center_zero_space_x -365
 #define center_zero_space_y -400
 #define center_zero_space_z -0.87
@@ -56,9 +56,6 @@ struct vector trajectory_refgnd; //contain the direction of the path "L"
 uint32_t tstart = 20e6; // path starting time
 uint32_t tend = 30e6; // path ending time
 
-// temporary variables
-uint8_t firstLoop = 1;
-
 // Construct Standard Controller
 //StandardController stdCTRL(hal);
 
@@ -72,7 +69,8 @@ int8_t aerobatOn = 0;
 struct StateVariables stateVars, prevStateVars;
 
 //temp for test
-StateVariables copyOfStateVars,temp;
+StateVariables copyOfStateVars, temp;
+int firstLoop=1;
 
 // Variables for Throttle error computation
 struct vector prevPathNED = {-365,-400,0.87};
@@ -129,7 +127,7 @@ void setup()
 void loop()
 {
     hardware_time = hal.scheduler->micros(); // real hadware time 
-    relative_time=hardware_time-zero_time;
+    relative_time=hardware_time-zero_time; //time since the new simulation
 
     /* zero space time:
     Manage the plane crash or reinitialsiation*/
@@ -138,9 +136,16 @@ void loop()
     &&  ( fabs(stateVars.pnPePd.z-center_zero_space_z) < zero_space_size )
     &&  ( relative_time > 10e6 ) )
     {
-        firstLoop = 1;
-        relative_time = 0;
+         //initialisation of the path origine
+         pathned.x = -365;
+         pathned.y = -400;
+         pathned.z = -0.87;
+
+        //time initialisation
+        relative_time = 0; //will be recalculate at each iteration
         zero_time=hal.scheduler->micros();
+
+        firstLoop=1;
     }
     //----//
 
@@ -207,13 +212,6 @@ void loop()
 
         //***************************************************
         // Path Generation
-
-        // Testwise desired Trajectory
-        if (firstLoop){
-            pathned.x = -365;
-            pathned.y = -400;
-            pathned.z = -0.87;
-        }
         if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
@@ -229,6 +227,7 @@ void loop()
         }
 
         //***************************************************
+
         // Path Processing
         // Calculating differential Trajectory
         trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
