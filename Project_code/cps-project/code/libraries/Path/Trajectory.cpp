@@ -160,16 +160,16 @@ struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, str
                 desired_path = traj_refresh(current_location);
             }
             */
-           else if (time<40e6){
+           else if (time<31e6){
                 //desired_path = traj_initialize(current_location);
-                trajectory_refgnd = traj_dive(desired_path, current_location);
+                //trajectory_refgnd = traj_dive(desired_path, current_location);
                 //trajectory_refgnd = traj_circle(desired_path, current_location, time);
             }
           
             else {   
                 //trajectory_refgnd = traj_climbup(desired_path, current_location);
-                trajectory_refgnd = traj_climbup(desired_path, current_location);
-                //trajectory_refgnd = traj_snake(desired_path, current_location, time);
+                //trajectory_refgnd = traj_climbup(desired_path, current_location);
+                trajectory_refgnd = traj_snake(desired_path, current_location, time);
             }
           
             return (trajectory_refgnd);

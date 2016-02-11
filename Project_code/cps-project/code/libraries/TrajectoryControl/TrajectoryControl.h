@@ -66,7 +66,7 @@ private:
 
 #define Kp_Aileron 0.09
 #define Ki_Aileron 0.0
-#define Kd_Aileron 0.01
+#define Kd_Aileron 0.04
 #define IntLim_Aileron 0.1
 #define Casc_Aileron 1
 

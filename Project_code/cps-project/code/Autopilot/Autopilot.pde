@@ -25,7 +25,7 @@ typedef int           BOOL;
 #define center_zero_space_z -0.87
 
 // Look Ahead Distance (Desired Length) [feet]
-#define LookAheadDistance 50
+#define LookAheadDistance 40
 
 //***************************************************
 // Libraries
@@ -74,6 +74,8 @@ uint32_t tend = 30e6; // path ending time
 //StandardController stdCTRL(hal);
 
 struct SteeringSignals stSig;
+int firstLoop=1;
+
 
 // Construct the Aerobatic Trajectory Controller
 TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
@@ -83,7 +85,7 @@ struct StateVariables stateVars, prevStateVars;
 
 //temp for test
 StateVariables copyOfStateVars, temp;
-int firstLoop=1;
+uint32_t resetGPS_time;
 
 // Variables for Throttle error computation
 PathDelay pathDly;
@@ -206,8 +208,10 @@ void loop()
         // Check for GPS-signal loss
         if(firstLoop){
             prevStateVars.importData(stateVars);
+            resetGPS_time = hal.scheduler->micros()-zero_time;
         }
     copyOfStateVars.importData(stateVars);
+
         if (1/* NoSignalAvailableGPS(stateVars.phiThetaPsi, 60)*/ ) {
                 // If signal loss, process new state variables with iteration method
                 estimateStateVars (hardware_time,hal,stateVars, prevStateVars);	// Because stateVars already contains the ideal values, only "real measured" data will be taken. The rest will be overwritten by estimating method.
@@ -219,12 +223,18 @@ void loop()
     stateVars.importData(copyOfStateVars);
     copyOfStateVars.importData(temp);
 
+    if(relative_time>=resetGPS_time){
+        resetGPS_time = hal.scheduler->micros()-zero_time+5e6;
+        hal.console->printf("ResetGPS.\n");
+        prevStateVars.importData(stateVars);
+    }
+
         //***************************************************
         // Path Generation
 /*        if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += -5.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += -10.0 * static_cast<float>(PERIOD) /1e6;
         }else if (relative_time<50e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
@@ -235,14 +245,15 @@ void loop()
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
 */
+        trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
+
         //***************************************************
 
         // Path Processing
         // Calculating differential Trajectory
         //trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
-         trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
-        // Calculating controller input for throttle
+         // Calculating controller input for throttle
         errorThrottle = pathDly.update(pathned,trajectory_refgnd);
         errorThrottle -= desiredL;
 
@@ -256,7 +267,7 @@ void loop()
 
         //***************************************************
         // Controller
-
+        gCMD_refbody = multiplyScalarToVector(gCMD_refbody,0.2);
         aCMD_refbody = subtractVector(aCMD_refbody,gCMD_refbody);
         stSig = trCTRL.update(hardware_time,errorThrottle,aCMD_refbody,gCMD_refbody,stateVars,phiRef);
 
