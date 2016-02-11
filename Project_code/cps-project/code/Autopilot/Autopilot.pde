@@ -301,7 +301,7 @@ void loop()
                 //hal.console->printf("in_velocity: %f\tbo_velocity: %f\n",velocity(stateVars.pnPePdDot),stateVars.groundSpeed);
                 //hal.console->printf("uvw: (%f,%f,%f)\tpos_in: (%f,%f,%f)\n\n",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
                 //hal.console->printf("acc: (%f,%f,%f)\n",stateVars.accelerationBodyFrame.x,stateVars.accelerationBodyFrame.y,stateVars.accelerationBodyFrame.z);
-
+            //hal.console->printf("DeltaL: %f\n",errorThrottle);
             hal.console->printf("ist: (%f,%f,%f)\nGPS?:%i\n\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,NoSignalAvailableGPS(stateVars.phiThetaPsi,60));
         }
 
