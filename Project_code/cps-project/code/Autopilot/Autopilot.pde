@@ -53,7 +53,7 @@ typedef int           BOOL;
 #include "../libraries/StateVariables/StateVariables.h"
 #include "../libraries/TrajectoryControl/TrajectoryControl.h"
 #include "../libraries/StandardController/StandardController.h"
-#include "../libraries/Path/Path.h"
+#include "../libraries/Path/Trajectory.h"
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"
 #include "../libraries/Interface/Interface.hpp"
 #include "generateOutSignals.h"
@@ -65,7 +65,7 @@ typedef int           BOOL;
 //***************************************************
 
 struct vector trajectory_refgnd; //contain the direction of the path "L"
-
+struct vector pathned;
 // Path start end time
 uint32_t tstart = 20e6; // path starting time
 uint32_t tend = 30e6; // path ending time
@@ -149,10 +149,6 @@ void loop()
     &&  ( fabs(stateVars.pnPePd.z-center_zero_space_z) < zero_space_size )
     &&  ( relative_time > 10e6 ) )
     {
-         //initialisation of the path origin
-         pathned.x = -365;
-         pathned.y = -400;
-         pathned.z = -0.87;
 
         //time initialisation
         relative_time = 0; //will be recalculate at each iteration
@@ -225,7 +221,7 @@ void loop()
 
         //***************************************************
         // Path Generation
-        if (relative_time<30e6){
+/*        if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -5.0 * static_cast<float>(PERIOD) /1e6;
@@ -238,13 +234,14 @@ void loop()
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
-
+*/
         //***************************************************
 
         // Path Processing
         // Calculating differential Trajectory
-        trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
+        //trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
+         trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
         // Calculating controller input for throttle
         errorThrottle = pathDly.update(pathned,trajectory_refgnd);
         errorThrottle -= desiredL;
