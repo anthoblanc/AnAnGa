@@ -66,9 +66,9 @@ typedef int           BOOL;
 
 struct vector trajectory_refgnd; //contain the direction of the path "L"
 struct vector pathned;
-// Path start end time
-uint32_t tstart = 20e6; // path starting time
-uint32_t tend = 30e6; // path ending time
+// Loop start end time
+uint32_t tstart = 30e6; // path starting time
+uint32_t tend = 50e6; // path ending time
 
 // Construct Standard Controller
 //StandardController stdCTRL(hal);
@@ -225,7 +225,7 @@ void loop()
 
     if(relative_time>=resetGPS_time){
         resetGPS_time = hal.scheduler->micros()-zero_time+5e6;
-        hal.console->printf("ResetGPS.\n");
+        //hal.console->printf("ResetGPS.\n");
         prevStateVars.importData(stateVars);
     }
 
@@ -245,6 +245,7 @@ void loop()
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
 */
+
         trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
         //***************************************************
@@ -287,7 +288,7 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+                hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);                
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
                 //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
@@ -301,8 +302,10 @@ void loop()
                 //hal.console->printf("in_velocity: %f\tbo_velocity: %f\n",velocity(stateVars.pnPePdDot),stateVars.groundSpeed);
                 //hal.console->printf("uvw: (%f,%f,%f)\tpos_in: (%f,%f,%f)\n\n",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
                 //hal.console->printf("acc: (%f,%f,%f)\n",stateVars.accelerationBodyFrame.x,stateVars.accelerationBodyFrame.y,stateVars.accelerationBodyFrame.z);
+
             //hal.console->printf("DeltaL: %f\n",errorThrottle);
-            hal.console->printf("ist: (%f,%f,%f)\nGPS?:%i\n\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,NoSignalAvailableGPS(stateVars.phiThetaPsi,60));
+            //hal.console->printf("ist: (%f,%f,%f)\nGPS?:%i\n\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,NoSignalAvailableGPS(stateVars.phiThetaPsi,60));
+
         }
 
 
