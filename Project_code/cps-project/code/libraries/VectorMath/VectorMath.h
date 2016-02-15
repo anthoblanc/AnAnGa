@@ -48,7 +48,7 @@ float NormVector(const struct vector v);
 
 
 
-// temporary...
+// For the StateVariablesEstimation. Matrix for adjusting accelerations
 struct vector radiusCoefficientMatrix ( struct vector input );
 
 
