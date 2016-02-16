@@ -95,6 +95,7 @@ uint32_t resetGPS_time;
 
 // Interface
 Interface intface(hal);
+char consoleInRaw[20];
 
 //time management
 uint32_t relative_time=hal.scheduler->micros(); //time from the last initialisation
@@ -173,19 +174,21 @@ void loop()
         }
 
 
-        //***************************************************
+        //***************************************************//
         // Interface
 
         // Read console data from COM-PORT. Only 20 characters allowed
-        /*i = 0;
+        i = 0;
         consoleInRaw[0] = '\0';
         while(hal.console->available() && i<20) {
             consoleInRaw[i] = hal.console->read();
+            hal.console->printf("%c",i);
             i++;
         }
         consoleInRaw[20] = '\0';
-        */// go to the Interface-Handler
-        /*if (consoleInRaw[0]!='\0'){
+        
+        /*// go to the Interface-Handler
+        if (consoleInRaw[0]!='\0'){
             interface.update(consoleInRaw);
         }*/
 
