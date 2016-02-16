@@ -20,7 +20,7 @@ void estimateStateVars (uint32_t hardware_time,const AP_HAL::HAL& hal,StateVaria
 
     newVars.phiThetaPsi = addVector( multiplyScalarToVector( addVector(newVars.phiThetaPsiDot,oldVars.phiThetaPsiDot), 0.5*PERIOD/1e6 ), oldVars.phiThetaPsi );
 
-    newVars.pnPePdDotDot = addVector( addVector( BODYtoNED(newVars.accelerationBodyFrame,newVars.phiThetaPsi), /*GRAVITY_NED*/ {0,0,0} ), radiusCoefficientMatrix(CrossProduct(newVars.pqr,oldVars.uvw)) );
+    newVars.pnPePdDotDot = addVector( BODYtoNED(newVars.accelerationBodyFrame,newVars.phiThetaPsi), radiusCoefficientMatrix(CrossProduct(newVars.pqr,oldVars.uvw)) );
 
     newVars.pnPePdDot = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDotDot,oldVars.pnPePdDotDot), 0.5*PERIOD/1e6 ), oldVars.pnPePdDot );
 
@@ -29,6 +29,6 @@ void estimateStateVars (uint32_t hardware_time,const AP_HAL::HAL& hal,StateVaria
     newVars.pnPePd = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDot,oldVars.pnPePdDot), 0.5*PERIOD/1e6 ), oldVars.pnPePd );
 
     if(hardware_time>=nextPrint){
-    hal.console->printf("est: (%f,%f,%f)\n",newVars.pnPePd.x,newVars.pnPePd.y,newVars.pnPePd.z);
+    //hal.console->printf("est: (%f,%f,%f)\n",newVars.pnPePd.x,newVars.pnPePd.y,newVars.pnPePd.z);
     }
 }

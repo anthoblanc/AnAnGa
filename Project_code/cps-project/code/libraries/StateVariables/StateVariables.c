@@ -116,7 +116,7 @@ struct StateVariables calculateStateVariables (const struct sample dataSample) {
 	out.groundSpeed = velocity( out.uvw );
 	out.groundSpeedDot = acceleration ( out.uvw, out.uvwDot );
 
-        out.pnPePdDotDot = addVector( addVector( BODYtoNED(out.accelerationBodyFrame,out.phiThetaPsi), GRAVITY_NED ), radiusCoefficientMatrix(CrossProduct(out.pqr,out.uvw)) );
+    out.pnPePdDotDot = addVector( addVector( BODYtoNED(out.accelerationBodyFrame,out.phiThetaPsi), /*GRAVITY_NED*/ {0,0,0} ), radiusCoefficientMatrix(CrossProduct(out.pqr,out.uvw)) );
 
 	
 	return(out);

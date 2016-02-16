@@ -140,14 +140,16 @@ float NormVector(const struct vector v) {
         return(norm);
 }
 
-// temporary....
+
+// For the StateVariablesEstimation. Matrix for adjusting accelerations
 struct vector radiusCoefficientMatrix ( struct vector in ){
 
     struct vector out;
-
-    out.x = 1.0*in.x + 0.0*in.y + 0.0*in.z;
-    out.y = 0.0*in.x + 1.0*in.y + 0.0*in.z;
-    out.z = 0.0*in.x + 0.0*in.y + 1.0*in.z;
+        struct vector scalars={0,0,0};
+	
+    out.x = scalars.x * in.x;
+    out.y = scalars.y * in.y;
+    out.z = scalars.z * in.z;
 
     return(out);
 }

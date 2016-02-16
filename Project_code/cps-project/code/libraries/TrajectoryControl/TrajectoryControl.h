@@ -72,7 +72,7 @@ private:
 
 #define Kp_Rudder 0.1
 #define Ki_Rudder 0
-#define Kd_Rudder 0.02
+#define Kd_Rudder 0
 #define IntLim_Rudder 1
 #define Casc_Rudder 1
 

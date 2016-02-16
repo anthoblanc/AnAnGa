@@ -99,14 +99,14 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
         t_vaCMDbYZ.z = -aCMDb.z;
         // Find suitable eRoll: Calculate eRoll,1
         t_veRoll.x = 0;
-        t_veRoll.y = - sin(m_fPhiRef);
-        t_veRoll.z = - cos(m_fPhiRef);
+        t_veRoll.y = sin(m_fPhiRef);
+        t_veRoll.z = cos(m_fPhiRef);
         // Decide, whether eRoll,1 or eRoll,2 = -eRoll,1
-        if (ScalarProduct(t_veRoll,t_vaCMDbYZ) < 0) {
+       /* if (ScalarProduct(t_veRoll,t_vaCMDbYZ) < 0) {
                 t_veRoll.y = -t_veRoll.y;
                 t_veRoll.z = -t_veRoll.z;
         }
-        // Build Cross Product and take x-component
+       */ // Build Cross Product and take x-component
         t_vAileronCalc = CrossProduct(t_veRoll,t_vaCMDbYZ);
         t_fAileronPID = t_vAileronCalc.x;
         // Take the arcsin of the x-component of the cross product
@@ -134,7 +134,7 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
         //hal.console->printf("%f,%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID,DeltaL);
         if (time >= nextPrint){
             //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
-            //hal.console->printf("error: %f\n\n",t_fRudderPID);
+            //hal.console->printf("rudder: %f,%f\t",t_fRudderPID,t_cOut.rudder);
         }
 
         return(t_cOut);

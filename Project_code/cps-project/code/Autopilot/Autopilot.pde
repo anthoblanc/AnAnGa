@@ -91,6 +91,7 @@ uint32_t resetGPS_time;
 PathDelay pathDly;
 float desiredL = LookAheadDistance;
 float errorThrottle;
+int testLock;
 
 // Interface
 Interface intface(hal);
@@ -231,28 +232,41 @@ void loop()
 
         //***************************************************
         // Path Generation
-/*        if (relative_time<30e6){
+/*    if(firstLoop){
+        pathned.x = center_zero_space_x;
+        pathned.y = center_zero_space_y;
+        pathned.z = center_zero_space_z;
+        phiRef = 0;
+        testLock = 0;
+    }
+        if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += -10.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += -20.0 * static_cast<float>(PERIOD) /1e6;
         }else if (relative_time<50e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
+            phiRef += 360.0/10e6*static_cast<float>(PERIOD);
+            if (phiRef>360 || testLock==1){
+                phiRef=0;
+                testLock=1;
+            }
+
         }else{
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
         }
-*/
 
+*/
         trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
         //***************************************************
 
         // Path Processing
         // Calculating differential Trajectory
-        //trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
+//        trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
          // Calculating controller input for throttle
         errorThrottle = pathDly.update(pathned,trajectory_refgnd);
@@ -288,13 +302,13 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-                hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);                
+                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
                 //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
                 //hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
                 //hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
-                //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
+                hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
                 //hal.console->printf("PID-In: %f, PID-Throttle out: %f, error-term: %f\n",inputThrottlePID,stSig.throttle,inputThrottlePID+stateVars.groundSpeed);
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
                 //hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
@@ -302,8 +316,7 @@ void loop()
                 //hal.console->printf("in_velocity: %f\tbo_velocity: %f\n",velocity(stateVars.pnPePdDot),stateVars.groundSpeed);
                 //hal.console->printf("uvw: (%f,%f,%f)\tpos_in: (%f,%f,%f)\n\n",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
                 //hal.console->printf("acc: (%f,%f,%f)\n",stateVars.accelerationBodyFrame.x,stateVars.accelerationBodyFrame.y,stateVars.accelerationBodyFrame.z);
-
-            //hal.console->printf("DeltaL: %f\n",errorThrottle);
+                //hal.console->printf("DeltaL: %f\n",errorThrottle);
             //hal.console->printf("ist: (%f,%f,%f)\nGPS?:%i\n\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,NoSignalAvailableGPS(stateVars.phiThetaPsi,60));
 
         }
