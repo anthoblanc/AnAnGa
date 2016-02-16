@@ -6,7 +6,7 @@ Print_help
 
 Print the explaination how to use the API
 *********************************************** */
-void print_help() 
+void API_print_help() ;
 
 /* ***********************************************
 API_interpretate_chain(char * stringAPI, int length_stringAPI)
@@ -16,6 +16,6 @@ int length_stringAPI : length of the string
 
 interpretate in term of action a given string 
 *********************************************** */
-void API_interpretate_chain(char * stringAPI, int length_stringAPI) 
+void API_interpretate_chain(char * stringAPI, int length_stringAPI) ;
 
 #endif

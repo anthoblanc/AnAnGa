@@ -59,6 +59,7 @@ typedef int           BOOL;
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
 #include "../libraries/PathDelay/PathDelay.h"
+#include "../libraries/API_perso/API_perso.h"
 
 //***************************************************
 // Variable Declaration
@@ -178,14 +179,14 @@ void loop()
         // Interface
 
         // Read console data from COM-PORT. Only 20 characters allowed
-        i = 0;
-        consoleInRaw[0] = '\0';
+        i = 0; //init
         while(hal.console->available() && i<20) {
             consoleInRaw[i] = hal.console->read();
             hal.console->printf("%c",i);
             i++;
         }
-        consoleInRaw[20] = '\0';
+        consoleInRaw[i] = '\0';
+        //if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //test
         
         /*// go to the Interface-Handler
         if (consoleInRaw[0]!='\0'){
