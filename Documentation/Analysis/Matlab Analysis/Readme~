@@ -1,0 +1,7 @@
+/*********** VISUALIZATION IN MATLAB *****************/
+
+1. Right click on the log file, select import data.
+2. Choose in column delimiters: comma, space, custom added "(", ")"
+3. Choose which column to imput, e.g. VarName N
+4. Make sure N is in accordance as in the code, such here is VarName 3 to 5.
+5. Run and visualize.
