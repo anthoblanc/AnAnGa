@@ -23,9 +23,13 @@ typedef int           BOOL;
 #define center_zero_space_x -365
 #define center_zero_space_y -400
 #define center_zero_space_z -0.87
+#define time_before_retesting_zero_time_condition 10e6
 
 // Look Ahead Distance (Desired Length) [feet]
 #define LookAheadDistance 40
+
+//interface
+#define size_buffer_interface 20
 
 //***************************************************
 // Libraries
@@ -75,7 +79,7 @@ uint32_t tend = 50e6; // path ending time
 //StandardController stdCTRL(hal);
 
 struct SteeringSignals stSig;
-int firstLoop=1;
+BOOL firstLoop=1;
 
 
 // Construct the Aerobatic Trajectory Controller
@@ -96,7 +100,7 @@ uint32_t resetGPS_time;
 
 // Interface
 Interface intface(hal);
-char consoleInRaw[20];
+char consoleInRaw[size_buffer_interface];
 
 //time management
 uint32_t relative_time=hal.scheduler->micros(); //time from the last initialisation
@@ -152,14 +156,14 @@ void loop()
     if( ( fabs(stateVars.pnPePd.x-center_zero_space_x) < zero_space_size )
     &&  ( fabs(stateVars.pnPePd.y-center_zero_space_y) < zero_space_size )
     &&  ( fabs(stateVars.pnPePd.z-center_zero_space_z) < zero_space_size )
-    &&  ( relative_time > 10e6 ) )
+    &&  ( relative_time > time_before_retesting_zero_time_condition ) )
     {
 
         //time initialisation
         relative_time = 0; //will be recalculate at each iteration
         zero_time=hal.scheduler->micros();
 
-        firstLoop=1;
+        firstLoop=TRUE;
     }
     //----//
 
@@ -178,9 +182,11 @@ void loop()
         //***************************************************//
         // Interface
 
-        // Read console data from COM-PORT. Only 20 characters allowed
+        // Read console data from COM-PORT. Only -size_buffer_interface- characters allowed
         i = 0; //init
-        while(hal.console->available() && i<20) {
+        while ( hal.console->available()
+        AND    i < size_buffer_interface ) 
+        {
             consoleInRaw[i] = hal.console->read();
             hal.console->printf("%c",i);
             i++;
