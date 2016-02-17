@@ -6,11 +6,12 @@
 //***************************************************
 
 
-//Writing style more readable
+//General
 typedef int           BOOL;
-
 #define FALSE         0
 #define TRUE          1
+//Note: Boolean also exist in a library but we don't really need to do complex feature
+
 #define NOT           !
 #define AND           &&
 #define OR            ||
@@ -92,7 +93,7 @@ struct StateVariables stateVars, prevStateVars;
 PathDelay pathDly;
 float desiredL = LookAheadDistance;
 float errorThrottle;
-int testLock;
+BOOL testLock;
 
 //temp for test
 StateVariables copyOfStateVars, temp;
@@ -192,7 +193,7 @@ void loop()
             i++;
         }
         consoleInRaw[i] = '\0';
-        //if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //test
+        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //i=0 means that there is nothing in the buffer
         
         /*// go to the Interface-Handler
         if (consoleInRaw[0]!='\0'){
@@ -241,7 +242,7 @@ void loop()
         pathned.y = center_zero_space_y;
         pathned.z = center_zero_space_z;
         phiRef = 0;
-        testLock = 0;
+        testLock = FALSE;
     }
         if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
@@ -252,9 +253,9 @@ void loop()
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
             phiRef += 360.0/10e6*static_cast<float>(PERIOD);
-            if (phiRef>360 || testLock==1){
+            if (phiRef>360 || testLock==TRUE){
                 phiRef=0;
-                testLock=1;
+                testLock=TRUE;
             }
 
         }else{
