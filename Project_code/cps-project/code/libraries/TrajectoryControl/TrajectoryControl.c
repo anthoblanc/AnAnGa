@@ -39,8 +39,8 @@ TrajectoryController::~TrajectoryController () {
 
 
 
-// setting the gains,integralLimit, and UpdateIntervall
-void TrajectoryController::setPID (const enum PID pidName, const float Kp, const float Ki, const float Kd, const float integralLimit, const int8_t updateIntervall) {
+// setting the gains,integralLimit, and refreshInterval
+void TrajectoryController::setPID (const enum PID pidName, const float Kp, const float Ki, const float Kd, const float integralLimit, const int8_t refreshInterval) {
 
         int i;
         switch(pidName) {
@@ -62,7 +62,7 @@ void TrajectoryController::setPID (const enum PID pidName, const float Kp, const
         }
         m_cPIDs[i]->setIntegralLimit(integralLimit);
         m_cPIDs[i]->setLPFfrequency(m_fCOFrequencyLPF);
-        m_cPIDs[i]->setUpdateIntervall(updateIntervall);
+        m_cPIDs[i]->setRefreshInterval(refreshInterval);
         m_cPIDs[i]->setControllerGains(Kp,Ki,Kd);
         return;
 }
@@ -125,6 +125,7 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
         t_fRudderPID = -aCMDbSubG.y;
         // Give the error of the Rudder to the Rudder-PID
         t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
+ t_cOut.rudder = 0;
         // Elevator
         // Choose the z-component of the acceleration subtracted by gravity
         t_fElevatorPID = -aCMDbSubG.z;

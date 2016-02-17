@@ -1,12 +1,12 @@
 PIDcontroller::PIDcontroller (const float Kp, const float Ki, const float Kd, const uint32_t dt,
-                      const int8_t updateIntervall)  :
-                        m_fKp(Kp), m_fKi(Ki), m_fKd(Kd), m_iDt(dt) , m_iUpdateIntervall(updateIntervall) {
+                      const int8_t refreshInterval)  :
+                        m_fKp(Kp), m_fKi(Ki), m_fKd(Kd), m_iDt(dt) , m_iRefreshInterval(refreshInterval) {
 
         m_fPrevOutput = 0;
         m_fPrevError[0] = 0;
         m_fPrevError[1] = 0;
         m_fIntegral = 0;
-        m_iUpdateIntervallCounter = 0;
+        m_iRefreshIntervalCounter = 0;
         m_iUpdateCounter = 0;
         m_iBadInputCounter = 0;
         m_fIntegralLimit = 100;
@@ -40,8 +40,8 @@ void PIDcontroller::setLPFfrequency (const float RC) {
 
 
 // Setting the update intervall
-void PIDcontroller::setUpdateIntervall (const int8_t updateIntervall) {
-        m_iUpdateIntervall = updateIntervall;
+void PIDcontroller::setRefreshInterval (const int8_t refreshInterval) {
+        m_iRefreshInterval = refreshInterval;
         return;
 }
 
@@ -86,17 +86,17 @@ float PIDcontroller::update (float error, const float derivative) {
         m_fPrevError[1] = error;
 
         // Check, if the Update should be executed or still waiting for the next intervall. If waiting, return the previous out-Value.
-        if (m_iUpdateIntervallCounter > 0) {
-                m_iUpdateIntervallCounter--;
+        if (m_iRefreshIntervalCounter > 0) {
+                m_iRefreshIntervalCounter--;
                 return(m_fPrevOutput);
         }
 
         // The case to recalculate the output has occurred
         // reset the IntervallCounter
-        m_iUpdateIntervallCounter = m_iUpdateIntervall - 1;
+        m_iRefreshIntervalCounter = m_iRefreshInterval - 1;
 
         // Update Integral
-        m_fIntegral = m_fIntegral + error * static_cast<float> (m_iDt)/1e6 * m_iUpdateIntervall;
+        m_fIntegral = m_fIntegral + error * static_cast<float> (m_iDt)/1e6 * m_iRefreshInterval;
         // Restrict Integral to boundaries
         if(m_fIntegral > m_fIntegralLimit){
                 m_fIntegral = m_fIntegralLimit;
@@ -106,7 +106,7 @@ float PIDcontroller::update (float error, const float derivative) {
         }
 
         // Update derivative
-        t_fDerivative = (error - m_fPrevUpdateError) / (static_cast<float> (m_iDt)/1e6 * m_iUpdateIntervall);
+        t_fDerivative = (error - m_fPrevUpdateError) / (static_cast<float> (m_iDt)/1e6 * m_iRefreshInterval);
         m_fPrevUpdateError = error;
 
         // Low-Pass-Filtering of Derivative

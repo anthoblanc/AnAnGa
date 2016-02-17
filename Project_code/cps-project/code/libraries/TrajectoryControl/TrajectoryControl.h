@@ -28,8 +28,8 @@ public:
         // Destructor
         ~TrajectoryController();
 
-        // setting the gains,integralLimit, and UpdateIntervall
-        void setPID (const enum PID pidName, const float Kp, const float Ki, const float Kd, const float integralLimit = 100, const int8_t updateIntervall = 1);
+        // setting the gains,integralLimit, and refreshInterval
+        void setPID (const enum PID pidName, const float Kp, const float Ki, const float Kd, const float integralLimit = 100, const int8_t refreshInterval = 1);
 
         // Setting the reference vector phi_ref
         void setPhiRef (const float PhiRef);
@@ -44,9 +44,9 @@ public:
 private:
         const AP_HAL::HAL& m_rHAL;	// reference to the console (for printing messages)
         PIDcontroller* m_cPIDs[4];	// Array of the PIDs
-        uint32_t m_iDt;	// Intervall time for update rate (for case updateIntervall==1); time in microseconds
+        uint32_t m_iDt;	// Intervall time for update rate (for case refreshInterval==1); time in microseconds
         float m_fCOFrequencyLPF;	// Cut-off-frequency for the Low-Pass-Filter
-        int8_t m_iUpdateIntervall;	// Factor of the intervall time, the controller is updated
+        int8_t m_iRefreshIntervall;	// Factor of the intervall time, the controller is updated
         float m_fPhiRef;	// Reference Vector
 
 };

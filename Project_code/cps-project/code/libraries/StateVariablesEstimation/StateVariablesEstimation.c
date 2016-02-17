@@ -25,7 +25,7 @@ vector x = CrossProduct(newVars.pqr,oldVars.uvw);
     newVars.pnPePdDot = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDotDot,oldVars.pnPePdDotDot), 0.5*PERIOD/1e6 ), oldVars.pnPePdDot );
 
     newVars.uvw = NEDtoBODY(newVars.pnPePdDot,newVars.phiThetaPsi);
-
+// Multiply more, because speed is not the right one.
     newVars.pnPePd = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDot,oldVars.pnPePdDot), 1.9*PERIOD/1e6 ), oldVars.pnPePd );
 
     if(hardware_time>=nextPrint){

@@ -1,5 +1,8 @@
+/*##########################################################################################
+                                   class vector
+  ########################################################################################## */
 
-void vector::importVector (vector refVector){
+void vector::importVector (const vector refVector){
 
     x = refVector.x;
     y = refVector.y;
@@ -7,68 +10,6 @@ void vector::importVector (vector refVector){
 
 }
 
-
-// Transformation from NED-frame to Body-frame
-struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaPsi ) {
-
-        struct vector body;
-
-        float sinPhi = sin(phiThetaPsi.x);
-        float sinTheta = sin(phiThetaPsi.y);
-        float sinPsi = sin(phiThetaPsi.z);
-        float cosPhi = cos(phiThetaPsi.x);
-        float cosTheta = cos(phiThetaPsi.y);
-        float cosPsi = cos(phiThetaPsi.z);
-
-        float sinPhiSinTheta = sinPhi * sinTheta;
-        float cosPhiSinTheta = cosPhi * sinTheta;
-
-        //source: http://www.es.ele.tue.nl/education/5HC99/wiki/images/4/42/RigidBodyDynamics.pdf
-        body.x = (cosTheta*cosPsi) * ned.x +
-                (cosTheta*sinPsi)  * ned.y +
-                -sinTheta          * ned.z;
-        body.y = (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * ned.x +
-                (sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * ned.y +
-                sinPhi*cosTheta                          * ned.z;
-        body.z = (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * ned.x +
-                (cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * ned.y +
-                cosPhi*cosTheta                          * ned.z;
-
-        return(body);
-
-}
-
-// Transformation from Body-frame to NED-frame
-// STILL HAVE TO VERIFY IF INVERSE OF BODYTONED IS JUST THE TRANSPOSE
-struct vector BODYtoNED ( const struct vector body, const struct vector phiThetaPsi ) {
-
-        struct vector ned;
-
-        float sinPhi = sin(phiThetaPsi.x);
-        float sinTheta = sin(phiThetaPsi.y);
-        float sinPsi = sin(phiThetaPsi.z);
-        float cosPhi = cos(phiThetaPsi.x);
-        float cosTheta = cos(phiThetaPsi.y);
-        float cosPsi = cos(phiThetaPsi.z);
-
-        float sinPhiSinTheta = sinPhi * sinTheta;
-        float cosPhiSinTheta = cosPhi * sinTheta;
-
-        ned.x = (cosTheta*cosPsi) * body.x +
-                (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * body.y +
-                (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * body.z;
-
-        ned.y = (cosTheta*sinPsi)  * body.x +
-                (sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * body.y +
-                (cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * body.z;
-
-        ned.z = -sinTheta * body.x +
-                sinPhi*cosTheta * body.y +
-                cosPhi*cosTheta * body.z;
-
-        return(ned);
-
-}
 
 /*##########################################################################################
                                    General Math Operations
@@ -140,12 +81,82 @@ float NormVector(const struct vector v) {
         return(norm);
 }
 
+/*##########################################################################################
+                                   Transformations
+  ########################################################################################## */
+
+// Transformation from NED-frame to Body-frame
+struct vector NEDtoBODY ( const struct vector ned, const struct vector phiThetaPsi ) {
+
+        struct vector body;
+
+        float sinPhi = sin(phiThetaPsi.x);
+        float sinTheta = sin(phiThetaPsi.y);
+        float sinPsi = sin(phiThetaPsi.z);
+        float cosPhi = cos(phiThetaPsi.x);
+        float cosTheta = cos(phiThetaPsi.y);
+        float cosPsi = cos(phiThetaPsi.z);
+
+        float sinPhiSinTheta = sinPhi * sinTheta;
+        float cosPhiSinTheta = cosPhi * sinTheta;
+
+        //source: http://www.es.ele.tue.nl/education/5HC99/wiki/images/4/42/RigidBodyDynamics.pdf
+        body.x = (cosTheta*cosPsi) * ned.x +
+                (cosTheta*sinPsi)  * ned.y +
+                -sinTheta          * ned.z;
+        body.y = (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * ned.x +
+                (sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * ned.y +
+                sinPhi*cosTheta                          * ned.z;
+        body.z = (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * ned.x +
+                (cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * ned.y +
+                cosPhi*cosTheta                          * ned.z;
+
+        return(body);
+
+}
+
+// Transformation from Body-frame to NED-frame
+struct vector BODYtoNED ( const struct vector body, const struct vector phiThetaPsi ) {
+
+        struct vector ned;
+
+        float sinPhi = sin(phiThetaPsi.x);
+        float sinTheta = sin(phiThetaPsi.y);
+        float sinPsi = sin(phiThetaPsi.z);
+        float cosPhi = cos(phiThetaPsi.x);
+        float cosTheta = cos(phiThetaPsi.y);
+        float cosPsi = cos(phiThetaPsi.z);
+
+        float sinPhiSinTheta = sinPhi * sinTheta;
+        float cosPhiSinTheta = cosPhi * sinTheta;
+
+		//source: http://www.es.ele.tue.nl/education/5HC99/wiki/images/4/42/RigidBodyDynamics.pdf
+		// Transposed of NEDtoBODY()
+        ned.x = (cosTheta*cosPsi) * body.x +
+                (sinPhiSinTheta*cosPsi - cosPhi*sinPsi) * body.y +
+                (cosPhiSinTheta*cosPsi + sinPhi*sinPsi) * body.z;
+
+        ned.y = (cosTheta*sinPsi)  * body.x +
+                (sinPhiSinTheta*sinPsi + cosPhi*cosPsi)  * body.y +
+                (cosPhiSinTheta*sinPsi - sinPhi*cosPsi)  * body.z;
+
+        ned.z = -sinTheta * body.x +
+                sinPhi*cosTheta * body.y +
+                cosPhi*cosTheta * body.z;
+
+        return(ned);
+
+}
+
+/*##########################################################################################
+                                   Temporary
+  ########################################################################################## */
 
 // For the StateVariablesEstimation. Matrix for adjusting accelerations
-struct vector radiusCoefficientMatrix ( struct vector in ){
+struct vector radiusCoefficientMatrix ( const struct vector in ){
 
     struct vector out;
-        struct vector scalars={0,0,0};
+    struct vector scalars={0,0,0};
 	
     out.x = scalars.x * in.x;
     out.y = scalars.y * in.y;
