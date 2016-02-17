@@ -1,3 +1,5 @@
+
+// Constructor
 PIDcontroller::PIDcontroller (const float Kp, const float Ki, const float Kd, const uint32_t dt,
                       const int8_t refreshInterval)  :
                         m_fKp(Kp), m_fKi(Ki), m_fKd(Kd), m_iDt(dt) , m_iRefreshInterval(refreshInterval) {
@@ -15,7 +17,7 @@ PIDcontroller::PIDcontroller (const float Kp, const float Ki, const float Kd, co
         m_fAlpha = 1;
 
         if( m_iDt == 0) {
-                //Fehlerroutine
+                // Error-Routine to be established.
         }
 }
 
@@ -32,8 +34,8 @@ void PIDcontroller::setIntegralLimit (const float integralLimit) {
 
 
 // Setting the Low-Pass-Filter cut-off-frequency
-void PIDcontroller::setLPFfrequency (const float RC) {
-        m_fAlpha = static_cast<float>(m_iDt)/1e6 / (RC + static_cast<float>(m_iDt)/1e6 );
+void PIDcontroller::setLPFfrequency (const float freq) {
+        m_fAlpha = static_cast<float>(m_iDt)/1e6 / (1.0/freq + static_cast<float>(m_iDt)/1e6 );
         return;
 }
 
@@ -60,7 +62,7 @@ void PIDcontroller::setControllerGains (const float Kp, const float Ki, const fl
 
 
 // Update Routine.
-/* 	If derivative not available, leave out this variable so not a number will be chosen	and quasi-derivative is then calculated.
+/* 	If derivative not available, leave out this variable so not a number will be chosen and quasi-derivative is then calculated.
 */
 float PIDcontroller::update (float error, const float derivative) {
 
@@ -73,7 +75,7 @@ float PIDcontroller::update (float error, const float derivative) {
 
                 t_fK = m_fPrevError[1];
                 t_fLambda = log(m_fPrevError[1]/m_fPrevError[0]);
-                error = t_fK * exp(t_fLambda);		// Other approach: Set to zero <-------
+                error = t_fK * exp(t_fLambda);
 
                 // increase counter for bad input
                 m_iBadInputCounter++;
@@ -89,36 +91,41 @@ float PIDcontroller::update (float error, const float derivative) {
         if (m_iRefreshIntervalCounter > 0) {
                 m_iRefreshIntervalCounter--;
                 return(m_fPrevOutput);
+        }else{
+
+            // The case to recalculate the output has occurred
+            // Reset the IntervallCounter
+            m_iRefreshIntervalCounter = m_iRefreshInterval - 1;
+
+            // Update Integral
+            m_fIntegral = m_fIntegral + error * static_cast<float> (m_iDt)/1e6 * m_iRefreshInterval;
+            // Restrict Integral to boundaries
+            if(m_fIntegral > m_fIntegralLimit){
+                    m_fIntegral = m_fIntegralLimit;
+            }
+            else if (m_fIntegral < -m_fIntegralLimit){
+                    m_fIntegral = -m_fIntegralLimit;
+            }
+
+            // Update derivative if not given in argument
+            if (isnan(derivative)) {
+                t_fDerivative = (error - m_fPrevUpdateError) / (static_cast<float> (m_iDt)/1e6 * m_iRefreshInterval);
+            }else{
+                t_fDerivative = derivative;
+            }
+            m_fPrevUpdateError = error;
+
+            // Low-Pass-Filtering of Derivative
+            t_fDerivative = m_fAlpha * t_fDerivative + (1.0 - m_fAlpha) * m_fPrevDerivative;
+            m_fPrevDerivative = t_fDerivative;
+
+            // Calculate Output
+            t_fOutput = m_fKp * error +	m_fKi * m_fIntegral + m_fKd * t_fDerivative;
+
+            m_fPrevOutput = t_fOutput;
+
+            return(t_fOutput);
         }
-
-        // The case to recalculate the output has occurred
-        // reset the IntervallCounter
-        m_iRefreshIntervalCounter = m_iRefreshInterval - 1;
-
-        // Update Integral
-        m_fIntegral = m_fIntegral + error * static_cast<float> (m_iDt)/1e6 * m_iRefreshInterval;
-        // Restrict Integral to boundaries
-        if(m_fIntegral > m_fIntegralLimit){
-                m_fIntegral = m_fIntegralLimit;
-        }
-        else if (m_fIntegral < -m_fIntegralLimit){
-                m_fIntegral = -m_fIntegralLimit;
-        }
-
-        // Update derivative
-        t_fDerivative = (error - m_fPrevUpdateError) / (static_cast<float> (m_iDt)/1e6 * m_iRefreshInterval);
-        m_fPrevUpdateError = error;
-
-        // Low-Pass-Filtering of Derivative
-        t_fDerivative = m_fAlpha * t_fDerivative + (1.0 - m_fAlpha) * m_fPrevDerivative;
-        m_fPrevDerivative = t_fDerivative;
-
-        // Calculate Output
-        t_fOutput = m_fKp * error +	m_fKi * m_fIntegral + m_fKd * t_fDerivative;
-
-        m_fPrevOutput = t_fOutput;
-
-        return(t_fOutput);
 }
 
 
