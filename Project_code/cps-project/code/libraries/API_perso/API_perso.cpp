@@ -1,8 +1,3 @@
-#include <fstream>
-#include <string>
-
-//Arduino
-#include <AP_HAL.h>
 
 // **** Function **** //
 void API_print_help() 

@@ -1,6 +1,12 @@
 #ifndef API_PERSO_H
 #define API_PERSO_H
 
+#include <fstream>
+#include <string>
+
+//Arduino
+#include <AP_HAL.h>
+
 /* ***********************************************
 Print_help
 
@@ -17,5 +23,10 @@ int length_stringAPI : length of the string
 interpretate in term of action a given string 
 *********************************************** */
 void API_interpretate_chain(char * stringAPI, int length_stringAPI) ;
+
+
+
+
+#include "API_perso.cpp"
 
 #endif

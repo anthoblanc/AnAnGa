@@ -64,7 +64,7 @@ typedef int           BOOL;
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
 #include "../libraries/PathDelay/PathDelay.h"
-#include "../libraries/API_perso/API_perso.h"
+//#include "../libraries/API_perso/API_perso.h"
 
 //***************************************************
 // Variable Declaration
@@ -193,7 +193,7 @@ void loop()
             i++;
         }
         consoleInRaw[i] = '\0';
-        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //i=0 means that there is nothing in the buffer
+        //if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //i=0 means that there is nothing in the buffer
         
         /*// go to the Interface-Handler
         if (consoleInRaw[0]!='\0'){
@@ -237,13 +237,13 @@ void loop()
 
         //***************************************************
         // Path Generation
-    if(firstLoop){
-        pathned.x = center_zero_space_x;
-        pathned.y = center_zero_space_y;
-        pathned.z = center_zero_space_z;
-        phiRef = 0;
-        testLock = FALSE;
-    }
+        if(firstLoop){
+            pathned.x = center_zero_space_x;
+            pathned.y = center_zero_space_y;
+            pathned.z = center_zero_space_z;
+            phiRef = 0;
+            testLock = FALSE;
+        }
         if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
