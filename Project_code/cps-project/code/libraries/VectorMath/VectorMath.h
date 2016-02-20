@@ -6,6 +6,7 @@
 VectorMath.h
 	Library for 3-dimensional vectors and their operations plus some transformations.
 	
+	
 	vector: Elements can be accessed by their names .x, .y, and .z
 			Copy Function importVector(): Imports the x-, y-, and z-value of the referenced vector.
 			

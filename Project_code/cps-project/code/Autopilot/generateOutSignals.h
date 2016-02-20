@@ -1,6 +1,13 @@
 #ifndef GENERATEOUTSIGNALS_H
 #define GENERATEOUTSIGNALS_H
 
+/***********************************************************
+
+generateOutSignals.h
+	Final processing of the steering signals. Conversion from float to a signal, suitable for the actuators of the airplane.
+	(Initially given).
+
+************************************************************/
 
 void generateOutSignals(const struct SteeringSignals stSig, int16_t &aileronLOut, int16_t &aileronROut, int16_t &elevatorLOut, int16_t &elevatorROut, int16_t &throttleOut, int16_t &rudderOut){
 

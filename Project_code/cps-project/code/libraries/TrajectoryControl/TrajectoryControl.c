@@ -1,12 +1,5 @@
 
 
-
-/*##########################################################################################
-                                   Class Trajectory Controller
-  ########################################################################################## */
-
-
-
 // Constructor
 TrajectoryController::TrajectoryController (const AP_HAL::HAL& hal, const uint32_t dt, const float coFrequencyLPF) :
         m_rHAL(hal), m_iDt(dt) , m_fCOFrequencyLPF(coFrequencyLPF) {
@@ -40,7 +33,7 @@ TrajectoryController::~TrajectoryController () {
 
 
 // setting the gains,integralLimit, and refreshInterval
-void TrajectoryController::setPID (const enum PID pidName, const float Kp, const float Ki, const float Kd, const float integralLimit, const int8_t refreshInterval) {
+void TrajectoryController::setPID (const enum trajPIDs pidName, const float Kp, const float Ki, const float Kd, const float integralLimit, const int8_t refreshInterval) {
 
         int i;
         switch(pidName) {
@@ -101,13 +94,14 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
         t_veRoll.x = 0;
         t_veRoll.y = sin(m_fPhiRef);
         t_veRoll.z = cos(m_fPhiRef);
-        // Decide, whether eRoll,1 or eRoll,2 = -eRoll,1
+        // Decide, whether eRoll,1 or eRoll,2 = -eRoll,1 <------- Deactivated, not good for Roll maneuver and else not necessary.
        /* if (ScalarProduct(t_veRoll,t_vaCMDbYZ) < 0) {
                 t_veRoll.y = -t_veRoll.y;
                 t_veRoll.z = -t_veRoll.z;
-        }
-       */ // Build Cross Product and take x-component
-        t_vAileronCalc = CrossProduct(t_veRoll,t_vaCMDbYZ);
+        }*/ 
+	   // Build Cross Product and take x-component
+   float factor = 1.0/NormVector(t_vaCMDbYZ);
+        t_vAileronCalc = CrossProduct(t_veRoll,multiplyScalarToVector(t_vaCMDbYZ,factor));
         t_fAileronPID = t_vAileronCalc.x;
         // Take the arcsin of the x-component of the cross product
         t_fAileronPID = constrain(t_fAileronPID,-1,1);
@@ -125,28 +119,26 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
         t_fRudderPID = -aCMDbSubG.y;
         // Give the error of the Rudder to the Rudder-PID
         t_cOut.rudder = m_cPIDs[Rudder]->update(t_fRudderPID);
- t_cOut.rudder = 0;
+
         // Elevator
         // Choose the z-component of the acceleration subtracted by gravity
         t_fElevatorPID = -aCMDbSubG.z;
         // Give the error of the Elevator to the Elevator-PID
         t_cOut.elevator = m_cPIDs[Elevator]->update(t_fElevatorPID);
 
-        //hal.console->printf("%f,%f,%f,%f",t_fAileronPID,t_fRudderPID,t_fElevatorPID,DeltaL);
         if (time >= nextPrint){
             //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
-            //hal.console->printf("rudder: %f,%f\t",t_fRudderPID,t_cOut.rudder);
+            hal.console->printf("factor, Aileron: %f,%f\t",factor,t_fAileronPID);
         }
 
         return(t_cOut);
-
 }
 
 
 
 // Access to the PIDs
 // const is for denying any change in the PIDs
-const PIDcontroller *TrajectoryController::getPIDAccess (const enum PID pidName) {
+const PIDcontroller *TrajectoryController::getPIDAccess (const enum trajPIDs pidName) {
 
         int i;
         switch(pidName) {
@@ -167,10 +159,12 @@ const PIDcontroller *TrajectoryController::getPIDAccess (const enum PID pidName)
                         return(NULL);
         }
 
-        return(m_cPIDs[i]);
+        return(m_cPIDs[i]);	// Adress operator & ???
 }
 
 
+
+// Function to setup the TrajectoryController with the values from the defines from above.
 void setupTrCTRL (TrajectoryController& trCTRL) {
 
         trCTRL.setPID ( Throttle, Kp_Throttle, Ki_Throttle, Kd_Throttle, IntLim_Throttle, Casc_Throttle );

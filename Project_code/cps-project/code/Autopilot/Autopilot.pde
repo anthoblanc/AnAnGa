@@ -1,5 +1,5 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil
-
+#define THISFIRMWARE "CPS-Autopilot-Project"
 
 //***************************************************
 // Define
@@ -15,9 +15,6 @@ typedef int           BOOL;
 #define NOT           !
 #define AND           &&
 #define OR            ||
-
-
-#define THISFIRMWARE "CPS-Autopilot-Project"
 
 //zeros time space zone
 #define zero_space_size 0.5
@@ -49,7 +46,8 @@ typedef int           BOOL;
 #include <AP_Notify.h>
 #include <AP_Curve.h>
 
-#include <StandardConfiguration.h>
+// Export of all declarations, initially given.
+#include <StandardConfiguration.h>	
 
 
 // Own Libraries
@@ -58,9 +56,9 @@ typedef int           BOOL;
 #include "../libraries/StateVariables/StateVariables.h"
 #include "../libraries/TrajectoryControl/TrajectoryControl.h"
 #include "../libraries/StandardController/StandardController.h"
-#include "../libraries/Path/Trajectory.h"
-#include "../libraries/Trajectory_management/Acceleration_mgt.h"
-#include "../libraries/Interface/Interface.hpp"
+#include "../libraries/Path/Trajectory.h"							// not yet commented, is Path.h still needed?
+#include "../libraries/Trajectory_management/Acceleration_mgt.h"	// maybe improve comments
+#include "../libraries/Interface/Interface.hpp"						// Not (yet) in use
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
 #include "../libraries/PathDelay/PathDelay.h"
@@ -70,21 +68,15 @@ typedef int           BOOL;
 // Variable Declaration
 //***************************************************
 
-struct vector trajectory_refgnd; //contain the direction of the path "L"
-struct vector pathned;
-// Loop start end time
-uint32_t tstart = 30e6; // path starting time
-uint32_t tend = 50e6; // path ending time
+// Position variables
+struct vector pathned;	// desired position of the airplane
+struct vector trajectory_refgnd; // Distance vector between the desired position and current position of the airplane
 
-// Construct Standard Controller
-//StandardController stdCTRL(hal);
-
+// Steering signals container
 struct SteeringSignals stSig;
-BOOL firstLoop=1;
 
-
-// Construct the Aerobatic Trajectory Controller
-TrajectoryController trCTRL (hal,PERIOD,CO_Freq_LPF);
+// Variables for Aerobatic Trajectory Controller
+TrajectoryController trCTRL (hal,PERIOD);
 float phiRef=0;
 struct vector aCMD_refin, gCMD_refin = GRAVITY_NED, aCMD_refbody, gCMD_refbody;
 struct StateVariables stateVars, prevStateVars;
@@ -93,20 +85,23 @@ struct StateVariables stateVars, prevStateVars;
 PathDelay pathDly;
 float desiredL = LookAheadDistance;
 float errorThrottle;
-BOOL testLock;
-
-//temp for test
-StateVariables copyOfStateVars, temp;
-uint32_t resetGPS_time;
 
 // Interface
 Interface intface(hal);
 char consoleInRaw[size_buffer_interface];
 
 //time management
-uint32_t relative_time=hal.scheduler->micros(); //time from the last initialisation
-uint32_t zero_time=hal.scheduler->micros(); //time of the last initialisation
+uint32_t relative_time = hal.scheduler->micros(); //time from the last initialisation
+uint32_t zero_time = hal.scheduler->micros(); //time of the last initialisation
 uint32_t hardware_time = hal.scheduler->micros(); // real hadware time
+uint32_t tstart = 30e6; // path starting time
+uint32_t tend = 50e6; // path ending time
+
+
+//temp for test							<--------------------------------------- temp
+StateVariables copyOfStateVars, temp;
+uint32_t resetGPS_time;
+BOOL testLock,testLock2;
 
 //***************************************************
 // Setup cycle
@@ -115,16 +110,12 @@ uint32_t hardware_time = hal.scheduler->micros(); // real hadware time
 // setup: called once at boot
 void setup()
 {
-    //hal.console->printf("\r\n\r\nStarting up\r\n\r\n");
     Wire.begin(); // Begin I2C communcation
     int i;
     // Initialize dataSample to all 0
     for(i = 0; i < DATAPOINTS; i++) {
         dataSample.data.f[i] = 0.0;
     }
-	
-    // StandardController: Set Constrains to flight manouvers and define Flight directions
-    //stdCTRL.setup();
 
     // Trajectory Controller: Make all settings for the Aerobatic Trajectory Controller
     setupTrCTRL(trCTRL);
@@ -189,7 +180,7 @@ void loop()
         AND    i < size_buffer_interface ) 
         {
             consoleInRaw[i] = hal.console->read();
-            hal.console->printf("%c",i);
+//            hal.console->printf("%c",i);
             i++;
         }
         consoleInRaw[i] = '\0';
@@ -199,13 +190,6 @@ void loop()
         if (consoleInRaw[0]!='\0'){
             interface.update(consoleInRaw);
         }*/
-
-
-
-        // Updating the StandardController
-        //stSig = stdCTRL.update(dataSample);
-        //stSig.rudder=0;
-
 
         //***************************************************
         // Measurements of the plane
@@ -224,7 +208,7 @@ void loop()
         }
     copyOfStateVars.importData(stateVars);
 
-        if ( NoSignalAvailableGPS(stateVars.phiThetaPsi, 60) ) {
+        if (1/* NoSignalAvailableGPS(stateVars.phiThetaPsi, 60) */) {
                 // If signal loss, process new state variables with iteration method
                 estimateStateVars (hardware_time,hal,stateVars, prevStateVars);	// Because stateVars already contains the ideal values, only "real measured" data will be taken. The rest will be overwritten by estimating method.
         }
@@ -235,6 +219,12 @@ void loop()
     stateVars.importData(copyOfStateVars);
     copyOfStateVars.importData(temp);
 
+    if(relative_time>=resetGPS_time){
+            resetGPS_time = hal.scheduler->micros()-zero_time+5e6;
+            //hal.console->printf("ResetGPS.\n");
+            prevStateVars.importData(stateVars);
+    }
+
         //***************************************************
         // Path Generation
         if(firstLoop){
@@ -243,25 +233,36 @@ void loop()
             pathned.z = center_zero_space_z;
             phiRef = 0;
             testLock = FALSE;
+            testLock2 = FALSE;
         }
         if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 40.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -20.0 * static_cast<float>(PERIOD) /1e6;
         }else if (relative_time<50e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 40.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
-            phiRef += 360.0/10e6*static_cast<float>(PERIOD);
-            if (phiRef>360 || testLock==TRUE){
-                phiRef=0;
-                testLock=TRUE;
-            }
+
+        }else if (relative_time<60e6){
+        pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
+        pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
+        pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
+        phiRef += 180.0/5e6*static_cast<float>(PERIOD);
+        if (phiRef>180 || testLock==TRUE){
+            phiRef=180;
+            testLock=TRUE;
+        }
 
         }else{
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
             pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
+            phiRef += 180.0/5e6*static_cast<float>(PERIOD);
+            if (phiRef>360 || testLock2==TRUE){
+                phiRef=0;
+                testLock2=TRUE;
+            }
         }
 
 
@@ -270,7 +271,7 @@ void loop()
         //***************************************************
 
         // Path Processing
-        // Calculating differential Trajectory
+        // Calculating the differential Trajectory
         trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
          // Calculating controller input for throttle
@@ -297,6 +298,8 @@ void loop()
 
         // Printing in 20ms cycle
         if (firstLoop){
+            hal.console->printf("eEulerDot.x\teEulerDot.y\teEulerDot.z\teEuler.x\teEuler.y\teEuler.z\teAcc.x\teAcc.y\teAcc.z\tePQRxUVW.x\tePQRxUVW.y\tePQRxUVW.z\teV.x\teV.y\teV.z\teVb.x\teVb.y\teVb.z\teXYZ.x\teXYZ.y\teXYZ.z\t");
+            hal.console->printf("rEulerDot.x\trEulerDot.y\trEulerDot.z\trEuler.x\trEuler.y\trEuler.z\trAcc.x\trAcc.y\trAcc.z\trPQRxUVW.x\trPQRxUVW.y\trPQRxUVW.z\trV.x\trV.y\trV.z\trVb.x\trVb.y\trVb.z\trXYZ.x\trXYZ.y\trXYZ.z\n");
             //hal.console->printf("VxL.x,VxL.y,VxL.z,normL,errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
         }
         //hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
@@ -322,10 +325,15 @@ void loop()
                 //hal.console->printf("uvw: (%f,%f,%f)\tpos_in: (%f,%f,%f)\n\n",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
                 //hal.console->printf("acc: (%f,%f,%f)\n",stateVars.accelerationBodyFrame.x,stateVars.accelerationBodyFrame.y,stateVars.accelerationBodyFrame.z);
                 //hal.console->printf("DeltaL: %f\n",errorThrottle);
-            hal.console->printf("est: (%f,%f,%f)\n",copyOfStateVars.pnPePd.x,copyOfStateVars.pnPePd.y,copyOfStateVars.pnPePd.z);
-            hal.console->printf("ist: (%f,%f,%f)\nGPS?:%i\n\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,NoSignalAvailableGPS(stateVars.phiThetaPsi,60));
-
-        }
+         /*   vector x = CrossProduct(stateVars.pqr,stateVars.uvw);
+            hal.console->printf("%f\t%f\t%f\t",stateVars.phiThetaPsiDot.x,stateVars.phiThetaPsiDot.y,stateVars.phiThetaPsiDot.z);
+            hal.console->printf("%f\t%f\t%f\t",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
+            hal.console->printf("%f\t%f\t%f\t",stateVars.pnPePdDotDot.x,stateVars.pnPePdDotDot.y,stateVars.pnPePdDotDot.z);
+            hal.console->printf("%f\t%f\t%f\t",x.x,x.y,x.z);
+            hal.console->printf("%f\t%f\t%f\t",stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z);
+            hal.console->printf("%f\t%f\t%f\t",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z);
+            hal.console->printf("%f\t%f\t%f\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
+     */   }
 
 
         //***************************************************
@@ -341,9 +349,9 @@ void loop()
         hal.rcout->write(3, aileronLOut);
         hal.rcout->write(4, rudderOut);   // Rudder output
 		
-        // Switch off first Loop
+        // Switch off first Loop indicator
         if (firstLoop){
-            firstLoop = 0; //Switch off at temp path when this here is removed!
+            firstLoop = 0;
         }
     }
 }

@@ -1,6 +1,13 @@
 #ifndef STDCONFIG_H
 #define STDCONFIG_H
 
+/***********************************************************
+
+StandardConfiguration.h
+	All declarations, initially given.
+	
+************************************************************/
+
 // Gravity Constant in NED-frame
 #define GRAVITY_NED {0,0,32.185}   //[ft/s^2]
 
@@ -71,5 +78,7 @@ int16_t elevatorROut;
 int16_t throttleOut;
 int16_t rudderOut;
 
+// Routine logic
+BOOL firstLoop=1;
 
 #endif

@@ -1,3 +1,5 @@
+
+// Class StandardController
 // Constructor
 StandardController::StandardController( const AP_HAL::HAL& hal ) : m_rHAL(hal) {
 
@@ -16,7 +18,7 @@ StandardController::StandardController( const AP_HAL::HAL& hal ) : m_rHAL(hal) {
 }
 
 // Instructions for the setup routine
-void StandardController::setup() {
+void StandardController::setup(/* Possibility here, to override the control targets or hard bounds */) {
         // Initial flight control targets, note altitude is down.
         target.heading = TargetHeading*(M_PI/180.0);
         target.speed = TargetSpeed;
@@ -37,65 +39,74 @@ void StandardController::setup() {
 struct SteeringSignals StandardController::update (const struct sample dataSample){
 
         struct SteeringSignals out;
-        struct StateVariables stateVars;
 
         // From the measured data of the plane, calculate all necessary state variables.
-        stateVars = calculateStateVariables (dataSample);
-        uvw = stateVars.uvw;
-        uvwDot = stateVars.uvwDot;
-        pqr = stateVars.pqr;
-        phiThetaPsi = stateVars.phiThetaPsi;
-        phiThetaPsiDot = stateVars.phiThetaPsiDot;
-        pnPePd = stateVars.pnPePd;
-        pnPePdDot = stateVars.pnPePdDot;
-        groundSpeed = stateVars.groundSpeed;
-        groundSpeedDot = stateVars.groundSpeedDot;
+        m_stateVars = calculateStateVariables (dataSample);
 
         // Compute heading PID
-        float headingPIDOut = PID.Heading.update(target.heading-phiThetaPsi.z, phiThetaPsiDot.z);
+        float headingPIDOut = PID.Heading.update(target.heading-m_stateVars.phiThetaPsi.z, m_stateVars.phiThetaPsiDot.z);
 
         // Constrain output of heading PID such that it is a valid target roll
         headingPIDOut = constrain(headingPIDOut,-hardBound.maxRoll,hardBound.maxRoll);
         // Compute roll PID
-        out.aileron = PID.Roll.update(headingPIDOut - phiThetaPsi.x, phiThetaPsiDot.x);
+        out.aileron = PID.Roll.update(headingPIDOut - m_stateVars.phiThetaPsi.x, m_stateVars.phiThetaPsiDot.x);
 
         // Compute altitude PID
-        float altitudePIDOut = PID.Altitude.update(-target.altitude + pnPePd.z, -pnPePdDot.z);
+        float altitudePIDOut = PID.Altitude.update(-target.altitude + m_stateVars.pnPePd.z, -m_stateVars.pnPePdDot.z);
 
         // Compute climb rate PID
-        float climbRatePIDOut = PID.ClimbRate.update(altitudePIDOut + pnPePdDot.z,0);
+        float climbRatePIDOut = PID.ClimbRate.update(altitudePIDOut + m_stateVars.pnPePdDot.z);
 
         // Constrain output of climb rate PID such that it is a valid target pitch
         climbRatePIDOut = constrain (climbRatePIDOut,-hardBound.maxPitch/4, +hardBound.maxPitch);
 
         // Compute pitch PID
-        out.elevator = PID.Pitch.update(climbRatePIDOut - phiThetaPsi.y, phiThetaPsiDot.y);
+        out.elevator = PID.Pitch.update(climbRatePIDOut - m_stateVars.phiThetaPsi.y, m_stateVars.phiThetaPsiDot.y);
 
         // Compute speed PID
-        out.throttle = PID.Speed.update(target.speed - groundSpeed,groundSpeedDot);
-//hal.console->printf("%f\t%f\t%f\t%f\t%f\t%f\n",-target.altitude + pnPePd.z,altitudePIDOut,altitudePIDOut + pnPePdDot.z,climbRatePIDOut,climbRatePIDOut - phiThetaPsi.y,out.elevator);
+        out.throttle = PID.Speed.update(target.speed - m_stateVars.groundSpeed,m_stateVars.groundSpeedDot);
+
         return(out);
 
 }
+
 
 // Getting values of the state variables of the plane
-struct vector StandardController::getVector (const enum States x) {
-        struct vector out;
-        switch(x) {
-                case UVW: 		out = uvw;break;
-                case UVWdot: 	out = uvwDot;break;
-                case PQR:		out = pqr;break;
-                case PhiThetaPsi: out = phiThetaPsi;break;
-                case PhiThetaPsiDot: out = phiThetaPsiDot;break;
-                case PnPePd:	out = pnPePd;break;
-                case PnPePdDot:	out = pnPePdDot;break;
-                default:		out = {0,0,0};break;
-        }
-        return(out);
+const struct StateVariables *StandardController::getStateVariables () {
+        return(&m_stateVars);
 }
-float StandardController::getGroundSpeed () {return(groundSpeed);}
-float StandardController::getGroundSpeedDot () {return(groundSpeedDot);}
+
 
 // Access to the PIDs
 // const is for denying any change in the PIDs
-const struct PIDs *StandardController::getPIDAccess () {return(&PID);}
+const PIDcontroller *StandardController::getPIDAccess (enum stdPIDs pidName) {
+
+	switch(pidName) {
+			case heading :
+					return(&PID.Heading);
+					break;
+			case roll :
+					return(&PID.Roll);
+					break;
+			case altitude :
+					return(&PID.Altitude);
+					break;
+			case climbRate :
+					return(&PID.ClimbRate);
+					break;
+			case pitch :
+					return(&PID.Pitch);
+					break;
+			case speed :
+					return(&PID.Speed);
+					break;
+			default:
+					// Error-Routine
+					return(NULL);
+	}
+	
+}
+
+
+
+

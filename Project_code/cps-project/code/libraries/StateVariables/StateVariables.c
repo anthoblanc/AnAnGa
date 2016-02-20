@@ -1,4 +1,21 @@
 
+// Class StateVariables - member functions
+void StateVariables::importData (StateVariables refStateVars){
+
+    uvw.importVector(refStateVars.uvw);
+    uvwDot.importVector(refStateVars.uvwDot);
+    pqr.importVector(refStateVars.pqr);
+    phiThetaPsi.importVector(refStateVars.phiThetaPsi);
+    phiThetaPsiDot.importVector(refStateVars.phiThetaPsiDot);
+    pnPePd.importVector(refStateVars.pnPePd);
+    pnPePdDot.importVector(refStateVars.pnPePdDot);
+    groundSpeed = refStateVars.groundSpeed;
+    groundSpeedDot = refStateVars.groundSpeedDot;
+    pnPePdDotDot.importVector(refStateVars.pnPePdDotDot);
+    accelerationBodyFrame.importVector(refStateVars.accelerationBodyFrame);
+
+}
+
 
 
 // Formulas for calculating derivatives of the state variables
@@ -55,6 +72,7 @@ struct vector derivativeBodyVelocity( struct vector pqr, struct vector uvw, stru
 }
 
 
+
 // Formulas for calculating the vehicle-velocity plus the vehicle-acceleration
 float velocity( struct vector uvw ){
     return sqrt( pow(uvw.x,2) + pow(uvw.y,2) + pow(uvw.z,2));
@@ -67,23 +85,7 @@ float acceleration ( struct vector uvw, struct vector uvwDot ){
 
 
 
-void StateVariables::importData (StateVariables refStateVars){
-
-    uvw.importVector(refStateVars.uvw);
-    uvwDot.importVector(refStateVars.uvwDot);
-    pqr.importVector(refStateVars.pqr);
-    phiThetaPsi.importVector(refStateVars.phiThetaPsi);
-    phiThetaPsiDot.importVector(refStateVars.phiThetaPsiDot);
-    pnPePd.importVector(refStateVars.pnPePd);
-    pnPePdDot.importVector(refStateVars.pnPePdDot);
-    groundSpeed = refStateVars.groundSpeed;
-    groundSpeedDot = refStateVars.groundSpeedDot;
-    pnPePdDotDot.importVector(refStateVars.pnPePdDotDot);
-    accelerationBodyFrame.importVector(refStateVars.accelerationBodyFrame);
-
-}
-
-
+// From the measured data of the plane, calculate all necessary state variables.
 struct StateVariables calculateStateVariables (const struct sample dataSample) {
 	
 	struct StateVariables out;
