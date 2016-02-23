@@ -1,11 +1,6 @@
 #ifndef API_PERSO_H
 #define API_PERSO_H
 
-#include <fstream>
-#include <string>
-
-//Arduino
-#include <AP_HAL.h>
 
 /* ***********************************************
 Print_help
@@ -24,7 +19,14 @@ interpretate in term of action a given string
 *********************************************** */
 void API_interpretate_chain(char * stringAPI, int length_stringAPI) ;
 
+/* ***********************************************
+int atoi(char *str)
 
+char * str string to convert
+
+convert a char into an interger
+*********************************************** */
+int atoi(char *str);
 
 
 #include "API_perso.cpp"

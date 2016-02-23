@@ -2,7 +2,7 @@
 #define THISFIRMWARE "CPS-Autopilot-Project"
 
 //***************************************************
-// Define
+//                   Define
 //***************************************************
 
 
@@ -49,7 +49,6 @@ typedef int           BOOL;
 // Export of all declarations, initially given.
 #include <StandardConfiguration.h>	
 
-
 // Own Libraries
 #include "../libraries/VectorMath/VectorMath.h"
 #include "../libraries/PID/PID.h"
@@ -59,6 +58,7 @@ typedef int           BOOL;
 #include "../libraries/Path/Trajectory.h"							// not yet commented, is Path.h still needed?
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"	// maybe improve comments
 #include "../libraries/Interface/Interface.hpp"						// Not (yet) in use
+#include "../libraries/API_perso/API_perso.h"						// Not (yet) in use
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
 #include "../libraries/PathDelay/PathDelay.h"
@@ -184,7 +184,7 @@ void loop()
             i++;
         }
         consoleInRaw[i] = '\0';
-        //if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //i=0 means that there is nothing in the buffer
+        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //i=0 means that there is nothing in the buffer
         
         /*// go to the Interface-Handler
         if (consoleInRaw[0]!='\0'){
