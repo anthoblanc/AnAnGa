@@ -76,9 +76,9 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI)
 		
 		//Which PID?
 		switch(stringAPI[1]) {
-		case PIDcontroller_Heading  	: struct PIDs.Heading.setControllerGains(attribut[1],attribut[2],attribut[3]); 	break;
+		case PIDcontroller_Heading  	: struct PIDs.Heading.setControllerGains(attribut[1],attribut[2],attribut[3]); 		break;
 		case PIDcontroller_Roll     	: struct PIDs.Roll.setControllerGains(attribut[1],attribut[2],attribut[3]); 		break;
-		case PIDcontroller_Altitude 	: struct PIDs.Altitude.setControllerGains(attribut[1],attribut[2],attribut[3]);	break;
+		case PIDcontroller_Altitude 	: struct PIDs.Altitude.setControllerGains(attribut[1],attribut[2],attribut[3]);		break;
 		case PIDcontroller_ClimbRate	: struct PIDs.ClimbRate.setControllerGains(attribut[1],attribut[2],attribut[3]); 	break;
 		case PIDcontroller_Pitch    	: struct PIDs.Pitch.setControllerGains(attribut[1],attribut[2],attribut[3]);		break;
 		case PIDcontroller_Speed    	: struct PIDs.Speed.setControllerGains(attribut[1],attribut[2],attribut[3]); 		break;
