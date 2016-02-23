@@ -24,7 +24,12 @@ void estimateStateVars (uint32_t time, const AP_HAL::HAL& hal,StateVariables& ne
 
     newVars.phiThetaPsi = addVector( multiplyScalarToVector( addVector(newVars.phiThetaPsiDot,oldVars.phiThetaPsiDot), 0.5*PERIOD/1e6 ), oldVars.phiThetaPsi );
 	
-	// Edit: If one angle >Pi then do modulo operation to keep within -Pi<x<Pi
+    if (newVars.phiThetaPsi.x>M_PI){newVars.phiThetaPsi.x -= 2*M_PI;}
+    if (newVars.phiThetaPsi.x<-M_PI){newVars.phiThetaPsi.x += 2*M_PI;}
+    if (newVars.phiThetaPsi.y>M_PI){newVars.phiThetaPsi.y -= 2*M_PI;}
+    if (newVars.phiThetaPsi.y<-M_PI){newVars.phiThetaPsi.y += 2*M_PI;}
+    if (newVars.phiThetaPsi.z>M_PI){newVars.phiThetaPsi.z -= 2*M_PI;}
+    if (newVars.phiThetaPsi.z<-M_PI){newVars.phiThetaPsi.z += 2*M_PI;}
 
 	// Try: rCM to (1,1,1) and BODY to NED over all summands.
     newVars.pnPePdDotDot = addVector (BODYtoNED(newVars.accelerationBodyFrame,newVars.phiThetaPsi), radiusCoefficientMatrix(CrossProduct(newVars.pqr,oldVars.uvw)) );
@@ -35,15 +40,15 @@ vector x = CrossProduct(newVars.pqr,oldVars.uvw);
     newVars.uvw = NEDtoBODY(newVars.pnPePdDot,newVars.phiThetaPsi);
 	
 // Edit: Add a factor of about 3*(3.8?) to the pnPePdDot
-    newVars.pnPePd = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDot,oldVars.pnPePdDot), 1.9*PERIOD/1e6 ), oldVars.pnPePd );
+    newVars.pnPePd = addVector( multiplyScalarToVector( addVector(newVars.pnPePdDot,oldVars.pnPePdDot), 0.5*PERIOD/1e6 ), oldVars.pnPePd );
 
     if(time>=nextPrint){
-/*        hal.console->printf("%f\t%f\t%f\t",newVars.phiThetaPsiDot.x,newVars.phiThetaPsiDot.y,newVars.phiThetaPsiDot.z);
-        hal.console->printf("%f\t%f\t%f\t",newVars.phiThetaPsi.x,newVars.phiThetaPsi.y,newVars.phiThetaPsi.z);
-        hal.console->printf("%f\t%f\t%f\t",newVars.pnPePdDotDot.x,newVars.pnPePdDotDot.y,newVars.pnPePdDotDot.z);
-        hal.console->printf("%f\t%f\t%f\t",x.x,x.y,x.z);
-        hal.console->printf("%f\t%f\t%f\t",newVars.pnPePdDot.x,newVars.pnPePdDot.y,newVars.pnPePdDot.z);
-        hal.console->printf("%f\t%f\t%f\t",newVars.uvw.x,newVars.uvw.y,newVars.uvw.z);
-        hal.console->printf("%f\t%f\t%f\t",newVars.pnPePd.x,newVars.pnPePd.y,newVars.pnPePd.z);
-  */  }
+        //hal.console->printf("%f\t%f\t%f\t",newVars.phiThetaPsiDot.x,newVars.phiThetaPsiDot.y,newVars.phiThetaPsiDot.z);
+        //hal.console->printf("%f\t%f\t%f\t",newVars.phiThetaPsi.x,newVars.phiThetaPsi.y,newVars.phiThetaPsi.z);
+        //hal.console->printf("%f\t%f\t%f\t",newVars.pnPePdDotDot.x,newVars.pnPePdDotDot.y,newVars.pnPePdDotDot.z);
+        //hal.console->printf("%f\t%f\t%f\t",x.x,x.y,x.z);
+        //hal.console->printf("%f\t%f\t%f\t",newVars.pnPePdDot.x,newVars.pnPePdDot.y,newVars.pnPePdDot.z);
+        //hal.console->printf("%f\t%f\t%f\t",newVars.uvw.x,newVars.uvw.y,newVars.uvw.z);
+        //hal.console->printf("%f\t%f\t%f\t",newVars.pnPePd.x,newVars.pnPePd.y,newVars.pnPePd.z);
+    }
 }

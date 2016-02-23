@@ -100,7 +100,7 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
                 t_veRoll.z = -t_veRoll.z;
         }*/ 
 	   // Build Cross Product and take x-component
-   float factor = 1.0/NormVector(t_vaCMDbYZ);
+        float factor = 1.0/NormVector(t_vaCMDbYZ);
         t_vAileronCalc = CrossProduct(t_veRoll,multiplyScalarToVector(t_vaCMDbYZ,factor));
         t_fAileronPID = t_vAileronCalc.x;
         // Take the arcsin of the x-component of the cross product
@@ -128,7 +128,7 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
 
         if (time >= nextPrint){
             //hal.console->printf("vector: (%f,%f), ref: (%f,%f), error: %f\n\n",t_vaCMDbYZ.y,t_vaCMDbYZ.z,t_veRoll.y,t_veRoll.z,t_fAileronPID);
-            hal.console->printf("factor, Aileron: %f,%f\t",factor,t_fAileronPID);
+            //hal.console->printf("factor, Aileron: %f,%f\t",factor,t_fAileronPID);
         }
 
         return(t_cOut);

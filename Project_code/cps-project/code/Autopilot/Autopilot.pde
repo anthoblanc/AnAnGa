@@ -99,7 +99,7 @@ uint32_t tend = 50e6; // path ending time
 
 
 //temp for test							<--------------------------------------- temp
-StateVariables copyOfStateVars, temp;
+StateVariables copyOfStateVars;
 uint32_t resetGPS_time;
 BOOL testLock,testLock2;
 
@@ -140,7 +140,7 @@ void setup()
 // loop: called repeatedly in a loop
 void loop()
 {
-    hardware_time = hal.scheduler->micros(); // real hadware time 
+    hardware_time = hal.scheduler->micros(); // real hadware time
     relative_time=hardware_time-zero_time; //time since the new simulation
 
     /* zero space time:
@@ -215,9 +215,7 @@ void loop()
         // Save stateVars for possible iteration in next time step
         prevStateVars.importData(stateVars);
 
-    temp.importData(stateVars);
     stateVars.importData(copyOfStateVars);
-    copyOfStateVars.importData(temp);
 
     if(relative_time>=resetGPS_time){
             resetGPS_time = hal.scheduler->micros()-zero_time+5e6;
@@ -238,11 +236,11 @@ void loop()
         if (relative_time<30e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
             pathned.y += 40.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += -20.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += -15.0 * static_cast<float>(PERIOD) /1e6;
         }else if (relative_time<50e6){
             pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 40.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
+            pathned.z += -5.0 * static_cast<float>(PERIOD) /1e6;
 
         }else if (relative_time<60e6){
         pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
@@ -291,7 +289,7 @@ void loop()
         gCMD_refbody = multiplyScalarToVector(gCMD_refbody,0.2);
         aCMD_refbody = subtractVector(aCMD_refbody,gCMD_refbody);
         stSig = trCTRL.update(hardware_time,errorThrottle,aCMD_refbody,gCMD_refbody,stateVars,phiRef);
-
+        stSig.rudder = 0;
 
         //***************************************************
         // Print to Console
@@ -333,7 +331,9 @@ void loop()
             hal.console->printf("%f\t%f\t%f\t",stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z);
             hal.console->printf("%f\t%f\t%f\t",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z);
             hal.console->printf("%f\t%f\t%f\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
-     */   }
+
+     */   hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
+        }
 
 
         //***************************************************

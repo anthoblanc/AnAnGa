@@ -59,10 +59,10 @@ TrajectoryControl.h
 #define IntLim_Throttle 1	// Integral limit
 #define Casc_Throttle 1		// Factor to set a multiple of the update time the controller is updated
 
-#define Kp_Aileron 0.09		// PID parameters for Aileron
+#define Kp_Aileron 0.9		// PID parameters for Aileron
 #define Ki_Aileron 0.0
-#define Kd_Aileron 0.04
-#define IntLim_Aileron 0.1
+#define Kd_Aileron 0.4
+#define IntLim_Aileron 0.5
 #define Casc_Aileron 1
 
 #define Kp_Rudder 0.1		// PID parameters for Rudder
