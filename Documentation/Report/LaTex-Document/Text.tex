@@ -76,7 +76,7 @@
 	
 		\vspace{1.5cm}
 	
-		\huge{\textbf{Autonomous Aerobatics on Commanded Paths}}
+		\huge{\textbf{Autonomous Aerobatics on\\Commanded Paths}}
 	
 		\vspace{1.5cm}
 	
@@ -102,13 +102,22 @@
 	
 \end{titlepage}
 
-
+\setstretch{1.2}
 
 
 % Inhaltsverzeichnis   (Überschriften werden automatisch in das Inhaltsverzeichnis aufgenommen.)
 % ===========================================
 \newpage
 \tableofcontents	
+
+\vfill
+
+% Abbildungsverzeichnis
+% ===========================================
+
+%\renewcommand{\listfigurename}{}
+\listoffigures
+%{\def\section*#1{}\listoffigures}
 
 
 % Textbeginn
@@ -117,30 +126,66 @@
 
 
 % Neue Seite
-% Kapitel 1: Motivation
 % ===========================================
 \newpage
 	
-	
 
-\section{first chapeter...}\label{label one}
+\section{Overview}
 
-Im 
+As a part of the CPS course in WS15/16, a controller structure for an aircraft in an simulation environment was built, performing autonomous aerobatics on commanded paths.
+In this report, the controller structure is explained and achievements are presented.
+Before, an overview of the features are given and the underlying work is clarified.
 
 \medskip
 
-Der  Prozessschritte.
+\subsection{Working Principle and Features}
 
-\begin{figure}[!b]
+Control target of the controller is a path in 3-dimensional space as a function of time.
+The controller's aim is to fly along this commanded path by determining the deviation from the given trajectory and thereout calculating acceleration commands which are the inputs of the actuator-controllers of the aircraft.
+
+\textbf{Figure~\ref{fig_complete_structure}} depicts the complete control structure of the aerobatic controller. 
+With the position data of the trajectory and actual position signals of the aircraft, the desired acceleration is computed, and by considering the gravity handed to the control structure where the acceleration in body frame is used as the control variable for the aileron-, elevator-, and rudder-control.
+Also, with the position data, the delay of the aircraft from the desired path is determined and by considering a look ahead distance, the throttle is controlled with this information.
+
+The resulting steering signals computed by the control structure are handed to the simulation environment which hands back measurement results of the virtual aircraft's sensors.
+These signals are processed and provided to the control structure. A feature of the signal processing is the estimation of the aircraft-position with accelerometers and gyrometers when there is no available GPS-signal.
+
+\begin{figure}[!h]
   \begin{center}
-  	\includegraphics[width=12cm]{pictures/explanation-diagram-throttle.pdf}
+  	\includegraphics[width=\textheight, angle=90]{pictures/complete_structure.pdf}
   \end{center}
-  \caption{Spezisfische CO\textsubscript{2-äq.}-Emissionen von Wasserstoff, über verschiedenen Prozessketten erzeugt. Unterteilung der Emissionen in die verursachenden Prozesse. Datengrundlage.}
-  \label{im_spez-emissions}
+  \caption{Overview of the control structure of the aerobatic controller.}
+  \label{fig_complete_structure}
 \end{figure}
 
-\noindent
-Gegenüber dem Referenzfall, der Erdgas-Dampfreformierung, \cite[S.~2089]{Felgenhauer.2015}\cite{Cao.2015}
+
+\subsection{Underlying Work}
+
+The control structure, implemented and presented in this project work, is based on the work of Sanghyuk Park\cite{Park.2012} and modified by establishing the desired path depending on time and determining the path delay in order to control the throttle.
+
+The estimation of the aircraft's position signal is implemented after a method which is, at the time of handing in this report, not yet published. We got the access ahead to the release by our tutor.
+
+\section{Details}
+
+In the following, each part of the control structure (compare Figure~\ref{fig_complete_structure}) is presented in detail.
+
+\subsection{Interface with the Simulation Environment}
+
+\subsection{User Interface}
+
+\subsection{Path Generation}
+
+\subsection{Processing of Control Variables}
+
+\subsection{Control Structure}
+
+\subsection{GPS Signal Estimation}
+
+\section{Results}
+
+
+
+
 
 
 % Textende
@@ -174,13 +219,26 @@ Gegenüber dem Referenzfall, der Erdgas-Dampfreformierung, \cite[S.~2089]{Felgen
 
 \bigskip
 
-% Abbildungsverzeichnis
-% ===========================================
-\subsection{List of Figures}
+\subsection{'Variables Declaration'}
 
-\renewcommand{\listfigurename}{}
-%\listoffigures
-{\def\section*#1{}\listoffigures}
+\begin{tabbing}
+	 \hspace{2cm} \= \hspace{2cm} \= \hspace{3cm} \kill
+	\> $t_k$ \> Point in time (time-discrete)\\	
+	\> $\phi_{ref}$ \> Angle of reference vector for aileron control, forces the roll-angle\\
+	\> $\vec{P}_{des}^i$ \> Desired position of the aircraft (inertial frame)\\
+	\> $\vec{P}_{is}^i$ \> Actual position of the aircraft (inertial frame)\\
+	\> $\vec{L}_{is}^i$ \> Difference between desired and actual position (inertial frame)\\
+	\> $\vec{a}_{CMD}^v$ \> Desired Acceleration of the aircraft (vehicle frame)\\
+	\> $\vec{g}^{v,b}$ \> Acceleration by gravity (vehicle,body frame)\\
+	\> $\vec{A}_{CMD}^{v,b}$ \> Desired Acceleration with gravity considered (vehicle,body frame)\\
+	\> $L_{des}$ \> Look ahead distance \\
+	\> $L_{is,Path}$ \> Distance concerning the desired path, the aircraft lags behind \\
+	\> $\Delta L$ \> Desired distance the aircraft needs to catch up \\
+	\> $e_{Throttle}$ \> Input error for the throttle controller \\
+	\> $(\phi,\theta,\psi)$ \> Euler angles of the aircraft \\
+	\> $\vec{V}^v$ \> Velocity vector of the aircraft (vehicle frame)\\	
+	
+\end{tabbing}
 
 
 \end{appendix}
