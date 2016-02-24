@@ -280,7 +280,7 @@ void loop()
                 plane_flying_busy=TRUE;
                 //code here
                 trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, relative_time, timer);
-                if(relative_time-timer > looping_duration){
+                if(relative_time-timer > looping_duration){ // need reconsider, in accordance with the looping function
                     plane_flying_busy=FALSE;
                     timer = relative_time;
                     if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
