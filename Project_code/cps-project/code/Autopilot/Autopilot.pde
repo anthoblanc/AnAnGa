@@ -26,6 +26,9 @@ typedef int           BOOL;
 // Look Ahead Distance (Desired Length) [feet]
 #define LookAheadDistance 40
 
+// Activate the GPS-Signal Estimation when setting to 1
+#define ActivateGPS_SignalEstimation 0
+
 //interface
 #define size_buffer_interface 20
 
@@ -76,7 +79,6 @@ typedef int           BOOL;
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
 #include "../libraries/PathDelay/PathDelay.h"
-//#include "../libraries/API_perso/API_perso.h"
 
 //***************************************************
 // Variable Declaration
@@ -225,24 +227,17 @@ void loop()
             prevStateVars.importData(stateVars);
             resetGPS_time = hal.scheduler->micros()-zero_time;
         }
-    copyOfStateVars.importData(stateVars);
 
-        if (1/* NoSignalAvailableGPS(stateVars.phiThetaPsi, 60) */) {
+        if ( NoSignalAvailableGPS(stateVars.phiThetaPsi, 60) && ActivateGPS_SignalEstimation) {
                 // If signal loss, process new state variables with iteration method
                 estimateStateVars (hardware_time,hal,stateVars, prevStateVars);	// Because stateVars already contains the ideal values, only "real measured" data will be taken. The rest will be overwritten by estimating method.
         }
         // Save stateVars for possible iteration in next time step
         prevStateVars.importData(stateVars);
 
-    stateVars.importData(copyOfStateVars);
+    //***************************************************
+    // Path Generation
 
-    if(relative_time>=resetGPS_time){
-            resetGPS_time = hal.scheduler->micros()-zero_time+5e6;
-            //hal.console->printf("ResetGPS.\n");
-            prevStateVars.importData(stateVars);
-    }
-        //***************************************************
-        // Path management
         if(firstLoop){
             pathned.x = center_zero_space_x;
             pathned.y = center_zero_space_y;
@@ -319,55 +314,11 @@ void loop()
                 Plane_flying_next_state=glide_mode;
                 break;
             }
-/*
-        //***************************************************
-        // Path Generation
-        if(firstLoop){
-            pathned.x = center_zero_space_x;
-            pathned.y = center_zero_space_y;
-            pathned.z = center_zero_space_z;
-            phiRef = 0;
-            testLock = FALSE;
-            testLock2 = FALSE;
-        }
-        if (relative_time<30e6){
-            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 40.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += -15.0 * static_cast<float>(PERIOD) /1e6;
-        }else if (relative_time<50e6){
-            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += -5.0 * static_cast<float>(PERIOD) /1e6;
 
-        }else if (relative_time<60e6){
-        pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-        pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
-        pathned.z += -0.0 * static_cast<float>(PERIOD) /1e6;
-        phiRef += 180.0/5e6*static_cast<float>(PERIOD);
-        if (phiRef>180 || testLock==TRUE){
-            phiRef=180;
-            testLock=TRUE;
-        }
-
-        }else{
-            pathned.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.y += 50.0 * static_cast<float>(PERIOD) /1e6;
-            pathned.z += 0.0 * static_cast<float>(PERIOD) /1e6;
-            phiRef += 180.0/5e6*static_cast<float>(PERIOD);
-            if (phiRef>360 || testLock2==TRUE){
-                phiRef=0;
-                testLock2=TRUE;
-            }
-        }
-
-*/
-//        trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
         //***************************************************
 
         // Path Processing
-        // Calculating the differential Trajectory
-        //trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
          // Calculating controller input for throttle
         errorThrottle = pathDly.update(pathned,trajectory_refgnd);
