@@ -43,7 +43,7 @@ class PIDcontroller {
 
 public:
         // Constructor
-        PIDcontroller (const float Kp, const float Ki, const float Kd, const uint32_t dt,
+        PIDcontroller (float Kp, float Ki, float Kd, const uint32_t dt,
                               const int8_t refreshInterval = 1);
 
 
