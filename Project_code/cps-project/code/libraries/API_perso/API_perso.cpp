@@ -48,6 +48,7 @@ ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \
     while (str[i]!='\0')
     {
         hal.console->printf("%c",str[i]);
+	i++
     }
 }
 
@@ -66,14 +67,14 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 	//*** edit ***//	
 	case 'e': 
 
-		if(stringAPI[2]!=separation_char) hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		if(stringAPI[2]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 
 		//Kp
 		for(i=first_position_num;stringAPI[i]!='-';i++) buffer_conv[i-first_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-first_position_num]='\0'; //end char
 		attribut[1]=atoi(buffer_conv); //convertion to inter
 
-		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 
 		//Ki
 		second_position_num=i+2;
@@ -81,7 +82,7 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		buffer_conv[i-second_position_num]='\0'; //end char
 		attribut[2]=atoi(buffer_conv); //convertion to inter
 
-		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		
 		//Kd
 		third_position_num=i+2;
@@ -91,12 +92,13 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		
 		//Which PID?
 		switch(stringAPI[1]) {
-		case PIDcontroller_Throttle 	: trCTRL.editPID(Throttle,attribut[1],attribut[2],attribut[3]);		break;
-		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 		break;
-		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		break;
-		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	break;
-		default:hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		case PIDcontroller_Throttle 	: trCTRL.editPID(Throttle,attribut[1],attribut[2],attribut[3]);		hal.console->printf("PID modified\n");break;
+		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 		hal.console->printf("PID modified\n");break;
+		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		hal.console->printf("PID modified\n");break;
+		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	hal.console->printf("PID modified\n");break;
+		default:hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
+		hal.console->printf("PID modified\n");
 		break;	
 	
 	//*** help ***//
@@ -106,16 +108,16 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 	//*** fly ***//
 	case 'f': 
 		switch(stringAPI[1]) {
-			case 't': Plane_flying_current_state=takeoff_mod; 	hal.console->printf("akeoff_mod actived"); 	break;
-			case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle_mod actived"); 	break;
-			case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping_mod actived"); 	break;
-			case 's': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("go_streight_mod actived"); break;
-			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mod actived"); 	break;
-			default: hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+			case 't': Plane_flying_current_state=takeoff_mod; 	hal.console->printf("akeoff_mod actived \n"); 	break;
+			case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle_mod actived \n"); 	break;
+			case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping_mod actived \n"); 	break;
+			case 's': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("go_streight_mod actived \n"); break;
+			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mod actived \n"); 	break;
+			default: hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
 		break;
 	default: 
-		hal.console->printf("The function does not exist or is not operational yet!");
+		hal.console->printf("The function does not exist or is not operational yet! \n");
 		break;
 	}	
 }
