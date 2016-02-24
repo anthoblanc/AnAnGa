@@ -13,12 +13,11 @@
 #define separation_char 	'-'
 
 //PID reference
-#define PIDcontroller_Heading		'h'
-#define PIDcontroller_Roll		'r'
-#define PIDcontroller_Altitude		'a'
-#define PIDcontroller_ClimbRate		'c'
-#define PIDcontroller_Pitch		'p'
-#define PIDcontroller_Speed 		's'
+#define PIDcontroller_Throttle		't'
+#define PIDcontroller_Aileron		'a'
+#define PIDcontroller_Rudder 		'r'
+#define PIDcontroller_Elevator		'h'
+
 
 //***************************************************
 //                    Function
@@ -38,7 +37,7 @@ h: help \n\
 }
 
 //**********************//
-void API_interpretate_chain(char * stringAPI, int length_stringAPI) 
+void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryController& trCTRL) 
 {
 	int i=0; //local counter
 	char buffer_conv[10]; //buffer for atoi
@@ -77,12 +76,10 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI)
 		
 		//Which PID?
 		switch(stringAPI[1]) {
-		case PIDcontroller_Heading  	: struct PIDs.Heading.setControllerGains(attribut[1],attribut[2],attribut[3]); 		break;
-		case PIDcontroller_Roll     	: struct PIDs.Roll.setControllerGains(attribut[1],attribut[2],attribut[3]); 		break;
-		case PIDcontroller_Altitude 	: struct PIDs.Altitude.setControllerGains(attribut[1],attribut[2],attribut[3]);		break;
-		case PIDcontroller_ClimbRate	: struct PIDs.ClimbRate.setControllerGains(attribut[1],attribut[2],attribut[3]); 	break;
-		case PIDcontroller_Pitch    	: struct PIDs.Pitch.setControllerGains(attribut[1],attribut[2],attribut[3]);		break;
-		case PIDcontroller_Speed    	: struct PIDs.Speed.setControllerGains(attribut[1],attribut[2],attribut[3]); 		break;
+		case PIDcontroller_Throttle 	: trCTRL.editPID(Throttle,attribut[1],attribut[2],attribut[3]);	break;
+		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 	break;
+		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		break;
+		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	break;
 		default:hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
 		}
 		break;	
