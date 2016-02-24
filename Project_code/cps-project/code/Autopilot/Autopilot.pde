@@ -119,8 +119,6 @@ uint32_t timer = 0; // trajectory timer
 
 
 //temp for test							<--------------------------------------- temp
-StateVariables copyOfStateVars;
-uint32_t resetGPS_time;
 BOOL testLock,testLock2;
 
 //***************************************************
@@ -191,8 +189,8 @@ void loop()
         }
 
 
-        //***************************************************//
-        // Interface
+        //***************************************************
+        // User Interface
 
         // Read console data from COM-PORT. Only -size_buffer_interface- characters allowed
         i = 0; //init
@@ -205,11 +203,6 @@ void loop()
         }
         consoleInRaw[i] = '\0';
         if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL, (int&) Plane_flying_next_state, (float&)desiredL); //i=0 means that there is nothing in the buffer
-        
-        /*// go to the Interface-Handler
-        if (consoleInRaw[0]!='\0'){
-            interface.update(consoleInRaw);
-        }*/
 
         //***************************************************
         // Measurements of the plane
@@ -225,7 +218,6 @@ void loop()
         // Check for GPS-signal loss
         if(firstLoop){
             prevStateVars.importData(stateVars);
-            resetGPS_time = hal.scheduler->micros()-zero_time;
         }
 
         if ( NoSignalAvailableGPS(stateVars.phiThetaPsi, 60) && ActivateGPS_SignalEstimation) {
@@ -235,8 +227,8 @@ void loop()
         // Save stateVars for possible iteration in next time step
         prevStateVars.importData(stateVars);
 
-    //***************************************************
-    // Path Generation
+        //***************************************************
+        // Path Generation
 
         if(firstLoop){
             pathned.x = center_zero_space_x;
@@ -251,7 +243,7 @@ void loop()
           timer = relative_time;
           }
         switch(Plane_flying_current_state)
-            {
+        {
             case takeoff_mode:
                 plane_flying_busy=TRUE;
                 //code here
@@ -313,7 +305,7 @@ void loop()
                 Plane_flying_current_state=glide_mode;
                 Plane_flying_next_state=glide_mode;
                 break;
-            }
+        }
 
 
         //***************************************************
@@ -344,11 +336,8 @@ void loop()
 
         // Printing in 20ms cycle
         if (firstLoop){
-            hal.console->printf("eEulerDot.x\teEulerDot.y\teEulerDot.z\teEuler.x\teEuler.y\teEuler.z\teAcc.x\teAcc.y\teAcc.z\tePQRxUVW.x\tePQRxUVW.y\tePQRxUVW.z\teV.x\teV.y\teV.z\teVb.x\teVb.y\teVb.z\teXYZ.x\teXYZ.y\teXYZ.z\t");
-            hal.console->printf("rEulerDot.x\trEulerDot.y\trEulerDot.z\trEuler.x\trEuler.y\trEuler.z\trAcc.x\trAcc.y\trAcc.z\trPQRxUVW.x\trPQRxUVW.y\trPQRxUVW.z\trV.x\trV.y\trV.z\trVb.x\trVb.y\trVb.z\trXYZ.x\trXYZ.y\trXYZ.z\n");
-            //hal.console->printf("VxL.x,VxL.y,VxL.z,normL,errorAileron,errorRudder,errorElevator,errorThrottle,P_des.x,P_des.y,P_des.z,P_is.x,P_is.y,P_is.z,L_is.x,L_is.y,L_is.z,aCMDin.x,aCMDin.y,aCMDin.z,aCMDb.x,aCMDb.y,aCMDb.z,ACMDb.x,ACMD.y,ACMDb.z\n");
+            // Prints only for the startup phase
         }
-        //hal.console->printf(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
 
         // Printing in 1 sec cycle
         if(hardware_time >= nextPrint) {
