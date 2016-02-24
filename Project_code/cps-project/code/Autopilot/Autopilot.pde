@@ -405,7 +405,8 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-                hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
+            hal.console->printf("Plane_flying_current_state: %d\n", Plane_flying_current_state);
+                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
                 //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
