@@ -26,5 +26,5 @@ enum class trajName: char {
 
     struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t timer, float phiRef, bool testLock, bool testLock2);
 
-uint32_t looping_time = 10e6
+uint32_t looping_time = 10e6; // need reconsider
 #endif

@@ -67,7 +67,7 @@
 	
 	struct vector traj_loop (struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t timer){
     	struct vector delta_p; 
-        uint32_t looping_time = 10e6;
+        uint32_t looping_time = 10e6; // need reconsider
 
     	desired_path.x +=  0.0;
     	desired_path.y +=  (40.0*cos(360.0*(M_PI/180.0)*((time+1e6-timer)/(looping_time)))+40)*static_cast<float>(PERIOD)/1e6;//
