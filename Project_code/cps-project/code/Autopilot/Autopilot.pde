@@ -29,12 +29,12 @@ typedef int           BOOL;
 //interface
 #define size_buffer_interface 20
 
-//flying mode
-#define takeoff_mode        0
-#define circle_mode         1
-#define looping_mode        2
-#define go_streight_mode    3
-#define roll_mode           4
+// Trajectory time
+#define takeoff_time 10e6
+#define circle_time 20e6
+#define rolling_time 15e6
+#define looping_duration 10e6
+
 
 //***************************************************
 // Libraries
@@ -62,7 +62,7 @@ typedef int           BOOL;
 #include "../libraries/StateVariables/StateVariables.h"
 #include "../libraries/TrajectoryControl/TrajectoryControl.h"
 #include "../libraries/StandardController/StandardController.h"
-#include "../libraries/Path/Trajectory.h"							// not yet commented, is Path.h still needed?
+#include "../libraries/Path/Trajectory.h"							// Trajectory design
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"	// maybe improve comments
 #include "../libraries/Interface/Interface.hpp"						// Not (yet) in use
 #include "../libraries/API_perso/API_perso.h"						// Not (yet) in use
@@ -76,8 +76,9 @@ typedef int           BOOL;
 //***************************************************
 
 //Flying state
-int Plane_flying_current_state=takeoff_mode;
-int Plane_flying_next_state=takeoff_mode;
+enum Plane_state {takeoff_mode, circle_mode, looping_mode, glide_mode, roll_mode};
+Plane_state Plane_flying_current_state=takeoff_mode;
+Plane_state Plane_flying_next_state=takeoff_mode;
 BOOL plane_flying_busy=FALSE;
 
 // Position variables
@@ -106,8 +107,7 @@ char consoleInRaw[size_buffer_interface];
 uint32_t relative_time = hal.scheduler->micros(); //time from the last initialisation
 uint32_t zero_time = hal.scheduler->micros(); //time of the last initialisation
 uint32_t hardware_time = hal.scheduler->micros(); // real hadware time
-uint32_t tstart = 30e6; // path starting time
-uint32_t tend = 50e6; // path ending time
+uint32_t timer = 0; // trajectory timer
 
 
 //temp for test							<--------------------------------------- temp
@@ -196,7 +196,7 @@ void loop()
             i++;
         }
         consoleInRaw[i] = '\0';
-        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL, Plane_flying_current_state); //i=0 means that there is nothing in the buffer
+        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL); //i=0 means that there is nothing in the buffer
         
         /*// go to the Interface-Handler
         if (consoleInRaw[0]!='\0'){
@@ -237,48 +237,83 @@ void loop()
     }
         //***************************************************
         // Path management
-        if(plane_flying_busy==FALSE) Plane_flying_current_state=Plane_flying_next_state; //if the plane is not busy, we change the state
+        if(firstLoop){
+            pathned.x = center_zero_space_x;
+            pathned.y = center_zero_space_y;
+            pathned.z = center_zero_space_z;
+            phiRef = 0;
+            testLock = FALSE;
+            testLock2 = FALSE;
+        }
+        if(plane_flying_busy==FALSE){
+         Plane_flying_current_state=Plane_flying_next_state; //if the plane is not busy, we change the state
+          timer = relative_time;
+          }
         switch(Plane_flying_current_state)
             {
             case takeoff_mode:
                 plane_flying_busy=TRUE;
                 //code here
-
-                //if fin, then
+                trajectory_refgnd = traj_takeoff(pathned, stateVars.pnPePd);
+                if(relative_time-timer > takeoff_time){
                     plane_flying_busy=FALSE;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=go_streight_mode; //security
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
                 break;
             case circle_mode:
                 //code
-                plane_flying_busy=FALSE;
+                trajectory_refgnd = traj_circle(pathned, stateVars.pnPePd, relative_time);
+                if(relative_time-timer > circle_time){
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
                 break; 
             case looping_mode:
                 plane_flying_busy=TRUE;
                 //code here
-
-                //if fin, then
+                trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, relative_time, timer);
+                if(relative_time-timer > looping_duration){
                     plane_flying_busy=FALSE;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=go_streight_mode; 
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
+
                 break;
-            case go_streight_mode:
+            case glide_mode:
                 //code
-                plane_flying_busy=FALSE;
+                trajectory_refgnd = traj_glide(pathned, stateVars.pnPePd);
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
                 break; 
             case roll_mode:
                 plane_flying_busy=TRUE;
                 //code here
-
-                //if fin, then
+                trajectory_refgnd = traj_roll(pathned, stateVars.pnPePd);
+                phiRef += 180.0/5e6*static_cast<float>(PERIOD);
+                if (360>phiRef>180 || testLock==TRUE){
+                    phiRef=180;
+                    testLock=TRUE;
+                }
+                if (phiRef>360 || testLock2==TRUE){
+                phiRef=0;
+                testLock2=TRUE;
+                }
+                if(relative_time-timer > rolling_time){
                     plane_flying_busy=FALSE;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=go_streight_mode; 
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
+ 
                 break;
             //if there are a problem with the value
             default:
-                Plane_flying_current_state=go_streight_mode;
-                Plane_flying_next_state=go_streight_mode;
+                Plane_state Plane_flying_current_state=glide_mode;
+                Plane_state Plane_flying_next_state=glide_mode;
                 break;
             }
-
+/*
         //***************************************************
         // Path Generation
         if(firstLoop){
@@ -319,14 +354,14 @@ void loop()
             }
         }
 
-
+*/
 //        trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
         //***************************************************
 
         // Path Processing
         // Calculating the differential Trajectory
-        trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
+        //trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
          // Calculating controller input for throttle
         errorThrottle = pathDly.update(pathned,trajectory_refgnd);
@@ -364,7 +399,7 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
+                hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
                 //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
@@ -388,7 +423,7 @@ void loop()
             hal.console->printf("%f\t%f\t%f\t",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z);
             hal.console->printf("%f\t%f\t%f\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
 
-     */   hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
+     */ //  hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
         }
 
 

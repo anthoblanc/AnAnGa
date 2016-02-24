@@ -1,29 +1,20 @@
-	struct vector traj_initialize (struct vector current_location){
-	struct vector allola;
+    struct vector traj_initialize (struct vector &desired_path){
+
 	
-        allola.x = -365.0;//current_location.x;
-        allola.y = -400.0;//current_location.y;
-        allola.z = -0.87;//current_location.z;
+        desired_path.x = center_zero_space_x;//
+        desired_path.y = center_zero_space_y;//
+        desired_path.z = center_zero_space_z;//
+
         
-        return(allola);
+        return(desired_path);
 	}
-	
-    struct vector traj_refresh (struct vector current_location){
-    struct vector allola;
-    float rad = 50.0;
-        allola.x = current_location.x;
-        allola.y = current_location.y;
-        allola.z = current_location.z;
-        
-        return(allola);
-    }
 
 	struct vector traj_takeoff (struct vector &desired_path, struct vector current_location){
 	
 	    struct vector delta_p; 
 	    desired_path.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-        desired_path.y += 50.0 * static_cast<float>(PERIOD) /1e6;
-        desired_path.z -= 5.0 * static_cast<float>(PERIOD) /1e6; 
+        desired_path.y += 40.0 * static_cast<float>(PERIOD) /1e6;
+        desired_path.z -= 15.0 * static_cast<float>(PERIOD) /1e6; 
       
         delta_p.x = desired_path.x - current_location.x;
         delta_p.y = desired_path.y - current_location.y;
@@ -60,7 +51,7 @@
     return(delta_p);
     }
 	
-	struct vector traj_cruise (struct vector &desired_path, struct vector current_location){
+	struct vector traj_glide (struct vector &desired_path, struct vector current_location){
 	struct vector delta_p; 
 
         desired_path.x += 0.0 * static_cast<float>(PERIOD) /1e6; 
@@ -74,12 +65,13 @@
     return(delta_p);
 	}
 	
-	struct vector traj_loop (struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t tstart, uint32_t tend){
+	struct vector traj_loop (struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t timer){
     	struct vector delta_p; 
+        uint32_t looping_time = 10e6;
 
     	desired_path.x +=  0.0;
-    	desired_path.y +=  (40.0*cos(360.0*(M_PI/180.0)*((time+1e6-tstart)/(tend-tstart)))+40)*static_cast<float>(PERIOD)/1e6;//
-    	desired_path.z -=  (40.0*sin(360.0*(M_PI/180.0)*(time+1e6-tstart)/(tend-tstart))+10)*static_cast<float>(PERIOD)/1e6;//
+    	desired_path.y +=  (40.0*cos(360.0*(M_PI/180.0)*((time+1e6-timer)/(looping_time)))+40)*static_cast<float>(PERIOD)/1e6;//
+    	desired_path.z -=  (40.0*sin(360.0*(M_PI/180.0)*(time+1e6-timer)/(looping_time))+10)*static_cast<float>(PERIOD)/1e6;//
 
     
         delta_p.x = desired_path.x - current_location.x;
@@ -117,17 +109,53 @@
     return(delta_p);
     }
 
-struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t tstart, uint32_t tend){
-        struct vector trajectory_refgnd;
-	     if (firstLoop){
-                desired_path = traj_initialize(current_location);
+struct vector traj_roll (struct vector &desired_path, struct vector current_location){
+    struct vector delta_p; 
 
+        desired_path.x += 0.0 * static_cast<float>(PERIOD) /1e6; 
+        desired_path.y += 50.0 * static_cast<float>(PERIOD) /1e6; // 50 for entering circle
+        desired_path.z -= 0.0 * static_cast<float>(PERIOD) /1e6;// when circle = 0
+        
+        delta_p.x = desired_path.x - current_location.x;
+        delta_p.y = desired_path.y - current_location.y;
+        delta_p.z = desired_path.z- current_location.z;     
+        
+    return(delta_p);
+    }
+   /*    
+void traj_sel(const enum trajName trajnames){
+    int i;
+    switch(trajnames) {
+        case takeoff:
+        {
+
+        }
+
+
+    
+
+
+}
+     */      
+
+
+struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t tstart, uint32_t tend, float phiRef, bool testLock, bool testLock2){
+        struct vector trajectory_refgnd;
+         if (firstLoop){
+            desired_path = traj_initialize(desired_path);
+
+            phiRef = 0;
+            testLock = FALSE;
+            testLock2 = FALSE;
                 //firstLoop = 0; Switched off down at printing!
             }
-            if (time<3e6 && (-366<current_location.x<-364)&&(-401<current_location.y<-399)&&(-1.87<current_location.z<0.27)){
+        if (time<3e6 && (-366<current_location.x<-364)&&(-401<current_location.y<-399)&&(-1.87<current_location.z<0.27)){
 
-                desired_path = traj_initialize(current_location); // when restarted, reinitialize plane position
+                desired_path = traj_initialize(desired_path); // when restarted, reinitialize plane position
 
+            phiRef = 0;
+            testLock = FALSE;
+            testLock2 = FALSE;
             }
           if (time<10e6){
             
@@ -141,17 +169,28 @@ struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, str
             else if (time<30e6){
                 //desired_path = traj_initialize(current_location);
                 //trajectory_refgnd = traj_loop(desired_path, current_location, time, tstart, tend);
-                trajectory_refgnd = traj_cruise(desired_path, current_location);
+                //trajectory_refgnd = traj_glide(desired_path, current_location);
+                trajectory_refgnd = traj_roll(desired_path, current_location);
+                phiRef += 180.0/5e6*static_cast<float>(PERIOD);
+                if (360>phiRef>180 || testLock==TRUE){
+                phiRef=180;
+                testLock=TRUE;
+                }
+                if (phiRef>360 || testLock2==TRUE){
+                phiRef=0;
+                testLock2=TRUE;
+                }           
             }
    
             else {   
                 //trajectory_refgnd = traj_climbup(desired_path, current_location);
-                trajectory_refgnd = traj_circle(desired_path, current_location, time);
+                //trajectory_refgnd = traj_circle(desired_path, current_location, time);
                 //trajectory_refgnd = traj_snake(desired_path, current_location, time);
                 //trajectory_refgnd = traj_loop(desired_path, current_location, time, tstart, tend);
+                //trajectory_refgnd = traj_roll(desired_path, current_location, phiRef, testLock);
+                trajectory_refgnd = traj_glide(desired_path, current_location);
             }
           
             return (trajectory_refgnd);
 
 }
-
