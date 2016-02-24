@@ -53,7 +53,7 @@ ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \
 }
 
 //**********************//
-void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryController& trCTRL, int& Plane_flying_current_state) 
+void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryController& trCTRL, int& Plane_flying_current_state,float desiredL) 
 {
 	int i=0; //local counter
 	char buffer_conv[10]; //buffer for atoi
@@ -116,6 +116,14 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 			default: hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
 		break;
+	//*** look ahead distance ***//
+	case 'l':
+		if(stringAPI[1]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
+
+		for(i=2;stringAPI[i]!='-';i++) buffer_conv[i-2]=stringAPI[i]; //copy the number to convert
+		buffer_conv[i-1]='\0'; //end char
+		desiredL=atoi(buffer_conv); //convertion to inter
+		
 	default: 
 		hal.console->printf("The function does not exist or is not operational yet! \n");
 		break;
