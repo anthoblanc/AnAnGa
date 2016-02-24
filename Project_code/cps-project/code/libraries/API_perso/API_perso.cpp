@@ -21,6 +21,13 @@
 #define PIDcontroller_Rudder 		'r'
 #define PIDcontroller_Elevator		'h'
 
+//fly mode
+#define takeoff_mod 		0
+#define circle_mod 		1
+#define looping_mod		2 
+#define go_streight_mod		3
+#define roll_mod		4
+
 
 //***************************************************
 //                    Function
@@ -45,7 +52,7 @@ ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \
 }
 
 //**********************//
-void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryController& trCTRL) 
+void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryController& trCTRL, int& Plane_flying_current_state) 
 {
 	int i=0; //local counter
 	char buffer_conv[10]; //buffer for atoi
@@ -95,6 +102,17 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 	//*** help ***//
 	case 'h': 
 		API_print_help(); 
+		break;
+	//*** fly ***//
+	case 'f': 
+		switch(stringAPI[1]) {
+			case 't': Plane_flying_current_state=takeoff_mod; 	break;
+			case 'c': Plane_flying_current_state=circle_mod; 	break;
+			case 'l': Plane_flying_current_state=looping_mod; 	break;
+			case 's': Plane_flying_current_state=go_streight_mod; 	break;
+			case 'r': Plane_flying_current_state=roll_mod; 		break;
+			default: hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		}
 		break;
 	default: 
 		hal.console->printf("The function does not exist or is not operational yet!");

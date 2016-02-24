@@ -31,7 +31,7 @@ interpretate in term of action a given string such as:
 #VAL_D# sould be remplace by the value of the DERIVATE 		gain
 
 *********************************************** */
-void API_interpretate_chain(char * stringAPI, int length_stringAPI,TrajectoryController& trCTRL) ;
+void API_interpretate_chain(char * stringAPI, int length_stringAPI,TrajectoryController& trCTRL, int& Plane_flying_current_state) ;
 
 /* ***********************************************
 int atoi(char *str)
