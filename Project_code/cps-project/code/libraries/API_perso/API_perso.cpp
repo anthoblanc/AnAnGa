@@ -9,7 +9,8 @@
 #include "../libraries/PID/PID.h"
 
 //String intepretation
-#define first_position_num 3
+#define first_position_num 	3
+#define separation_char 	'-'
 
 //PID reference
 #define PIDcontroller_Heading		'h'
@@ -51,28 +52,28 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI)
 	//*** edit ***//	
 	case 'e': 
 
-		if(stringAPI[2]!='-') hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		if(stringAPI[2]!=separation_char) hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
 
 		//Kp
 		for(i=first_position_num;stringAPI[i]!='-';i++) buffer_conv[i-first_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-first_position_num]='\0'; //end char
-		attribut[1]=atoi(buffer_conv);
+		attribut[1]=atoi(buffer_conv); //convertion to inter
 
-		if(stringAPI[i+1]!='-') hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
 
 		//Ki
 		second_position_num=i+2;
 		for(i=second_position_num;stringAPI[i]!='-';i++) buffer_conv[i-second_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-second_position_num]='\0'; //end char
-		attribut[2]=atoi(buffer_conv);
+		attribut[2]=atoi(buffer_conv); //convertion to inter
 
-		if(stringAPI[i+1]!='-') hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
+		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
 		
 		//Kd
 		third_position_num=i+2;
 		for(i=third_position_num;stringAPI[i]!='-';i++) buffer_conv[i-third_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-third_position_num]='\0'; //end char
-		attribut[3]=atoi(buffer_conv);
+		attribut[3]=atoi(buffer_conv); //convertion to inter
 		
 		//Which PID?
 		switch(stringAPI[1]) {
