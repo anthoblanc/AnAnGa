@@ -1,4 +1,4 @@
-
+#include "TrajectoryControl.h"
 
 // Constructor
 TrajectoryController::TrajectoryController (const AP_HAL::HAL& hal, const uint32_t dt, const float coFrequencyLPF) :
@@ -60,7 +60,30 @@ void TrajectoryController::setPID (const enum trajPIDs pidName, const float Kp, 
         return;
 }
 
+void TrajectoryController::editPID(const enum trajPIDs pidName,float Kp, float Ki,float Kd)
+{
 
+        int i;
+        switch(pidName) {
+                case Throttle :
+                        i = 0;
+                        break;
+                case Aileron :
+                        i = 1;
+                        break;
+                case Rudder :
+                        i = 2;
+                        break;
+                case Elevator :
+                        i = 3;
+                        break;
+                default:
+                        // Error-Routine
+                        return;
+        }
+        m_cPIDs[i]->setControllerGains(Kp,Ki,Kd);
+        return;
+}
 
 // Setting the reference vector phi_ref
 void TrajectoryController::setPhiRef (const float PhiRef) {

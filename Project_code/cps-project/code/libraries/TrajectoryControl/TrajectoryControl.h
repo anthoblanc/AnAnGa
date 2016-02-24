@@ -104,6 +104,9 @@ public:
         // setting the gains,integralLimit, and refreshInterval
         void setPID (const enum trajPIDs pidName, const float Kp, const float Ki, const float Kd, const float integralLimit = 100, const int8_t refreshInterval = 1);
 
+	// edit PID
+	void editPID(const enum trajPIDs pidName, float Kp, float Ki,float Kd);
+	
         // Setting the reference vector phi_ref
         void setPhiRef (const float PhiRef);
 
