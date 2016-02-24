@@ -29,6 +29,13 @@ typedef int           BOOL;
 //interface
 #define size_buffer_interface 20
 
+//flying mode
+#define takeoff_mode        0
+#define circle_mode         1
+#define looping_mode        2
+#define glide_mode          3
+#define roll_mode           4
+
 // Trajectory time
 #define takeoff_time 10e6
 #define circle_time 20e6
@@ -76,9 +83,8 @@ typedef int           BOOL;
 //***************************************************
 
 //Flying state
-enum Plane_state {takeoff_mode, circle_mode, looping_mode, glide_mode, roll_mode};
-Plane_state Plane_flying_current_state=takeoff_mode;
-Plane_state Plane_flying_next_state=takeoff_mode;
+int Plane_flying_current_state=takeoff_mode;
+int Plane_flying_next_state=takeoff_mode;
 BOOL plane_flying_busy=FALSE;
 
 // Position variables
@@ -196,7 +202,7 @@ void loop()
             i++;
         }
         consoleInRaw[i] = '\0';
-        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL); //i=0 means that there is nothing in the buffer
+        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL, Plane_flying_current_state); //i=0 means that there is nothing in the buffer
         
         /*// go to the Interface-Handler
         if (consoleInRaw[0]!='\0'){
@@ -309,8 +315,8 @@ void loop()
                 break;
             //if there are a problem with the value
             default:
-                Plane_state Plane_flying_current_state=glide_mode;
-                Plane_state Plane_flying_next_state=glide_mode;
+                Plane_flying_current_state=glide_mode;
+                Plane_flying_next_state=glide_mode;
                 break;
             }
 /*
