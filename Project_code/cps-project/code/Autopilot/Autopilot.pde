@@ -29,6 +29,8 @@ typedef int           BOOL;
 //interface
 #define size_buffer_interface 20
 
+
+
 //***************************************************
 // Libraries
 //***************************************************
@@ -67,6 +69,12 @@ typedef int           BOOL;
 //***************************************************
 // Variable Declaration
 //***************************************************
+
+//Flying state
+enum Plane_state {takeoff_mode, circle_mode, looping_mode, go_streight_mode, roll_mode};
+Plane_state Plane_flying_current_state=takeoff_mode;
+Plane_state Plane_flying_next_state=takeoff_mode;
+BOOL plane_flying_busy=FALSE;
 
 // Position variables
 struct vector pathned;	// desired position of the airplane
@@ -119,11 +127,6 @@ void setup()
 
     // Trajectory Controller: Make all settings for the Aerobatic Trajectory Controller
     setupTrCTRL(trCTRL);
-
-//----------------------------------------------------------
-// Example of PID-Access for Anthony
-    trCTRL.getPIDAccess(Throttle)->updateSuccessRate();
-//----------------------------------------------------------
 
     // Enable PWM output on channels 0 to 3
     hal.rcout->enable_ch(0);
@@ -204,7 +207,8 @@ void loop()
 		
 		
         //***************************************************
-        // Process a loss of GPS-signal: If (ideal) Euler angles indicate a loss of GPS signal, stateVars will be overwritten by iterative estimating method as long as (ideal) Euler angles are in a GPS-losing position.
+        // Process a loss of GPS-signal: 
+        //If (ideal) Euler angles indicate a loss of GPS signal, stateVars will be overwritten by iterative estimating method as long as (ideal) Euler angles are in a GPS-losing position.
 
         // Check for GPS-signal loss
         if(firstLoop){
@@ -227,6 +231,49 @@ void loop()
             //hal.console->printf("ResetGPS.\n");
             prevStateVars.importData(stateVars);
     }
+        //***************************************************
+        // Path management
+        if(plane_flying_busy==FALSE) Plane_flying_current_state=Plane_flying_next_state; //if the plane is not busy, we change the state
+        switch(Plane_flying_current_state)
+            {
+            case takeoff_mode:
+                plane_flying_busy=TRUE;
+                //code here
+
+                //if fin, then
+                    plane_flying_busy=FALSE;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=go_streight_mode; //security
+                break;
+            case circle_mode:
+                //code
+                plane_flying_busy=FALSE;
+                break; 
+            case looping_mode:
+                plane_flying_busy=TRUE;
+                //code here
+
+                //if fin, then
+                    plane_flying_busy=FALSE;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=go_streight_mode; 
+                break;
+            case go_streight_mode:
+                //code
+                plane_flying_busy=FALSE;
+                break; 
+            case roll_mode:
+                plane_flying_busy=TRUE;
+                //code here
+
+                //if fin, then
+                    plane_flying_busy=FALSE;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=go_streight_mode; 
+                break;
+            //if there are a problem with the value
+            default:
+                Plane_state Plane_flying_current_state=go_streight_mode;
+                Plane_state Plane_flying_next_state=go_streight_mode;
+                break;
+            }
 
         //***************************************************
         // Path Generation
