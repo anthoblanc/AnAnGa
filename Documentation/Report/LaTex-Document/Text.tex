@@ -26,7 +26,7 @@
 
 \usepackage[numbers,square]{natbib}
 \bibliographystyle{alphadin}%plaindin}%unsrt}%alphadin}
-
+\usepackage{gensymb}
 \usepackage{setspace}
 \usepackage{geometry}
 \geometry{a4paper,left=2.5cm,right=2.5cm}
@@ -138,6 +138,11 @@ Before, an overview of the features are given and the underlying work is clarifi
 
 \medskip
 
+
+
+
+
+
 \subsection{Working Principle and Features}
 
 Control target of the controller is a path in 3-dimensional space as a function of time.
@@ -152,7 +157,7 @@ These signals are processed and provided to the control structure. A feature of 
 
 \begin{figure}[!h]
   \begin{center}
-  	\includegraphics[width=\textheight, angle=90]{pictures/complete_structure.pdf}
+  	\includegraphics[width=18cm, angle=90]{pictures/complete_structure.pdf}
   \end{center}
   \caption{Overview of the control structure of the aerobatic controller.}
   \label{fig_complete_structure}
@@ -165,23 +170,207 @@ The control structure, implemented and presented in this project work, is based 
 
 The estimation of the aircraft's position signal is implemented after a method which is, at the time of handing in this report, not yet published. We got the access ahead to the release by our tutor.
 
+\medskip
+
+
+
+
+
 \section{Details}
 
 In the following, each part of the control structure (compare Figure~\ref{fig_complete_structure}) is presented in detail.
 
+\medskip
+
+
+
+
+
 \subsection{Interface with the Simulation Environment}
+
+The interface of our program with the simulation environment is at the beginning of each program run, when sensor data is handed over.
+The function~\textsf{calculateStateVariables} reads this sensor data  to our program.
+
+At the end of each program run, the four steering signals for the actuators throttle, aileron, rudder, and elevator are given to the simulation environment in the function~\textsf{generateOutSignals} and the following instructions \textsf{hal.rcout}.
+
+\medskip
+
+
+
 
 \subsection{User Interface}
 
+We have implemented an user interface which enables a communication with the aircraft controller via the USB connection with the controller board. 
+We used the program \texttt{hterm} for communicating with the controller over a COM-Port.
+
+The interface enables the user to modify controller parameters and flight paths at run time by sending following instructions:
+\begin{itemize}
+\item 
+instruction 1
+\item
+instruction 2
+\end{itemize}
+
+\medskip
+
+
+
+
 \subsection{Path Generation}
+
+
+
+\medskip
+
+
+
+
 
 \subsection{Processing of Control Variables}
 
+\subsubsection*{Processing the Sensor Data}
+
+\subsubsection*{Computing the Desired Acceleration}
+
+Introduce look ahead distance, explain, why important -> $L_is$ is always > 0 and ensures a good acceleration command
+
+\subsubsection*{Determining the Desired Speed}\label{ch-Determ-Desired-Speed}
+
+The desired speed of the aircraft is given implicitly with the desired path and can be gathered by calculating the derivative of $\vec{P}_{des}^i$:
+\begin{equation}
+\vec{v}_{Path}^i(t_k) = \frac{\vec{P}_{des}^i(t_k)-\vec{P}_{des}^i(t_{k-1})}{\Delta T}\quad .
+\end{equation}
+
+But the desired speed is not the control variable of the throttle controller. As shown in Figure~\ref{fig_complete_structure}, the input for the throttle controller is $\Delta L$ which is the distance of the aircraft from the desired position with respect to the look-ahead distance~$L_{des}$ and is computed by
+\begin{equation}
+\Delta L = \frac{\vec{v}_{Path}^i \cdot \vec{L}_{is}^i}{|\vec{v}_{Path}^i|}-L_{des} = L_{is,Path}-L_{des} \quad .
+\end{equation}
+Here, $L_{is,Path}$ is the distance of the aircraft concerning/on the desired flight direction expressed in $\vec{v}_{Path}^i$.
+This relation is shown graphically in \textbf{Figure~\ref{fig_explanation-diagram-throttle}}. The inner structure of the component \texttt{Path Delay} is depicted in \textbf{Figure~\ref{fig_Path_Delay}}.
+Finally, $\Delta L$ is divided by a constant value~$K$ and handed to the throttle controller as input $e_{Throttle}$ (see Figure~\ref{fig_Control-Structure}).
+
+\begin{figure}[tbh]
+  \begin{center}
+  	\includegraphics[width=8cm]{pictures/explanation-diagram-throttle.pdf}
+  \end{center}
+  \caption{Determination of the input for the throttle-controller $\Delta L$.}
+  \label{fig_explanation-diagram-throttle}
+\end{figure}
+
+\begin{figure}[tbh]
+  \begin{center}
+  	\includegraphics[width=12cm]{pictures/Path_Delay.pdf}
+  \end{center}
+  \caption{Inner structure of the component \texttt{Path Delay}.}
+  \label{fig_Path_Delay}
+\end{figure} 
+
+With this control mechanism, the aircraft will adjust the throttle in order to always stay behind the desired position by the length of the look ahead distance~$L_{des}$ which is the intersection of the desired flight direction~$\vec{v}_{Path}^i$ and the circle of $L_{des}$ as shown in Figure~\ref{fig_explanation-diagram-throttle}. In this point, $\Delta L$ will become zero, which is the control target of the control structure (of course, the whole tangent of the intersection point will meet the control target of $\Delta L = 0$ but the rest of the control structure will force the aircraft onto the desired path and thus to this one intersection point).  
+
+\medskip
+
+
+
+
+
 \subsection{Control Structure}
+
+In the \texttt{Control Structure}, the four actuators of the aircraft, namely throttle, aileron, rudder, and elevator, are regulated by PID-controllers with a error~$e$ value as input:
+\begin{equation}
+output(t) = K_p \cdot E(t) + K_i \cdot \int_{t_0}^t E(\tau)\, \mathrm{d}\tau + K_d \cdot \frac{\mathrm{d}}{\mathrm{d}t}E(t)\quad .
+\end{equation}
+
+\subsubsection*{Throttle}
+The input error of the throttle is the sum of current aircraft velocity~$|\vec{V}^v|$ and the distance of the aircraft~$e_{Throttle}$, lagging behind the desired point, as described in Section~\ref{ch-Determ-Desired-Speed}. 
+\begin{equation}
+E_{throttle} = |\vec{V}^v| + e_{Throttle}
+\end{equation} 
+The addition of the aircraft velocity is for keeping the engine speed at the desired level, only the error term can increase or decrease the engine speed.
+
+\subsubsection*{Aileron}
+The aileron controller is implemented as described in the work of S.~Park\cite[p.~71]{Park.2012}.
+A reference vector~$\hat{e}_{roll}$, always pointing out of the roof of the aircraft, is compared with the acceleration command~$\vec{A}_{CMD}^b$. 
+The control target is to let both vectors point into the same direction (this is shown graphically in the paper of S.~Park on page~70~\cite{Park.2012}.
+Mathematically, this is achieved with following equation:
+\begin{equation}
+E_{aileron}=\arcsin\left(\hat{e}_{roll} \times \frac{\vec{A}_{CMD}^b}{|\vec{A}_{CMD}^b|}\right)_x
+\end{equation}
+The reference vector~$\hat{e}_{roll}$ can be modified by the angle~$\phi_{ref}$. At the value of $\phi_{ref}=90\degree$, $\hat{e}_{roll}$ is pointing out of the right wing of the aircraft; at $\phi_{ref}=180\degree$, the reference vector is pointing out of the fuselage.
+This can be used for performing a roll manoeuvre.
+
+\subsubsection*{Rudder and Elevator}
+Rudder and elevator are controlled with the acceleration command~$\vec{a}_{CMD}^b$, which does not contain the gravity term~$\vec{g}^b$.
+The rudder control takes the y-component as input, and the elevator control uses the z-component:
+\begin{equation}
+E_{rudder}=(\vec{a}_{CMD}^b)_y\quad , \quad E_{elevator} = (\vec{a}_{CMD}^b)_z
+\end{equation}
+
+The \texttt{Control Structure} is depicted in symbolic form in \textbf{Figure~\ref{fig_Control-Structure}}.
+
+\begin{figure}[tbh]
+  \begin{center}
+  	\includegraphics[width=12cm]{pictures/PID.pdf}
+  \end{center}
+  \caption{Inner structure of the component \texttt{Control Structure}.}
+  \label{fig_Control-Structure}
+\end{figure}
+
+
+\medskip
+
+
+
+
+
 
 \subsection{GPS Signal Estimation}
 
+In the case of an inverted flight attitude, a GPS-signal cannot be received due to GPS-receivers not pointing to the sky.
+Therefore, the position of the aircraft has to be estimated with data of measuring instruments, still available, which is data from the accelerometer and the gyrometer.
+However, in the simulation, position data is always provided, so an inverted flight attitude has to be detected and position signals have to be ignored in order to realise a real GPS-signal.
+
+\smallskip
+
+Therefore, a function is implemented, which observes the euler angles of the aircraft, which indicate the flight attitude of the aircraft.
+As soon as the roll angle or heading angle has an amount greater than $60\degree$, the function activates the position estimation and overwrites the position signals.
+
+\smallskip
+
+The position estimation principle is an integration method.
+First, the derivatives of the Euler angles are computed with the available rotation rates. 
+Those derivatives are time-step integrated to obtain the Euler angles, e.g.:
+\begin{equation}
+ \phi_{t_k} = \frac{1}{2}(\dot{\phi}_{t_k}+\dot{\phi}_{t_{k-1}})\cdot \Delta T + \phi_{t_k}
+\end{equation}
+
+In the next step, the acceleration of the aircraft is depicted with the data of the accelerometer plus data of the rotation rates.
+With the same time-step integration method as shown above, the aircraft-velocity, and with a further integration step, the position is obtained.
+
+\smallskip
+
+As soon as the aircraft is able to receive a GPS-signal, the estimation is switched off and the measured position data is taken, again.
+
+
+\medskip
+
+
+
+
+
 \section{Results}
+
+
+In summary, the presented and implemented control structure showed very good results for various aerobatic manoeuvres which are shown in the following.
+
+\medskip
+
+But beforehand, it is to mention that the rudder was not activated as the results were recorded.
+The reason was a faulty adapter software which caused a disconnection with the controller after a few seconds of flight. Instead, we used a stable working adapter software which did not support the control of the rudder.
+
+Also, the GPS signal estimation could not be activated due to imprecise estimation results.
+The reasons were the lack of information about the used units of the measurement data and the position of the accelerometers in the aircraft which has to be considered in a compensation term.
+
+\bigskip
 
 
 
@@ -219,11 +408,12 @@ In the following, each part of the control structure (compare Figure~\ref{fig_co
 
 \bigskip
 
-\subsection{'Variables Declaration'}
+\subsection{Notation}
 
 \begin{tabbing}
 	 \hspace{2cm} \= \hspace{2cm} \= \hspace{3cm} \kill
 	\> $t_k$ \> Point in time (time-discrete)\\	
+	\> $\Delta T$ \> Time period of one time step of the system\\
 	\> $\phi_{ref}$ \> Angle of reference vector for aileron control, forces the roll-angle\\
 	\> $\vec{P}_{des}^i$ \> Desired position of the aircraft (inertial frame)\\
 	\> $\vec{P}_{is}^i$ \> Actual position of the aircraft (inertial frame)\\
@@ -231,7 +421,7 @@ In the following, each part of the control structure (compare Figure~\ref{fig_co
 	\> $\vec{a}_{CMD}^v$ \> Desired Acceleration of the aircraft (vehicle frame)\\
 	\> $\vec{g}^{v,b}$ \> Acceleration by gravity (vehicle,body frame)\\
 	\> $\vec{A}_{CMD}^{v,b}$ \> Desired Acceleration with gravity considered (vehicle,body frame)\\
-	\> $L_{des}$ \> Look ahead distance \\
+	\> $L_{des}$ \> Look-ahead distance \\
 	\> $L_{is,Path}$ \> Distance concerning the desired path, the aircraft lags behind \\
 	\> $\Delta L$ \> Desired distance the aircraft needs to catch up \\
 	\> $e_{Throttle}$ \> Input error for the throttle controller \\
