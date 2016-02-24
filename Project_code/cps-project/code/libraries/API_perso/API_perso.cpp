@@ -48,12 +48,12 @@ ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \
     while (str[i]!='\0')
     {
         hal.console->printf("%c",str[i]);
-	i++
+	i++;
     }
 }
 
 //**********************//
-void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryController& trCTRL, int& Plane_flying_current_state,float desiredL) 
+void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryController& trCTRL, int& Plane_flying_current_state, float& desiredL) 
 {
 	int i=0; //local counter
 	char buffer_conv[10]; //buffer for atoi

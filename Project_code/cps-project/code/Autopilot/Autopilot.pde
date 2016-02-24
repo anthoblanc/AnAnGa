@@ -29,6 +29,20 @@ typedef int           BOOL;
 //interface
 #define size_buffer_interface 20
 
+//flying mode
+#define takeoff_mode        0
+#define circle_mode         1
+#define looping_mode        2
+#define glide_mode          3
+#define roll_mode           4
+
+// Trajectory time
+#define takeoff_time 10e6
+#define circle_time 20e6
+#define rolling_time 15e6
+#define looping_duration 10e6
+
+
 //***************************************************
 // Libraries
 //***************************************************
@@ -55,10 +69,10 @@ typedef int           BOOL;
 #include "../libraries/StateVariables/StateVariables.h"
 #include "../libraries/TrajectoryControl/TrajectoryControl.h"
 #include "../libraries/StandardController/StandardController.h"
-#include "../libraries/Path/Trajectory.h"							// not yet commented, is Path.h still needed?
+#include "../libraries/Path/Trajectory.h"							// Trajectory design
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"	// maybe improve comments
 #include "../libraries/Interface/Interface.hpp"						// Not (yet) in use
-//#include "../libraries/API_perso/API_perso.h"						// Not (yet) in use
+#include "../libraries/API_perso/API_perso.h"						// Not (yet) in use
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
 #include "../libraries/PathDelay/PathDelay.h"
@@ -68,6 +82,11 @@ typedef int           BOOL;
 // Variable Declaration
 //***************************************************
 
+//Flying state
+int Plane_flying_current_state=takeoff_mode;
+int Plane_flying_next_state=takeoff_mode;
+BOOL plane_flying_busy=FALSE;
+
 // Position variables
 struct vector pathned;	// desired position of the airplane
 struct vector trajectory_refgnd; // Distance vector between the desired position and current position of the airplane
@@ -76,7 +95,7 @@ struct vector trajectory_refgnd; // Distance vector between the desired position
 struct SteeringSignals stSig;
 
 // Variables for Aerobatic Trajectory Controller
-TrajectoryController trCTRL (hal,PERIOD);
+TrajectoryController trCTRL (hal,PERIOD); 
 float phiRef=0;
 struct vector aCMD_refin, gCMD_refin = GRAVITY_NED, aCMD_refbody, gCMD_refbody;
 struct StateVariables stateVars, prevStateVars;
@@ -94,8 +113,7 @@ char consoleInRaw[size_buffer_interface];
 uint32_t relative_time = hal.scheduler->micros(); //time from the last initialisation
 uint32_t zero_time = hal.scheduler->micros(); //time of the last initialisation
 uint32_t hardware_time = hal.scheduler->micros(); // real hadware time
-uint32_t tstart = 30e6; // path starting time
-uint32_t tend = 50e6; // path ending time
+uint32_t timer = 0; // trajectory timer
 
 
 //temp for test							<--------------------------------------- temp
@@ -119,11 +137,6 @@ void setup()
 
     // Trajectory Controller: Make all settings for the Aerobatic Trajectory Controller
     setupTrCTRL(trCTRL);
-
-//----------------------------------------------------------
-// Example of PID-Access for Anthony
-    trCTRL.getPIDAccess(Throttle)->updateSuccessRate();
-//----------------------------------------------------------
 
     // Enable PWM output on channels 0 to 3
     hal.rcout->enable_ch(0);
@@ -189,7 +202,7 @@ void loop()
             i++;
         }
         consoleInRaw[i] = '\0';
-        //if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1)); //i=0 means that there is nothing in the buffer
+        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL, (int&) Plane_flying_next_state, (float&)desiredL); //i=0 means that there is nothing in the buffer
         
         /*// go to the Interface-Handler
         if (consoleInRaw[0]!='\0'){
@@ -204,7 +217,8 @@ void loop()
 		
 		
         //***************************************************
-        // Process a loss of GPS-signal: If (ideal) Euler angles indicate a loss of GPS signal, stateVars will be overwritten by iterative estimating method as long as (ideal) Euler angles are in a GPS-losing position.
+        // Process a loss of GPS-signal: 
+        //If (ideal) Euler angles indicate a loss of GPS signal, stateVars will be overwritten by iterative estimating method as long as (ideal) Euler angles are in a GPS-losing position.
 
         // Check for GPS-signal loss
         if(firstLoop){
@@ -227,7 +241,85 @@ void loop()
             //hal.console->printf("ResetGPS.\n");
             prevStateVars.importData(stateVars);
     }
+        //***************************************************
+        // Path management
+        if(firstLoop){
+            pathned.x = center_zero_space_x;
+            pathned.y = center_zero_space_y;
+            pathned.z = center_zero_space_z;
+            phiRef = 0;
+            testLock = FALSE;
+            testLock2 = FALSE;
+        }
+        if(plane_flying_busy==FALSE){
+         Plane_flying_current_state=Plane_flying_next_state; //if the plane is not busy, we change the state
+          timer = relative_time;
+          }
+        switch(Plane_flying_current_state)
+            {
+            case takeoff_mode:
+                plane_flying_busy=TRUE;
+                //code here
+                trajectory_refgnd = traj_takeoff(pathned, stateVars.pnPePd);
+                if(relative_time-timer > takeoff_time){
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
+                break;
+            case circle_mode:
+                //code
+                trajectory_refgnd = traj_circle(pathned, stateVars.pnPePd, relative_time);
+                if(relative_time-timer > circle_time){
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
+                break; 
+            case looping_mode:
+                plane_flying_busy=TRUE;
+                //code here
+                trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, relative_time, timer);
+                if(relative_time-timer > looping_duration){ // need reconsider, in accordance with the looping func
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
 
+                break;
+            case glide_mode:
+                //code
+                trajectory_refgnd = traj_glide(pathned, stateVars.pnPePd);
+                plane_flying_busy=FALSE;
+                timer = relative_time;
+                break; 
+            case roll_mode:
+                plane_flying_busy=TRUE;
+                //code here
+                trajectory_refgnd = traj_roll(pathned, stateVars.pnPePd);
+                phiRef += 180.0/5e6*static_cast<float>(PERIOD);
+                if (360>phiRef>180 || testLock==TRUE){
+                    phiRef=180;
+                    testLock=TRUE;
+                }
+                if (phiRef>360 || testLock2==TRUE){
+                phiRef=0;
+                testLock2=TRUE;
+                }
+                if(relative_time-timer > rolling_time){
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
+ 
+                break;
+            //if there are a problem with the value
+            default:
+                Plane_flying_current_state=glide_mode;
+                Plane_flying_next_state=glide_mode;
+                break;
+            }
+/*
         //***************************************************
         // Path Generation
         if(firstLoop){
@@ -268,14 +360,14 @@ void loop()
             }
         }
 
-
+*/
 //        trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
         //***************************************************
 
         // Path Processing
         // Calculating the differential Trajectory
-        trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
+        //trajectory_refgnd = subtractVector(pathned,stateVars.pnPePd);
 
          // Calculating controller input for throttle
         errorThrottle = pathDly.update(pathned,trajectory_refgnd);
@@ -313,6 +405,7 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
+            hal.console->printf("Plane_flying_current_state: %d\n", Plane_flying_current_state);
                 //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
@@ -337,7 +430,7 @@ void loop()
             hal.console->printf("%f\t%f\t%f\t",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z);
             hal.console->printf("%f\t%f\t%f\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
 
-     */   hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
+     */ //  hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
         }
 
 
