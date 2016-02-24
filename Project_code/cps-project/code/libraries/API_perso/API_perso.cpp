@@ -106,11 +106,11 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 	//*** fly ***//
 	case 'f': 
 		switch(stringAPI[1]) {
-			case 't': Plane_flying_current_state=takeoff_mod; 	hal.console->printf("akeoff_mod actived"); break;
-			case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle_mod actived"); break;
-			case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping_mod actived"); break;
+			case 't': Plane_flying_current_state=takeoff_mod; 	hal.console->printf("akeoff_mod actived"); 	break;
+			case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle_mod actived"); 	break;
+			case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping_mod actived"); 	break;
 			case 's': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("go_streight_mod actived"); break;
-			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mod actived"); break;
+			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mod actived"); 	break;
 			default: hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
 		}
 		break;
