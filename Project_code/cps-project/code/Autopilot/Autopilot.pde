@@ -120,6 +120,11 @@ void setup()
     // Trajectory Controller: Make all settings for the Aerobatic Trajectory Controller
     setupTrCTRL(trCTRL);
 
+//----------------------------------------------------------
+// Example of PID-Access for Anthony
+    trCTRL.getPIDAccess(Throttle)->updateSuccessRate();
+//----------------------------------------------------------
+
     // Enable PWM output on channels 0 to 3
     hal.rcout->enable_ch(0);
     hal.rcout->enable_ch(1);

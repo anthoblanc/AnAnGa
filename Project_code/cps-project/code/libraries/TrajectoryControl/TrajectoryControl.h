@@ -112,7 +112,7 @@ public:
 
         // Access to the PIDs
         // const is for denying any change in the PIDs
-        const PIDcontroller *getPIDAccess (const enum trajPIDs pidName);
+        PIDcontroller *getPIDAccess (const enum trajPIDs pidName);
 
 private:
         const AP_HAL::HAL& m_rHAL;	// reference to the console (for printing messages)

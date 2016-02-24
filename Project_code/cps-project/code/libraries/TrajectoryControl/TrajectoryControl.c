@@ -138,7 +138,7 @@ struct SteeringSignals TrajectoryController::update (uint32_t time, float errorT
 
 // Access to the PIDs
 // const is for denying any change in the PIDs
-const PIDcontroller *TrajectoryController::getPIDAccess (const enum trajPIDs pidName) {
+PIDcontroller *TrajectoryController::getPIDAccess (const enum trajPIDs pidName) {
 
         int i;
         switch(pidName) {
