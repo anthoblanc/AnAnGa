@@ -290,8 +290,8 @@ void loop()
             case glide_mode:
                 //code
                 trajectory_refgnd = traj_glide(pathned, stateVars.pnPePd);
-                    plane_flying_busy=FALSE;
-                    timer = relative_time;
+                plane_flying_busy=FALSE;
+                timer = relative_time;
                 break; 
             case roll_mode:
                 plane_flying_busy=TRUE;
