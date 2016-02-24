@@ -138,7 +138,7 @@ void traj_sel(const enum trajName trajnames){
 }
      */      
 
-
+/*
 struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t tstart, uint32_t tend, float phiRef, bool testLock, bool testLock2){
         struct vector trajectory_refgnd;
          if (firstLoop){
@@ -194,3 +194,4 @@ struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, str
             return (trajectory_refgnd);
 
 }
+*/
