@@ -2,6 +2,9 @@
 //                     Define
 //***************************************************
 
+#define FALSE         0
+#define TRUE          1
+
 //Arduino
 #include <AP_HAL.h>
 //Own library
@@ -25,9 +28,14 @@
 void API_print_help() 
 { 
     char str[]=\
-"\
-e-12-0-1-2: edit PID12 with   \n\
-h: help \n\
+"h help \
+et-#VAL_P#-#VAL_I#-#VAL_D# edit throttle \n\
+ea-#VAL_P#-#VAL_I#-#VAL_D# edit aileron \n \
+er-#VAL_P#-#VAL_I#-#VAL_D# edit rudder \n \
+ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \
+#VAL_P# sould be remplace by the value of the PROPORTIONAL gain \n \
+#VAL_I# sould be remplace by the value of the INTEGRALE gain \n \
+#VAL_D# sould be remplace by the value of the DERIVATE gain \n \
 \0";
     int i=0;
     while (str[i]!='\0')
@@ -41,11 +49,11 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 {
 	int i=0; //local counter
 	char buffer_conv[10]; //buffer for atoi
-	int attribut[4]={0};
+	float attribut[4]={0};
 	int second_position_num=0;
 	int third_position_num=0;
 
-	hal.console->printf("The given string is: %s",stringAPI); //test
+	//hal.console->printf("The given string is: %s",stringAPI); //test
 	
 	switch(stringAPI[0]) {
 	//*** edit ***//	
@@ -76,8 +84,8 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		
 		//Which PID?
 		switch(stringAPI[1]) {
-		case PIDcontroller_Throttle 	: trCTRL.editPID(Throttle,attribut[1],attribut[2],attribut[3]);	break;
-		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 	break;
+		case PIDcontroller_Throttle 	: trCTRL.editPID(Throttle,attribut[1],attribut[2],attribut[3]);		break;
+		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 		break;
 		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		break;
 		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	break;
 		default:hal.console->printf("Wrong usage of the function"); break; //if the standart is not respected
@@ -95,15 +103,27 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 }
 
 //**********************//
-int atoi(char *str)
+float atoi(char *str)
 {
-    int res = 0; // Initialize result
-  
-    // Iterate through all characters of input string and
-    // update result
-    for (int i = 0; str[i] != '\0'; ++i)
-        res = res*10 + str[i] - '0';
-  
-    // return result.
-    return res;
+	float res = 0; // Initialize result
+	float store=0; //temp variable
+	int nb_after_coma=0;
+	// Iterate through all characters of input string and
+	// update result
+	for (int i = 0; str[i] != '\0'; ++i)
+	{
+		if(str[i] =='.') nb_after_coma++; //coma detected
+		if(nb_after_coma==0) res = res*10 + str[i] - '0'; //before coma
+		else 
+		{
+		store=(str[i] - '0');
+		for(int j=0;j<nb_after_coma;j++) store*=0.1; //calculate the digit value in decimal
+		res = res + store; //concatain with the value
+		nb_after_coma++;
+		}
+	}
+	
+
+	// return result.
+	return res;
 }
