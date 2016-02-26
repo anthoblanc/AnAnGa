@@ -172,7 +172,9 @@ void loop()
         //time initialisation
         relative_time = 0; //will be recalculate at each iteration
         zero_time=hal.scheduler->micros();
-
+        Plane_flying_current_state=takeoff_mode;
+        Plane_flying_next_state=takeoff_mode;
+        plane_flying_busy=FALSE;
         firstLoop=TRUE;
     }
     //----//
@@ -345,7 +347,7 @@ void loop()
             nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-            hal.console->printf("Plane_flying_current_state: %d\n", Plane_flying_current_state);
+            hal.console->printf("state %d\n", Plane_flying_current_state);
                 //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
