@@ -64,14 +64,28 @@
         
     return(delta_p);
 	}
+
+	struct vector traj_back_glide (struct vector &desired_path, struct vector current_location){
+	struct vector delta_p; 
+
+        desired_path.x += 0.0 * static_cast<float>(PERIOD) /1e6; 
+        desired_path.y -= 50.0 * static_cast<float>(PERIOD) /1e6; // 50 for entering circle
+        desired_path.z -= 0.0 * static_cast<float>(PERIOD) /1e6;// when circle = 0
+        
+        delta_p.x = desired_path.x - current_location.x;
+        delta_p.y = desired_path.y - current_location.y;
+        delta_p.z = desired_path.z- current_location.z;     
+        
+    return(delta_p);
+	}
 	
 	struct vector traj_loop (struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t timer){
     	struct vector delta_p; 
         uint32_t looping_time = 10e6; // need reconsider
 
     	desired_path.x +=  0.0;
-    	desired_path.y +=  (40.0*cos(360.0*(M_PI/180.0)*((time+1e6-timer)/(looping_time)))+40)*static_cast<float>(PERIOD)/1e6;//
-    	desired_path.z -=  (40.0*sin(360.0*(M_PI/180.0)*(time+1e6-timer)/(looping_time))+10)*static_cast<float>(PERIOD)/1e6;//
+    	desired_path.y -=  (100.0*cos(360.0*(M_PI/180.0)*((time+1e6-timer)/(looping_time))))*static_cast<float>(PERIOD)/1e6;//
+    	desired_path.z +=  (100.0*sin(360.0*(M_PI/180.0)*(time+1e6-timer)/(looping_time)))*static_cast<float>(PERIOD)/1e6;//
 
     
         delta_p.x = desired_path.x - current_location.x;

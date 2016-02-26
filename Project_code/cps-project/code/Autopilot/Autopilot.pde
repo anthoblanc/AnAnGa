@@ -38,12 +38,15 @@ typedef int           BOOL;
 #define looping_mode        2
 #define glide_mode          3
 #define roll_mode           4
+#define back_glide_mode     5
+#define half_circle_mode    6
 
 // Trajectory time
 #define takeoff_time 10e6
 #define circle_time 20e6
 #define rolling_time 15e6
-#define looping_duration 10e6
+#define looping_duration 3e6
+#define half_circle_duration 17e6
 
 
 //***************************************************
@@ -265,10 +268,26 @@ void loop()
                     if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
                     }
                 break; 
+            case half_circle_mode:
+                plane_flying_busy=TRUE;
+                //code
+                trajectory_refgnd = traj_circle(pathned, stateVars.pnPePd, relative_time);
+                if(relative_time-timer > half_circle_duration){
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
+                break; 
+
             case looping_mode:
                 plane_flying_busy=TRUE;
                 //code here
                 trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, relative_time, timer);
+                phiRef += 180.0/5e6*static_cast<float>(PERIOD);
+                if (360>phiRef>180 || testLock==TRUE){
+                    phiRef=180;
+                    testLock=TRUE;
+                }
                 if(relative_time-timer > looping_duration){ // need reconsider, in accordance with the looping func
                     plane_flying_busy=FALSE;
                     timer = relative_time;
@@ -282,6 +301,12 @@ void loop()
                 plane_flying_busy=FALSE;
                 timer = relative_time;
                 break; 
+            case back_glide_mode:
+                //code
+                trajectory_refgnd = traj_back_glide(pathned, stateVars.pnPePd);
+                plane_flying_busy=FALSE;
+                timer = relative_time;
+                break;
             case roll_mode:
                 plane_flying_busy=TRUE;
                 //code here

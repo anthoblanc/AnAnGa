@@ -7,6 +7,7 @@
     struct vector traj_takeoff (struct vector &desired_path, struct vector current_location);
     struct vector traj_climbup (struct vector &desired_path, struct vector current_location);
     struct vector traj_glide (struct vector &desired_path, struct vector current_location);
+    struct vector traj_back_glide (struct vector &desired_path, struct vector current_location);
     struct vector traj_loop (struct vector &desired_path, struct vector current_location, uint32_t timer);
     struct vector traj_snake (struct vector &desired_path, struct vector current_location, uint32_t time);
     struct vector traj_dive (struct vector &desired_path, struct vector current_location);

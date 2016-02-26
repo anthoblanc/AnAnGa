@@ -27,6 +27,8 @@
 #define looping_mod		2 
 #define go_streight_mod		3
 #define roll_mod		4
+#define back_glide_mod		5
+#define half_circle_mod		6
 
 
 //***************************************************
@@ -113,6 +115,9 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 			case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping_mod actived \n"); 	break;
 			case 's': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("go_streight_mod actived \n"); break;
 			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mod actived \n"); 	break;
+			case 'b': Plane_flying_current_state=back_glide_mod; 	hal.console->printf("akeoff_mod actived \n"); 	break;
+			case 'h': Plane_flying_current_state=half_circle_mod; 	hal.console->printf("akeoff_mod actived \n"); 	break;
+
 			default: hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
 		break;
@@ -149,9 +154,10 @@ float atoi(char *str)
 		res = res + store; //concatain with the value
 		nb_after_coma++;
 		}
+	
 	}
 	
-
+	hal.console->printf("atoi %f\n",res);
 	// return result.
 	return res;
 }
