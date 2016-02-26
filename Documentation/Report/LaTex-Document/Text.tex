@@ -132,9 +132,9 @@
 
 \section{Overview}
 
-As a part of the CPS course in WS15/16, a controller structure for an aircraft in an simulation environment was built, performing autonomous aerobatics on commanded paths.
-In this report, the controller structure is explained and achievements are presented.
-Before, an overview of the features are given and the underlying work is clarified.
+As a part of the Cyber-Physical Systems course in WS15/16, a controller structure for an aircraft in a simulation environment was realised, performing autonomous aerobatics on commanded paths.
+In this report, the controller structure is presented in Chapter~\ref{ch_Details} and performance results are shown in Chapter~\ref{ch-Results}.
+Before this, an overview of the features are given and the underlying work is clarified.
 
 \medskip
 
@@ -145,19 +145,21 @@ Before, an overview of the features are given and the underlying work is clarifi
 
 \subsection{Working Principle and Features}
 
-Control target of the controller is a path in 3-dimensional space as a function of time.
-The controller's aim is to fly along this commanded path by determining the deviation from the given trajectory and thereout calculating acceleration commands which are the inputs of the actuator-controllers of the aircraft.
+Control target of the presented system is to follow a path as a function of time in 3-dimensional space.
+The controller's aim is to fly along this commanded path by determining the deviation from the given trajectory and thereout calculating acceleration commands which are the inputs of the aircraft's actuator controllers.
 
 \textbf{Figure~\ref{fig_complete_structure}} depicts the complete control structure of the aerobatic controller. 
-With the position data of the trajectory and actual position signals of the aircraft, the desired acceleration is computed, and by considering the gravity handed to the control structure where the acceleration in body frame is used as the control variable for the aileron-, elevator-, and rudder-control.
-Also, with the position data, the delay of the aircraft from the desired path is determined and by considering a look ahead distance, the throttle is controlled with this information.
+With the position data from the desired trajectory and with actual position signals of the aircraft, the desired acceleration to follow the path is computed.
+After considering the gravity, the desired acceleration is handed to the control structure where the acceleration in body frame is used as the control variable for the aileron-, elevator-, and rudder-controllers.
+Also, with the position data, the delay of the aircraft from the desired position is determined and by considering a \texttt{look ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
 
-The resulting steering signals computed by the control structure are handed to the simulation environment which hands back measurement results of the virtual aircraft's sensors.
-These signals are processed and provided to the control structure. A feature of the signal processing is the estimation of the aircraft-position with accelerometers and gyrometers when there is no available GPS-signal.
+The resulting steering signals, computed by the control structure, are handed to the simulation environment which simulates the physical reaction of the aircraft and then hands back measurement results of its virtual sensors.
+These signals are processed and provided to our control structure. 
+A feature of the signal processing is the estimation of the aircraft's position with only accelerometers and gyrometers when there is no available GPS-signal as it is in inverted flight.
 
 \begin{figure}[!h]
   \begin{center}
-  	\includegraphics[width=18cm, angle=90]{pictures/complete_structure.pdf}
+  	\includegraphics[width=18.8cm, angle=90]{pictures/complete_structure.pdf}
   \end{center}
   \caption{Overview of the control structure of the aerobatic controller.}
   \label{fig_complete_structure}
@@ -166,9 +168,9 @@ These signals are processed and provided to the control structure. A feature of 
 
 \subsection{Underlying Work}
 
-The control structure, implemented and presented in this project work, is based on the work of Sanghyuk Park\cite{Park.2012} and modified by establishing the desired path depending on time and determining the path delay in order to control the throttle.
+The control structure, implemented and presented in this project work, is based on the work of Sanghyuk Park\cite{Park.2012} and modified by establishing the desired path depending on time plus determining the path delay in order to control the throttle.
 
-The estimation of the aircraft's position signal is implemented after a method which is, at the time of handing in this report, not yet published. We got the access ahead to the release by our tutor.
+The estimation of the aircraft's position signal is implemented after a method which is, at the time of handing in this report, not yet published. We got the access ahead of the release by our tutor.
 
 \medskip
 
@@ -176,7 +178,7 @@ The estimation of the aircraft's position signal is implemented after a method w
 
 
 
-\section{Details}
+\section{Details}\label{ch_Details}
 
 In the following, each part of the control structure (compare Figure~\ref{fig_complete_structure}) is presented in detail.
 
@@ -357,7 +359,7 @@ As soon as the aircraft is able to receive a GPS-signal, the estimation is switc
 
 
 
-\section{Results}
+\section{Results}\label{ch-Results}
 
 
 In summary, the presented and implemented control structure showed very good results for various aerobatic manoeuvres which are shown in the following.
