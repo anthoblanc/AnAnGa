@@ -384,35 +384,15 @@ void loop()
                 //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
                 //hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
                 //hal.console->printf("%f\t%f\t%f\n",inputThrottlePID-stateVars.groundSpeed,inputThrottlePID,stateVars.groundSpeed);
-                //hal.console->printf("in_velocity: %f\tbo_velocity: %f\n",velocity(stateVars.pnPePdDot),stateVars.groundSpeed);
-                //hal.console->printf("uvw: (%f,%f,%f)\tpos_in: (%f,%f,%f)\n\n",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
-                //hal.console->printf("acc: (%f,%f,%f)\n",stateVars.accelerationBodyFrame.x,stateVars.accelerationBodyFrame.y,stateVars.accelerationBodyFrame.z);
-                //hal.console->printf("DeltaL: %f\n",errorThrottle);
-         /*   vector x = CrossProduct(stateVars.pqr,stateVars.uvw);
-            hal.console->printf("%f\t%f\t%f\t",stateVars.phiThetaPsiDot.x,stateVars.phiThetaPsiDot.y,stateVars.phiThetaPsiDot.z);
-            hal.console->printf("%f\t%f\t%f\t",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
-            hal.console->printf("%f\t%f\t%f\t",stateVars.pnPePdDotDot.x,stateVars.pnPePdDotDot.y,stateVars.pnPePdDotDot.z);
-            hal.console->printf("%f\t%f\t%f\t",x.x,x.y,x.z);
-            hal.console->printf("%f\t%f\t%f\t",stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z);
-            hal.console->printf("%f\t%f\t%f\t",stateVars.uvw.x,stateVars.uvw.y,stateVars.uvw.z);
-            hal.console->printf("%f\t%f\t%f\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z);
-
-     */ //  hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
+				//  hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
         }
 
 
         //***************************************************
         // Generate and Send output signals
 
-        //generate Outupt signals
-        generateOutSignals(stSig, aileronLOut,aileronROut,elevatorLOut,elevatorROut,throttleOut,rudderOut);
-
-        // Output PWM
-        hal.rcout->write(0, throttleOut);
-        hal.rcout->write(1, elevatorLOut);
-        hal.rcout->write(2, aileronROut);
-        hal.rcout->write(3, aileronLOut);
-        hal.rcout->write(4, rudderOut);   // Rudder output
+        //generate Outupt signals and hand to simulation environment
+        generateOutSignals(stSig, hal);
 		
         // Switch off first Loop indicator
         if (firstLoop){

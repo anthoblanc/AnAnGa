@@ -70,14 +70,6 @@ float constrain(float val, float min, float max)
     }
 }
 
-// Output Signals
-int16_t aileronLOut;
-int16_t aileronROut;
-int16_t elevatorLOut;
-int16_t elevatorROut;
-int16_t throttleOut;
-int16_t rudderOut;
-
 // Routine logic
 BOOL firstLoop=1;
 
