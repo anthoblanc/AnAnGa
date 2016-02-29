@@ -96,7 +96,7 @@
 
 		\vspace{1cm}		
 		
-		Date: 26th February 2016
+		Date: 7\textsuperscript{th} March 2016
 	
 	\end{center}
 	
@@ -133,8 +133,8 @@
 \section{Overview}
 
 As a part of the Cyber-Physical Systems course in WS15/16, a controller structure for an aircraft in a simulation environment was realised, performing autonomous aerobatics on commanded paths.
-In this report, the controller structure is presented in Chapter~\ref{ch_Details} and performance results are shown in Chapter~\ref{ch-Results}.
-Before this, an overview of the features are given and the underlying work is clarified.
+In this report, the controller structure is presented in Chapter~\ref{ch_Details}, and performance results are shown in Chapter~\ref{ch-Results}.
+Before this, an overview of the working principle and the features of the controller are given, and the underlying work is clarified.
 
 \medskip
 
@@ -146,16 +146,16 @@ Before this, an overview of the features are given and the underlying work is cl
 \subsection{Working Principle and Features}
 
 Control target of the presented system is to follow a path as a function of time in 3-dimensional space.
-The controller's aim is to fly along this commanded path by determining the deviation from the given trajectory and thereout calculating acceleration commands which are the inputs of the aircraft's actuator controllers.
+The aircraft's aim is to fly along this commanded path by determining the deviation from the given trajectory and thereout calculating acceleration commands which are the inputs of the aircraft's actuator controllers.
 
 \textbf{Figure~\ref{fig_complete_structure}} depicts the complete control structure of the aerobatic controller. 
 With the position data from the desired trajectory and with actual position signals of the aircraft, the desired acceleration to follow the path is computed.
 After considering the gravity, the desired acceleration is handed to the control structure where the acceleration in body frame is used as the control variable for the aileron-, elevator-, and rudder-controllers.
-Also, with the position data, the delay of the aircraft from the desired position is determined and by considering a \texttt{look ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
+Also, with the position data, the delay of the aircraft from the desired position is determined, and by considering a \textsl{look ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
 
 The resulting steering signals, computed by the control structure, are handed to the simulation environment which simulates the physical reaction of the aircraft and then hands back measurement results of its virtual sensors.
-These signals are processed and provided to our control structure. 
-A feature of the signal processing is the estimation of the aircraft's position with only accelerometers and gyrometers when there is no available GPS-signal as it is in inverted flight.
+These signals are processed and provided to the control structure. 
+A feature of the \texttt{Signal Processing} is the estimation of the aircraft's position with only accelerometers and gyrometers when there is no available GPS-signal as it is in inverted flight attitude.
 
 \begin{figure}[!h]
   \begin{center}
@@ -190,10 +190,10 @@ In the following, each part of the control structure (compare Figure~\ref{fig_co
 
 \subsection{Interface with the Simulation Environment}
 
-The interface of our program with the simulation environment is at the beginning of each program run, when sensor data is handed over.
-The function~\textsf{calculateStateVariables} reads this sensor data  to our program.
+The connection of our program with the simulation environment takes place at the beginning of each program run, when sensor data is handed over and at the end of each run, when commands for the actuators are given to the aircraft.
 
-At the end of each program run, the four steering signals for the actuators throttle, aileron, rudder, and elevator are given to the simulation environment in the function~\textsf{generateOutSignals} and the following instructions \textsf{hal.rcout}.
+In the code, the function~\textsf{calculateStateVariables} reads the sensor data of the aircraft to our part of the software.
+At the end of each program run, the four steering signals for the actuators throttle, aileron, rudder, and elevator are given to the simulation environment in the function~\textsf{generateOutSignals}.
 
 \medskip
 
@@ -202,16 +202,26 @@ At the end of each program run, the four steering signals for the actuators thro
 
 \subsection{User Interface}
 
-We have implemented an user interface which enables a communication with the aircraft controller via the USB connection with the controller board. 
+We have implemented an user interface which enables a communication with the aircraft controller via an USB connection with the controller board. 
 We used the program \texttt{hterm} for communicating with the controller over a COM-Port.
 
 The interface enables the user to modify controller parameters and flight paths at run time by sending following instructions:
+
 \begin{itemize}
 \item 
 instruction 1
 \item
 instruction 2
 \end{itemize}
+
+In the code, the function \textsf{API\_interpretate\_chain} cares for the interpretation of the user commands and the instruction transfer.
+
+\bigskip
+
+It is also to mention, that we introduced two time signals, the \textsl{hardware time} and the \textsl{relative time}.
+The hardware time is the time since the start-up of the aircraft controller whilst relative time measures the time passed since the last restart of the aircraft in the simulation environment.
+A restart brings back the aircraft to the initial position position on the start field, and thus we make sure to reset the desired path plus the relative time, too, in order to bring back the system to a initial state without the need to reset the controller.
+In the code, this functionality is implemented in lines 164--178 in \textsf{Autopilot.pde}.
 
 \medskip
 
@@ -251,9 +261,9 @@ Here, $L_{is,Path}$ is the distance of the aircraft concerning/on the desired fl
 This relation is shown graphically in \textbf{Figure~\ref{fig_explanation-diagram-throttle}}. The inner structure of the component \texttt{Path Delay} is depicted in \textbf{Figure~\ref{fig_Path_Delay}}.
 Finally, $\Delta L$ is divided by a constant value~$K$ and handed to the throttle controller as input $e_{Throttle}$ (see Figure~\ref{fig_Control-Structure}).
 
-\begin{figure}[tbh]
+\begin{figure}[bth]
   \begin{center}
-  	\includegraphics[width=8cm]{pictures/explanation-diagram-throttle.pdf}
+  	\includegraphics[width=9cm]{pictures/explanation-diagram-throttle.pdf}
   \end{center}
   \caption{Determination of the input for the throttle-controller $\Delta L$.}
   \label{fig_explanation-diagram-throttle}
@@ -261,7 +271,7 @@ Finally, $\Delta L$ is divided by a constant value~$K$ and handed to the throttl
 
 \begin{figure}[tbh]
   \begin{center}
-  	\includegraphics[width=12cm]{pictures/Path_Delay.pdf}
+  	\includegraphics[width=14cm]{pictures/Path_Delay.pdf}
   \end{center}
   \caption{Inner structure of the component \texttt{Path Delay}.}
   \label{fig_Path_Delay}
@@ -277,7 +287,7 @@ With this control mechanism, the aircraft will adjust the throttle in order to a
 
 \subsection{Control Structure}
 
-In the \texttt{Control Structure}, the four actuators of the aircraft, namely throttle, aileron, rudder, and elevator, are regulated by PID-controllers with a error~$e$ value as input:
+In the \texttt{Control Structure}, the four actuators of the aircraft, namely throttle, aileron, rudder, and elevator, are regulated by PID-controllers with a error~$E$ value as input:
 \begin{equation}
 output(t) = K_p \cdot E(t) + K_i \cdot \int_{t_0}^t E(\tau)\, \mathrm{d}\tau + K_d \cdot \frac{\mathrm{d}}{\mathrm{d}t}E(t)\quad .
 \end{equation}
@@ -311,7 +321,7 @@ The \texttt{Control Structure} is depicted in symbolic form in \textbf{Figure~\r
 
 \begin{figure}[tbh]
   \begin{center}
-  	\includegraphics[width=12cm]{pictures/PID.pdf}
+  	\includegraphics[width=15cm]{pictures/PID.pdf}
   \end{center}
   \caption{Inner structure of the component \texttt{Control Structure}.}
   \label{fig_Control-Structure}

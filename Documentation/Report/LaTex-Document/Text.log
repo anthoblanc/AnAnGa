@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.6.3)  26 FEB 2016 09:05
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.6.3)  29 FEB 2016 11:16
 entering extended mode
 **Text.tex
 
@@ -1532,7 +1532,14 @@ LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 61.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\lm\ot1lmtt.fd"
 File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [1
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <14.4> on input line 99.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 99.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 99.
+ [1
 Non-PDF special ignored!
 Non-PDF special ignored!
 Non-PDF special ignored!
@@ -1581,59 +1588,59 @@ Overfull \vbox (5.98169pt too high) has occurred while \output is active []
 
 [4 <C:/Users/Andreas/Dropbox/CPS/AnAnGa/Documentation/Report/LaTex-Document/pic
 tures/complete_structure.pdf>]
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 211.
+LaTeX Font Info:    Try loading font information for OMS+lmr on input line 212.
 
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\lm\omslmr.fd"
 File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 211.
+(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 212.
  [5]
-<pictures/explanation-diagram-throttle.pdf, id=153, 338.15538pt x 327.42369pt>
+<pictures/explanation-diagram-throttle.pdf, id=151, 338.15538pt x 327.42369pt>
 File: pictures/explanation-diagram-throttle.pdf Graphic file (type pdf)
 
 <use pictures/explanation-diagram-throttle.pdf>
 Package pdftex.def Info: pictures/explanation-diagram-throttle.pdf used on inpu
-t line 256.
-(pdftex.def)             Requested size: 227.62204pt x 220.4069pt.
+t line 266.
+(pdftex.def)             Requested size: 256.0748pt x 247.96527pt.
 
-<pictures/Path_Delay.pdf, id=154, 569.12625pt x 256.07669pt>
+<pictures/Path_Delay.pdf, id=152, 569.12625pt x 256.07669pt>
 File: pictures/Path_Delay.pdf Graphic file (type pdf)
 
 <use pictures/Path_Delay.pdf>
-Package pdftex.def Info: pictures/Path_Delay.pdf used on input line 264.
-(pdftex.def)             Requested size: 341.43306pt x 153.63156pt.
- [6 <C:/Users/Andreas/Dropbox/CPS/AnAnGa/Documentation/Report/LaTex-Document/pi
-ctures/explanation-diagram-throttle.pdf>] [7 <C:/Users/Andreas/Dropbox/CPS/AnAn
-Ga/Documentation/Report/LaTex-Document/pictures/Path_Delay.pdf>] <pictures/PID.
-pdf, id=228, 654.52531pt x 298.83646pt>
+Package pdftex.def Info: pictures/Path_Delay.pdf used on input line 274.
+(pdftex.def)             Requested size: 398.33858pt x 179.24074pt.
+ [6] [7 <C:/Users/Andreas/Dropbox/CPS/AnAnGa/Documentation/Report/LaTex-Documen
+t/pictures/explanation-diagram-throttle.pdf>]
+<pictures/PID.pdf, id=208, 654.52531pt x 298.83646pt>
 File: pictures/PID.pdf Graphic file (type pdf)
+ <use pictures/PID.pdf>
+Package pdftex.def Info: pictures/PID.pdf used on input line 324.
+(pdftex.def)             Requested size: 426.79134pt x 194.86609pt.
 
-<use pictures/PID.pdf>
-Package pdftex.def Info: pictures/PID.pdf used on input line 314.
-(pdftex.def)             Requested size: 341.43306pt x 155.89287pt.
- [8 <C:/Users/Andreas/Dropbox/CPS/AnAnGa/Documentation/Report/LaTex-Document/pi
-ctures/PID.pdf>] [9]
+[8 <C:/Users/Andreas/Dropbox/CPS/AnAnGa/Documentation/Report/LaTex-Document/pic
+tures/Path_Delay.pdf>] [9 <C:/Users/Andreas/Dropbox/CPS/AnAnGa/Documentation/Re
+port/LaTex-Document/pictures/PID.pdf>] [10]
 (C:\Users\Andreas\Dropbox\CPS\AnAnGa\Documentation\Report\LaTex-Document\Text.b
 bl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 438.
- [10]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 438.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 448.
+ [11]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 448.
 
 (C:\Users\Andreas\Dropbox\CPS\AnAnGa\Documentation\Report\LaTex-Document\Text.a
 ux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 438.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 438.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 448.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 448.
 Package rerunfilecheck Info: File `Text.out' has not changed.
 (rerunfilecheck)             Checksum: 8E8B8C93DF9FCE824234F6DD57C04A41;884.
  ) 
 Here is how much of TeX's memory you used:
- 27046 strings out of 494045
- 504394 string characters out of 3148382
- 600949 words of memory out of 3000000
- 29916 multiletter control sequences out of 15000+200000
- 62508 words of font info for 51 fonts, out of 3000000 for 9000
+ 27081 strings out of 494045
+ 504836 string characters out of 3148382
+ 602950 words of memory out of 3000000
+ 29942 multiletter control sequences out of 15000+200000
+ 89678 words of font info for 74 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
  50i,8n,75p,10392b,783s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ec.enc}{C:/Program Files/M
@@ -1650,14 +1657,15 @@ r10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr12.pfb><C:/Progra
 m Files/MiKTeX 2.9/fonts/type1/public/lm/lmr17.pfb><C:/Program Files/MiKTeX 2.9
 /fonts/type1/public/lm/lmr6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public
 /lm/lmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmri10.pfb><C:/
-Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmss10.pfb><C:/Program Files/MiK
-TeX 2.9/fonts/type1/public/lm/lmssbx10.pfb><C:/Program Files/MiKTeX 2.9/fonts/t
-ype1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lm
-sy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmsy8.pfb><C:/Progra
-m Files/MiKTeX 2.9/fonts/type1/public/lm/lmtt10.pfb>
-Output written on Text.pdf (10 pages, 1143900 bytes).
+Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmro10.pfb><C:/Program Files/MiK
+TeX 2.9/fonts/type1/public/lm/lmss10.pfb><C:/Program Files/MiKTeX 2.9/fonts/typ
+e1/public/lm/lmssbx10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lm
+sy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmsy6.pfb><C:/Progr
+am Files/MiKTeX 2.9/fonts/type1/public/lm/lmsy8.pfb><C:/Program Files/MiKTeX 2.
+9/fonts/type1/public/lm/lmtt10.pfb>
+Output written on Text.pdf (11 pages, 1173473 bytes).
 PDF statistics:
- 345 PDF objects out of 1000 (max. 8388607)
- 45 named destinations out of 1000 (max. 500000)
+ 353 PDF objects out of 1000 (max. 8388607)
+ 46 named destinations out of 1000 (max. 500000)
  133 words of extra memory for PDF output out of 10000 (max. 10000000)
 
