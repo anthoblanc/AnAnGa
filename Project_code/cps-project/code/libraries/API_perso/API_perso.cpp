@@ -37,14 +37,14 @@
 void API_print_help() 
 { 
     char str[]=\
-"h help \
+"h help \n\
 et-#VAL_P#-#VAL_I#-#VAL_D# edit throttle \n\
-ea-#VAL_P#-#VAL_I#-#VAL_D# edit aileron \n \
-er-#VAL_P#-#VAL_I#-#VAL_D# edit rudder \n \
-ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \
-#VAL_P# sould be remplace by the value of the PROPORTIONAL gain \n \
-#VAL_I# sould be remplace by the value of the INTEGRALE gain \n \
-#VAL_D# sould be remplace by the value of the DERIVATE gain \n \
+ea-#VAL_P#-#VAL_I#-#VAL_D# edit aileron \n\
+er-#VAL_P#-#VAL_I#-#VAL_D# edit rudder \n\
+ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \n\
+  #VAL_P# sould be remplace by the value of the PROPORTIONAL gain \n\
+  #VAL_I# sould be remplace by the value of the INTEGRALE gain \n\
+  #VAL_D# sould be remplace by the value of the DERIVATE gain \n\
 ft takeoff_mod \n\
 fc circle_mod \n\
 fl looping_mod \n\
@@ -75,36 +75,39 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 	switch(stringAPI[0]) {
 	//*** edit ***//	
 	case 'e': 
+		/*
+		Note: the 3 tests for the correct syntax may be desactiveted for a better performance!
+		*/		
 
-		if(stringAPI[2]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
+		//if(stringAPI[2]!=separation_char) { hal.console->printf("Wrong usage of the function \n"); break;}//if the standart is not respected
 
 		//Kp
 		for(i=first_position_num;stringAPI[i]!=separation_char;i++) buffer_conv[i-first_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-first_position_num]='\0'; //end char
 		attribut[1]=atof(buffer_conv); //convertion to inter
 
-		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
+		//if(stringAPI[i]!=separation_char) { hal.console->printf("Wrong usage of the function \n"); break;} //if the standart is not respected
 
 		//Ki
-		second_position_num=i+2;
+		second_position_num=i+1;
 		for(i=second_position_num;stringAPI[i]!=separation_char;i++) buffer_conv[i-second_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-second_position_num]='\0'; //end char
 		attribut[2]=atof(buffer_conv); //convertion to inter
 
-		if(stringAPI[i+1]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
+		//if(stringAPI[i]!=separation_char) { hal.console->printf("Wrong usage of the function \n"); break;}//if the standart is not respected
 		
 		//Kd
-		third_position_num=i+2;
+		third_position_num=i+1;
 		for(i=third_position_num;stringAPI[i]!=separation_char;i++) buffer_conv[i-third_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-third_position_num]='\0'; //end char
 		attribut[3]=atof(buffer_conv); //convertion to inter
 		
 		//Which PID?
 		switch(stringAPI[1]) {
-		case PIDcontroller_Throttle 	: trCTRL.editPID(Throttle,attribut[1],attribut[2],attribut[3]);		hal.console->printf("PID modified\n");break;
-		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 		hal.console->printf("PID modified\n");break;
-		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		hal.console->printf("PID modified\n");break;
-		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	hal.console->printf("PID modified\n");break;
+		case PIDcontroller_Throttle 	: trCTRL.editPID(Throttle,attribut[1],attribut[2],attribut[3]);		break; //hal.console->printf("PID modified\n");break;
+		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 		break; //hal.console->printf("PID modified\n");break;
+		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		break; //hal.console->printf("PID modified\n");break;
+		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	break; //hal.console->printf("PID modified\n");break;
 		default:hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
 		break;	
@@ -143,7 +146,8 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 
 //**********************//
 float atof(char *str)
-{
+{	
+	//Optimisation: conversion in float only at the end
 	int res = 0; // Initialize // int to reduce the complexity of the operation
 	// Iterate through all characters of input string and
 	// update result
@@ -151,7 +155,8 @@ float atof(char *str)
 	{
 		res = res*10 + str[i] - '0'; //before coma
 	}
-	hal.console->printf("atof %f\n",res);
+	//hal.console->printf("atoi %i\n",res);
+	//hal.console->printf("atof %f\n",(float) res/1000);
 	// return result.
 	return (float) res/1000;
 }
