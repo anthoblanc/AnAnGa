@@ -170,7 +170,7 @@ A feature of the \texttt{Signal Processing} is the estimation of the aircraft's 
 
 The control structure, implemented and presented in this project work, is based on the work of Sanghyuk Park\cite{Park.2012} and modified by establishing the desired path depending on time plus determining the path delay in order to control the throttle.
 
-The estimation of the aircraft's position signal is implemented after a method which is, at the time of handing in this report, not yet published. We got the access ahead of the release by our tutor.
+The estimation of the aircraft's position signal is implemented after a method which is, at the time of handing in this report, not yet published. We got the access ahead of the release by our tutor \cite{Dantsker.2016}.
 
 \medskip
 
@@ -230,7 +230,17 @@ In the code, this functionality is implemented in lines 164--178 in \textsf{Auto
 
 \subsection{Path Generation}
 
+Connected with the instructions of the user interface.
 
+stable flight paths: flight in one direction, flying a curve. -> Can be interrupted at any time.
+Flight paths, performed from beginning till end: Looping,... -> New instructions have to wait till completion.
+
+List all possible flight manoeuvres.
+
+Computing the difference between desired and actual position of the aircraft:
+\begin{equation}
+\vec{L}_{is}^i = \vec{P}_{des}^i - \vec{P}_{is}^i
+\end{equation}
 
 \medskip
 
@@ -287,17 +297,17 @@ With this control mechanism, the aircraft will adjust the throttle in order to a
 
 \subsection{Control Structure}
 
-In the \texttt{Control Structure}, the four actuators of the aircraft, namely throttle, aileron, rudder, and elevator, are regulated by PID-controllers with a error~$E$ value as input:
+In the \texttt{Control Structure}, the four actuators of the aircraft, namely throttle, aileron, rudder, and elevator, are regulated by PID-controllers with an error~$E$ as input value:
 \begin{equation}
 output(t) = K_p \cdot E(t) + K_i \cdot \int_{t_0}^t E(\tau)\, \mathrm{d}\tau + K_d \cdot \frac{\mathrm{d}}{\mathrm{d}t}E(t)\quad .
 \end{equation}
 
 \subsubsection*{Throttle}
-The input error of the throttle is the sum of current aircraft velocity~$|\vec{V}^v|$ and the distance of the aircraft~$e_{Throttle}$, lagging behind the desired point, as described in Section~\ref{ch-Determ-Desired-Speed}. 
+The input error of the throttle is the sum of current aircraft velocity~$|\vec{V}^v|$ and the distance of the aircraft~$e_{Throttle}$, lagging behind its desired position, as described in Section~\ref{ch-Determ-Desired-Speed}:
 \begin{equation}
-E_{throttle} = |\vec{V}^v| + e_{Throttle}
+E_{throttle} = |\vec{V}^v| + e_{Throttle} \quad .
 \end{equation} 
-The addition of the aircraft velocity is for keeping the engine speed at the desired level, only the error term can increase or decrease the engine speed.
+The aircraft velocity term is for keeping the engine speed at the desired level, only the error term can increase or decrease the engine speed.
 
 \subsubsection*{Aileron}
 The aileron controller is implemented as described in the work of S.~Park\cite[p.~71]{Park.2012}.
@@ -308,7 +318,7 @@ Mathematically, this is achieved with following equation:
 E_{aileron}=\arcsin\left(\hat{e}_{roll} \times \frac{\vec{A}_{CMD}^b}{|\vec{A}_{CMD}^b|}\right)_x
 \end{equation}
 The reference vector~$\hat{e}_{roll}$ can be modified by the angle~$\phi_{ref}$. At the value of $\phi_{ref}=90\degree$, $\hat{e}_{roll}$ is pointing out of the right wing of the aircraft; at $\phi_{ref}=180\degree$, the reference vector is pointing out of the fuselage.
-This can be used for performing a roll manoeuvre.
+Altering the angle of the reference vector can be used for performing a roll manoeuvre.
 
 \subsubsection*{Rudder and Elevator}
 Rudder and elevator are controlled with the acceleration command~$\vec{a}_{CMD}^b$, which does not contain the gravity term~$\vec{g}^b$.
@@ -337,30 +347,41 @@ The \texttt{Control Structure} is depicted in symbolic form in \textbf{Figure~\r
 
 \subsection{GPS Signal Estimation}
 
-In the case of an inverted flight attitude, a GPS-signal cannot be received due to GPS-receivers not pointing to the sky.
-Therefore, the position of the aircraft has to be estimated with data of measuring instruments, still available, which is data from the accelerometer and the gyrometer.
-However, in the simulation, position data is always provided, so an inverted flight attitude has to be detected and position signals have to be ignored in order to realise a real GPS-signal.
+In the case of an inverted flight attitude, a GPS-signal cannot be received due to GPS receivers not pointing to the sky.
+Therefore, the position of the aircraft has to be estimated with signals from measuring instruments, still available, which is the data from accelerometers and gyroscopes.
+However, in the simulation, position data is always provided perfectly, so an inverted flight attitude has first to be detected and position signals have then to be ignored in order to realise a \textsl{real} GPS-signal.
 
 \smallskip
 
-Therefore, a function is implemented, which observes the euler angles of the aircraft, which indicate the flight attitude of the aircraft.
-As soon as the roll angle or heading angle has an amount greater than $60\degree$, the function activates the position estimation and overwrites the position signals.
+So, the function~\textsf{NoSignalAvailableGPS} is implemented, observing the euler angles of the aircraft, wherewith the flight attitude of the aircraft is depicted.
+As soon as the roll angle~$phi$ or pitch angle~$\theta$ is according to amount greater than $60\degree$, this function activates the \textsl{position estimation} which overwrites the ideal position signals.
 
 \smallskip
 
-The position estimation principle is an integration method.
-First, the derivatives of the Euler angles are computed with the available rotation rates. 
-Those derivatives are time-step integrated to obtain the Euler angles, e.g.:
-\begin{equation}
- \phi_{t_k} = \frac{1}{2}(\dot{\phi}_{t_k}+\dot{\phi}_{t_{k-1}})\cdot \Delta T + \phi_{t_k}
+The \textsl{position estimation}-principle, implemented in the function \textsf{estimateStateVars}, is a method of integration \cite{Dantsker.2016}.
+First, the derivatives of the Euler angles are computed with the available rotation rates by changing the coordinate frame. 
+Then, the Euler-derivatives are time-step integrated with the previous values to obtain the new Euler angles, e.g.:
+\begin{equation}\label{eq-integration}
+ \phi_{t_k} = \frac{1}{2}(\dot{\phi}_{t_k}+\dot{\phi}_{t_{k-1}})\cdot \Delta T + \phi_{t_k} \quad .
 \end{equation}
 
-In the next step, the acceleration of the aircraft is depicted with the data of the accelerometer plus data of the rotation rates.
-With the same time-step integration method as shown above, the aircraft-velocity, and with a further integration step, the position is obtained.
+In the next step, the acceleration of the aircraft is depicted with the data of the accelerometer~$A$ plus data of the rotation rates~$pqr$, where $\mathbf{C_r}$ offsets the location of the IMU and $\mathcal{R}_b^i$ is the transformation from body frame to inertial frame:
+\begin{equation}
+\ddot{P^i}(t_k)= \mathcal{R}_b^i(\phi,\theta,\psi)(t_k)\cdot A(t_k) + \mathbf{C_r} \cdot \left[ pqr(t_k) \times uvw(t_{k-1})\right] \quad .
+\end{equation}
+Here, $uvw$ is the velocity of the aircraft in body frame:
+\begin{equation}
+uvw(t_k) = \mathcal{R}_i^b(\phi,\theta,\psi)(t_k) \cdot \dot{P^i}(t_k) \quad .
+\end{equation}
+
+With the same time-step integration method as shown in Equation~\ref{eq-integration}, the aircraft-velocity, and with a further integration step, the position of the aircraft can be obtained:
+\begin{equation}
+\ddot{P^i} \rightarrow \dot{P^i} \rightarrow P^i \quad .
+\end{equation}
 
 \smallskip
 
-As soon as the aircraft is able to receive a GPS-signal, the estimation is switched off and the measured position data is taken, again.
+As soon as the aircraft is able to receive a GPS-signal again, the estimation is switched off and the ideal position data is used.
 
 
 \medskip
@@ -374,13 +395,15 @@ As soon as the aircraft is able to receive a GPS-signal, the estimation is switc
 
 In summary, the presented and implemented control structure showed very good results for various aerobatic manoeuvres which are shown in the following.
 
-\medskip
+\subsubsection*{Restraints}
 
 But beforehand, it is to mention that the rudder was not activated as the results were recorded.
 The reason was a faulty adapter software which caused a disconnection with the controller after a few seconds of flight. Instead, we used a stable working adapter software which did not support the control of the rudder.
 
 Also, the GPS signal estimation could not be activated due to imprecise estimation results.
 The reasons were the lack of information about the used units of the measurement data and the position of the accelerometers in the aircraft which has to be considered in a compensation term.
+
+\subsubsection*{Analysis of flown Trajectories}
 
 \bigskip
 

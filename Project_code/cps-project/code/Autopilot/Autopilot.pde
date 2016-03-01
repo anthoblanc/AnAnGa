@@ -235,6 +235,7 @@ void loop()
         //***************************************************
         // Path Generation
 
+		// Restore initial conditions of the path, when a reset has taken place.
         if(firstLoop){
             pathned.x = center_zero_space_x;
             pathned.y = center_zero_space_y;
