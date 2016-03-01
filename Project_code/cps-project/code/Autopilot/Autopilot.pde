@@ -369,10 +369,10 @@ void loop()
         // Printing in 1 sec cycle
         if(hardware_time >= nextPrint) {
             // Print some status
-            nextPrint += 1000000;
+            nextPrint += 2000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-            hal.console->printf("state %d\n", Plane_flying_current_state);
+            hal.console->printf("s%d\n", Plane_flying_current_state);
                 //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
                 // Testwise printing the console-read variables
                 //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
