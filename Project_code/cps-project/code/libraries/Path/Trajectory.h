@@ -10,7 +10,7 @@
     struct vector traj_back_glide (struct vector &desired_path, struct vector current_location);
     struct vector traj_loop (struct vector &desired_path, struct vector current_location, uint32_t timer);
     struct vector traj_snake (struct vector &desired_path, struct vector current_location, uint32_t time);
-    struct vector traj_dive (struct vector &desired_path, struct vector current_location);
+    struct vector traj_dive (struct vector &desired_path, struct vector current_location);  // not yet used in Autopilot, add when necessary
     struct vector traj_roll (struct vector &desired_path, struct vector current_location);
 
     struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t timer, float phiRef, bool testLock, bool testLock2);

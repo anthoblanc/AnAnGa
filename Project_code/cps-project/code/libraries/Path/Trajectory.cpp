@@ -1,3 +1,4 @@
+    // initialization when using trajectory function of time
     struct vector traj_initialize (struct vector &desired_path){
 
 	
@@ -9,13 +10,15 @@
         return(desired_path);
 	}
 
+    // taking off
 	struct vector traj_takeoff (struct vector &desired_path, struct vector current_location){
 	
 	    struct vector delta_p; 
 	    desired_path.x += 0.0 * static_cast<float>(PERIOD) /1e6;
-        desired_path.y += 40.0 * static_cast<float>(PERIOD) /1e6;
-        desired_path.z -= 15.0 * static_cast<float>(PERIOD) /1e6; 
+        desired_path.y += 50.0 * static_cast<float>(PERIOD) /1e6;   // forward(y) direction incrementation for desired path in every second 
+        desired_path.z -= 15.0 * static_cast<float>(PERIOD) /1e6;   // height incrementation, note minus value (NED)
       
+        // calculate out the delta L, distance between desired location of the plane and the current location
         delta_p.x = desired_path.x - current_location.x;
         delta_p.y = desired_path.y - current_location.y;
         delta_p.z = desired_path.z- current_location.z;     
@@ -23,12 +26,13 @@
 	return(delta_p);
 	}
 	
+    // climb up mode
 	struct vector traj_climbup (struct vector &desired_path, struct vector current_location){
 	struct vector delta_p; 
 
     	desired_path.x += 0.0 * static_cast<float>(PERIOD) /1e6;
         desired_path.y += 50.0 * static_cast<float>(PERIOD) /1e6;
-        desired_path.z -= 20.0 * static_cast<float>(PERIOD) /1e6;
+        desired_path.z -= 25.0 * static_cast<float>(PERIOD) /1e6;
 
         delta_p.x = desired_path.x - current_location.x;
         delta_p.y = desired_path.y - current_location.y;
@@ -37,6 +41,7 @@
     return(delta_p);
 	}
 
+    // dive mode, not yet used
     struct vector traj_dive (struct vector &desired_path, struct vector current_location){
     struct vector delta_p; 
 
@@ -81,11 +86,11 @@
 	
 	struct vector traj_loop (struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t timer){
     	struct vector delta_p; 
-        uint32_t looping_time = 10e6; // need reconsider
+        uint32_t looping_time = 10e6; // need reconsider, faster maybe better for looping
 
     	desired_path.x +=  0.0;
-    	desired_path.y -=  (100.0*cos(360.0*(M_PI/180.0)*((time+1e6-timer)/(looping_time))))*static_cast<float>(PERIOD)/1e6;//
-    	desired_path.z +=  (100.0*sin(360.0*(M_PI/180.0)*(time+1e6-timer)/(looping_time)))*static_cast<float>(PERIOD)/1e6;//
+    	desired_path.y -=  (100.0*cos(360.0*(M_PI/180.0)*((time+1e6-timer)/(looping_time))))*static_cast<float>(PERIOD)/1e6;   // here radius is 100, need to reconsider
+    	desired_path.z +=  (100.0*sin(360.0*(M_PI/180.0)*(time+1e6-timer)/(looping_time)))*static_cast<float>(PERIOD)/1e6;     //
 
     
         delta_p.x = desired_path.x - current_location.x;
@@ -98,7 +103,7 @@
     struct vector traj_circle (struct vector &desired_path, struct vector current_location, uint32_t time){
     struct vector delta_p; 
 
-        desired_path.x += (70.0*cos(360.0*(M_PI/180.0)*(time-30e6)/(30e6)))*static_cast<float>(PERIOD)/1e6; //-20e6)/(
+        desired_path.x += (70.0*cos(360.0*(M_PI/180.0)*(time-30e6)/(30e6)))*static_cast<float>(PERIOD)/1e6; //
         desired_path.y += (70.0*sin(360.0*(M_PI/180.0)*(time-30e6)/(30e6)))*static_cast<float>(PERIOD)/1e6; //
         desired_path.z -= 1.0 * static_cast<float>(PERIOD) /1e6;
         
@@ -112,9 +117,10 @@
     struct vector traj_snake (struct vector &desired_path, struct vector current_location, uint32_t time){
     struct vector delta_p; 
 
-        desired_path.x += 50.0*cos(360.0*(M_PI/180.0)*(time-20e6)/(20e6))*static_cast<float>(PERIOD)/1e6;  //use derivative, added up to integral * static_cast<float>(PERIOD) /1e6; around 80-100 degrees
-        desired_path.y += 50.0 *static_cast<float>(PERIOD)/1e6; //10.0 * static_cast<float>(PERIOD) /1e6; 
-        desired_path.z -= 1.0* static_cast<float>(PERIOD) /1e6;;//(50.0*sin(360.0*(M_PI/180.0)*(time-20e6)/(20e6)))*static_cast<float>(PERIOD)/1e6; //
+        //use derivative, added up to integral * static_cast<float>(PERIOD) /1e6; around 80-100 degrees
+        desired_path.x += 50.0*cos(360.0*(M_PI/180.0)*(time-20e6)/(20e6))*static_cast<float>(PERIOD)/1e6;  
+        desired_path.y += 50.0 *static_cast<float>(PERIOD)/1e6; //
+        desired_path.z -= 1.0* static_cast<float>(PERIOD) /1e6;    // exchange with function in x, to achieve an up/down snake mode
         
         delta_p.x = desired_path.x - current_location.x;
         delta_p.y = desired_path.y - current_location.y;
@@ -123,6 +129,7 @@
     return(delta_p);
     }
 
+// actually real roll actions in autopilot, 
 struct vector traj_roll (struct vector &desired_path, struct vector current_location){
     struct vector delta_p; 
 
@@ -136,23 +143,10 @@ struct vector traj_roll (struct vector &desired_path, struct vector current_loca
         
     return(delta_p);
     }
-   /*    
-void traj_sel(const enum trajName trajnames){
-    int i;
-    switch(trajnames) {
-        case takeoff:
-        {
-
-        }
-
-
-    
-
-
-}
-     */      
+   
 
 /*
+// This trajectory function is based on time, free from typing in commands, you can adjust periods for different acrobatics
 struct vector FlyTrajectory (uint8_t firstLoop, struct vector &desired_path, struct vector current_location, uint32_t time, uint32_t tstart, uint32_t tend, float phiRef, bool testLock, bool testLock2){
         struct vector trajectory_refgnd;
          if (firstLoop){
