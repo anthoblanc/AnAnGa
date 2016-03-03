@@ -110,7 +110,7 @@
 \newpage
 \tableofcontents	
 
-\vfill
+\vspace{2.0cm}
 
 % Abbildungsverzeichnis
 % ===========================================
@@ -151,7 +151,7 @@ The aircraft's aim is to fly along this commanded path by determining the deviat
 \textbf{Figure~\ref{fig_complete_structure}} depicts the complete control structure of the aerobatic controller. 
 With the position data from the desired trajectory and with actual position signals of the aircraft, the desired acceleration to follow the path is computed.
 After considering the gravity, the desired acceleration is handed to the control structure where the acceleration in body frame is used as the control variable for the aileron-, elevator-, and rudder-controllers.
-Also, with the position data, the delay of the aircraft from the desired position is determined, and by considering a \textsl{look ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
+Also, with the position data, the delay of the aircraft from the desired position is determined, and by considering a \textsl{look-ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
 
 The resulting steering signals, computed by the control structure, are handed to the simulation environment which simulates the physical reaction of the aircraft and then hands back measurement results of its virtual sensors.
 These signals are processed and provided to the control structure. 
@@ -228,7 +228,7 @@ In the code, this functionality is implemented in lines 164--178 in \textsf{Auto
 
 
 
-\subsection{Path Generation}
+\subsection{Path Generation} \label{ch-Path-Generation}
 
 Connected with the instructions of the user interface.
 
@@ -237,10 +237,6 @@ Flight paths, performed from beginning till end: Looping,... -> New instructions
 
 List all possible flight manoeuvres.
 
-Computing the difference between desired and actual position of the aircraft:
-\begin{equation}
-\vec{L}_{is}^i = \vec{P}_{des}^i - \vec{P}_{is}^i
-\end{equation}
 
 \medskip
 
@@ -250,11 +246,34 @@ Computing the difference between desired and actual position of the aircraft:
 
 \subsection{Processing of Control Variables}
 
-\subsubsection*{Processing the Sensor Data}
+Now, we describe the computation of the variables, handed to the \texttt{Control Structure}, given the state variables, provided in function~\textsf{calculateStateVariables}, and the desired path, as described in Chapter~\ref{ch-Path-Generation}.
 
 \subsubsection*{Computing the Desired Acceleration}
 
-Introduce look ahead distance, explain, why important -> $L_is$ is always > 0 and ensures a good acceleration command
+As an essential part of the aerobatic controller, a \textsl{look-ahead distance}~$\L_{des}$ is introduced which effects the system to control the aircraft to lag behind the desired path by an adjustable distance.
+This guarantees the difference between desired and actual position of the aircraft 
+\begin{equation}
+\vec{L}_{is}^i = \vec{P}_{des}^i - \vec{P}_{is}^i
+\end{equation}
+to be greater than zero and leading to acceleration commands 
+\begin{equation}
+\vec{a}_{CMD}^v = \frac{2}{|\vec{L}_{des}^i|^2}\left(\vec{V}^v \times \vec{L}_{is}^i \right) \times \vec{V}^v
+\end{equation}
+being moderate and viable by the aircraft.
+This acceleration command is then subtracted by the gravity constant
+\begin{equation}
+\vec{A}_{CMD}^v = \vec{a}_{CMD}^v - \vec{g}^v
+\end{equation}
+and handed to the Control Structure in body frame:
+\begin{equation}
+\vec{A}_{CMD}^b = \mathcal{R}_i^b(\phi,\theta,\psi) \cdot \vec{A}_{CMD}^v \quad .
+\end{equation}
+
+\medskip
+
+
+
+
 
 \subsubsection*{Determining the Desired Speed}\label{ch-Determ-Desired-Speed}
 
@@ -263,7 +282,7 @@ The desired speed of the aircraft is given implicitly with the desired path and 
 \vec{v}_{Path}^i(t_k) = \frac{\vec{P}_{des}^i(t_k)-\vec{P}_{des}^i(t_{k-1})}{\Delta T}\quad .
 \end{equation}
 
-But the desired speed is not the control variable of the throttle controller. As shown in Figure~\ref{fig_complete_structure}, the input for the throttle controller is $\Delta L$ which is the distance of the aircraft from the desired position with respect to the look-ahead distance~$L_{des}$ and is computed by
+But the desired speed is not the control variable of the throttle controller. As shown in Figure~\ref{fig_complete_structure}, the input for the throttle controller is $\Delta L$ which is the distance of the aircraft from the desired position with respect to the \textsl{look-ahead distance}~$L_{des}$ and is computed by
 \begin{equation}
 \Delta L = \frac{\vec{v}_{Path}^i \cdot \vec{L}_{is}^i}{|\vec{v}_{Path}^i|}-L_{des} = L_{is,Path}-L_{des} \quad .
 \end{equation}
@@ -287,7 +306,7 @@ Finally, $\Delta L$ is divided by a constant value~$K$ and handed to the throttl
   \label{fig_Path_Delay}
 \end{figure} 
 
-With this control mechanism, the aircraft will adjust the throttle in order to always stay behind the desired position by the length of the look ahead distance~$L_{des}$ which is the intersection of the desired flight direction~$\vec{v}_{Path}^i$ and the circle of $L_{des}$ as shown in Figure~\ref{fig_explanation-diagram-throttle}. In this point, $\Delta L$ will become zero, which is the control target of the control structure (of course, the whole tangent of the intersection point will meet the control target of $\Delta L = 0$ but the rest of the control structure will force the aircraft onto the desired path and thus to this one intersection point).  
+With this control mechanism, the aircraft will adjust the throttle in order to always stay behind the desired position by the length of the \textsl{look-ahead distance}~$L_{des}$ which is the intersection of the desired flight direction~$\vec{v}_{Path}^i$ and the circle of $L_{des}$ as shown in Figure~\ref{fig_explanation-diagram-throttle}. In this point, $\Delta L$ will become zero, which is the control target of the control structure (of course, the whole tangent of the intersection point will meet the control target of $\Delta L = 0$ but the rest of the control structure will force the aircraft onto the desired path and thus to this one intersection point).  
 
 \medskip
 
