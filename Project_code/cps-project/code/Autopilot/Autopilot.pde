@@ -16,12 +16,7 @@ typedef int           BOOL;
 #define AND           &&
 #define OR            ||
 
-//zeros time space zone
-#define zero_space_size 0.5
-#define center_zero_space_x -365
-#define center_zero_space_y -400
-#define center_zero_space_z -0.87
-#define time_before_retesting_zero_time_condition 10e6
+
 
 // Look Ahead Distance (Desired Length) [feet]
 #define LookAheadDistance 40
@@ -31,25 +26,6 @@ typedef int           BOOL;
 
 //interface
 #define size_buffer_interface 20
-
-//flying mode
-#define takeoff_mode        0
-#define circle_mode         1
-#define looping_mode        2
-#define glide_mode          3
-#define roll_mode           4
-#define back_glide_mode     5
-#define half_circle_mode    6
-#define upclimb_mode        7
-#define snake_mode          8
-
-// Trajectory duration
-#define takeoff_time 10e6
-#define circle_time 20e6
-#define rolling_time 15e6
-#define looping_duration 3e6
-#define half_circle_duration 17e6
-#define climb_time  10e6
 
 
 //***************************************************
@@ -238,137 +214,16 @@ void loop()
         //***************************************************
         // Path Generation
 
-		// Restore initial conditions of the path, when a reset has taken place.
-        if(firstLoop){
-            pathned.x = center_zero_space_x;
-            pathned.y = center_zero_space_y;
-            pathned.z = center_zero_space_z;
-            phiRef = 0;
-            testLock = FALSE;
-            testLock2 = FALSE;
-        }
-        // If the plane is not busy, just jump into next flying mode/state
-        if(plane_flying_busy==FALSE){
-         Plane_flying_current_state=Plane_flying_next_state;    
-         timer = relative_time;     // Set timer to count time in a certain flying mode
-          }
-        
-        // Switch different flying mode according to the API typed-in commands, such as 'ft' for takeoff. Add or change in API_perso.cpp, starting from line 111
-        switch(Plane_flying_current_state)
-        {
-            case takeoff_mode:
-                plane_flying_busy=TRUE;
-                trajectory_refgnd = traj_takeoff(pathned, stateVars.pnPePd); // function defined in Trajectory.cpp
-                if(relative_time-timer > takeoff_time){
-                    plane_flying_busy=FALSE;    // Ready to take next state after some time
-                    timer = relative_time;      // Refresh timer for the next trajectory change 
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security, avoid false re-typing
-                    }
-                break;
-                
-            case circle_mode:
-                trajectory_refgnd = traj_circle(pathned, stateVars.pnPePd, relative_time);
-                if(relative_time-timer > circle_time){
-                    plane_flying_busy=FALSE;
-                    timer = relative_time;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
-                    }
-                break; 
-                
-            case half_circle_mode:  // Turn half a circle, better to perform loop acrobatics
-                plane_flying_busy=TRUE;
-                //code
-                trajectory_refgnd = traj_circle(pathned, stateVars.pnPePd, relative_time);
-                if(relative_time-timer > half_circle_duration){
-                    plane_flying_busy=FALSE;
-                    timer = relative_time;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
-                    }
-                break; 
-            
-            // Barrel looping needs high throttle and pitch acceleration, during test, desired path in looping might has not enough acceleration.
-            // Barrel looping achieved by first glide forward and then glide backward, plane will adjust itself in a looping style.
-            // looping function works when trying first roll upside down and perform a downward looping
-            case looping_mode:
-                plane_flying_busy=TRUE;
-                trajectory_refgnd = traj_loop(pathned, stateVars.pnPePd, relative_time, timer);
-                phiRef += 180.0/5e6*static_cast<float>(PERIOD);
-                if (360>phiRef>180 || testLock==TRUE){
-                    phiRef=180;
-                    testLock=TRUE;
-                }
-                if(relative_time-timer > looping_duration){ // need reconsider, in accordance with the looping func
-                    plane_flying_busy=FALSE;
-                    timer = relative_time;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
-                    }
-
-                break;
-                
-            case glide_mode:    // fly forward, these three modes are maintained without disturbance
-                trajectory_refgnd = traj_glide(pathned, stateVars.pnPePd);
-                plane_flying_busy=FALSE;
-                timer = relative_time;
-                break; 
-                
-            case back_glide_mode: // fly backward
-                trajectory_refgnd = traj_back_glide(pathned, stateVars.pnPePd);
-                plane_flying_busy=FALSE;
-                timer = relative_time;
-                break;
-                
-            case snake_mode: // snake mode, fly sinusoidally left/right or up/down
-                trajectory_refgnd = traj_snake(pathned, stateVars.pnPePd, relative_time);
-                plane_flying_busy=FALSE;
-                timer = relative_time;
-                break;
-                                
-            case roll_mode: // can be shrinked 
-                plane_flying_busy=TRUE;
-                trajectory_refgnd = traj_roll(pathned, stateVars.pnPePd);
-                phiRef += 180.0/5e6*static_cast<float>(PERIOD);
-                if (360>phiRef>180 || testLock==TRUE){
-                    phiRef=180;
-                    testLock=TRUE;
-                }
-                if (phiRef>360 || testLock2==TRUE){
-                phiRef=0;
-                testLock2=TRUE;
-                }
-                if(relative_time-timer > rolling_time){
-                    plane_flying_busy=FALSE;
-                    timer = relative_time;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
-                    }
- 
-                break;
-                
-            case upclimb_mode: // higher climb rate after takeoff
-                plane_flying_busy=TRUE;
-                trajectory_refgnd = traj_climbup(pathned, stateVars.pnPePd);
-                if(relative_time-timer > climb_time){
-                    plane_flying_busy=FALSE;
-                    timer = relative_time;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
-                    }
-                break;                
-                
-            //if there are a problem with the value
-            default:
-                Plane_flying_current_state=glide_mode;
-                Plane_flying_next_state=glide_mode;
-                break;
-        }
-
+        trajectory_refgnd = choose_traj(firstLoop, Plane_flying_current_state, Plane_flying_next_state, plane_flying_busy, pathned, stateVars.phiThetaPsi, relative_time, timer, phiRef);
         // Path can also be replaced by a total designed trajectory in a function of time, out commentted in Trajectory.cpp
-        // trajectory_refgnd = FlyTrajectory();
+        // trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
         //***************************************************
 
         // Path Processing
 
          // Calculating controller input for throttle
-        errorThrottle = pathDly.update(pathned,trajectory_refgnd);
+        errorThrottle = pathDly.update(pathned, trajectory_refgnd);
         errorThrottle -= desiredL;
 
         // Calculating the Acceleration out of Position Difference L
