@@ -67,15 +67,19 @@ void TrajectoryController::editPID(const enum trajPIDs pidName,float Kp, float K
         switch(pidName) {
                 case Throttle :
                         i = 0;
+                        hal.console->printf("Changed Throttle gains:\tKd: %f\tKi: %f\tKd: %f\n",Kp,Ki,Kd);
                         break;
                 case Aileron :
                         i = 1;
+                        hal.console->printf("Changed Aileron gains:\tKd: %f\tKi: %f\tKd: %f\n",Kp,Ki,Kd);
                         break;
                 case Rudder :
                         i = 2;
+                        hal.console->printf("Changed Rudder gains:\tKd: %f\tKi: %f\tKd: %f\n",Kp,Ki,Kd);
                         break;
                 case Elevator :
                         i = 3;
+                        hal.console->printf("Changed Elevator gains:\tKd: %f\tKi: %f\tKd: %f\n",Kp,Ki,Kd);
                         break;
                 default:
                         // Error-Routine

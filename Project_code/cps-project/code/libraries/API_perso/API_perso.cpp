@@ -100,7 +100,7 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		
 		//Kd
 		third_position_num=i+1;
-		for(i=third_position_num;stringAPI[i]!=separation_char;i++) buffer_conv[i-third_position_num]=stringAPI[i]; //copy the number to convert
+                for(i=third_position_num;stringAPI[i]!='\0';i++) buffer_conv[i-third_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-third_position_num]='\0'; //end char
                 attribut[3]=atof_own(buffer_conv); //convertion to inter
 		
@@ -110,7 +110,7 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 		break; //hal.console->printf("PID modified\n");break;
 		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		break; //hal.console->printf("PID modified\n");break;
 		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	break; //hal.console->printf("PID modified\n");break;
-                //default:hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
+                default:hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
                 break;
 	
@@ -135,12 +135,19 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		}
 		break;
 	//*** look ahead distance ***//
-	case 'l': //not tested
-		if(stringAPI[1]!=separation_char) hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
+        case 'l': //not tested
+                if(stringAPI[1]!=separation_char) {
+                    hal.console->printf("Wrong usage of the function \n");
+                    break; //if the standart is not respected
+                }
 
-		for(i=2;stringAPI[i]!='-';i++) buffer_conv[i-2]=stringAPI[i]; //copy the number to convert
-		buffer_conv[i-1]='\0'; //end char
-                desiredL=atof_own(buffer_conv)*1000; //convertion to inter
+                for(i=2;stringAPI[i]!='\0';i++) {
+                    buffer_conv[i-2]=stringAPI[i];
+                }
+                buffer_conv[i-2]='\0'; //end char
+                desiredL=atof_own(buffer_conv);
+                hal.console->printf("Look ahead distance changed to: %f\n",desiredL);
+                break;
 		
 	default: 
 		hal.console->printf("The function does not exist or is not operational yet! \n");
