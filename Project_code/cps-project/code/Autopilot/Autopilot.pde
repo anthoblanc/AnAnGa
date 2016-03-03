@@ -5,7 +5,6 @@
 //                   Define
 //***************************************************
 
-
 //General
 typedef int           BOOL;
 #define FALSE         0
@@ -184,7 +183,7 @@ void loop()
             i++;
         }
         consoleInRaw[i] = '\0';
-        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL, (int&) Plane_flying_next_state, (float&)desiredL); //i=0 means that there is nothing in the buffer
+        if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL, Plane_flying_next_state, desiredL); //i=0 means that there is nothing in the buffer
 
         //***************************************************
         // Measurements of the plane
@@ -212,7 +211,7 @@ void loop()
         //***************************************************
         // Path Generation
 
-        trajectory_refgnd = choose_traj(firstLoop, Plane_flying_current_state, Plane_flying_next_state, plane_flying_busy, pathned, stateVars.phiThetaPsi, relative_time, timer, phiRef);
+        trajectory_refgnd = choose_traj(firstLoop, Plane_flying_current_state, Plane_flying_next_state, plane_flying_busy, pathned, stateVars.pnPePd , relative_time, timer, phiRef);
         // Path can also be replaced by a total designed trajectory in a function of time, out commentted in Trajectory.cpp
         // trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
@@ -253,19 +252,8 @@ void loop()
             nextPrint += 2000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-            hal.console->printf("s%d\n", Plane_flying_current_state);
-                //hal.console->printf("pathned: (%f,%f,%f)\npnPePd: (%f,%f,%f)\nL-vec: (%f,%f,%f)\n",pathned.x,pathned.y,pathned.z,stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z);
-                // Testwise printing the console-read variables
-                //hal.console->printf("Read from COM-PORT: %c\n",consoleInRaw);
-                //hal.console->printf("A:(%f,%f,%f), a:(%f,%f,%f), out:%f\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,stSig.elevator);
-                //hal.console->printf("aCMDb: (%f,%f,%f),\ngCMDb: (%f,%f,%f)\n",aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z,gCMD_refbody.x,gCMD_refbody.y,gCMD_refbody.z);
-                //hal.console->printf("euler: (%f,%f,%f)\n",stateVars.phiThetaPsi.x,stateVars.phiThetaPsi.y,stateVars.phiThetaPsi.z);
-                //hal.console->printf("aCMDinertial: (%f,%f,%f)\n",aCMD_refin.x,aCMD_refin.y,aCMD_refin.z);
-                //hal.console->printf("PID-In: %f, PID-Throttle out: %f, error-term: %f\n",inputThrottlePID,stSig.throttle,inputThrottlePID+stateVars.groundSpeed);
-                //hal.console->printf("phi: %f, out: %f\n",stateVars.phiThetaPsi.z, stSig.rudder);
-                //hal.console->printf("L-vec: (%f,%f,%f), speed: (%f,%f,%f),\naCMDin: (%f,%f,%f)\naCMDb: (%f,%f,%f), A_CMDb: (%f,%f,%f)\n\n",trajectory_refgnd.x,trajectory_refgnd.y,trajectory_refgnd.z,stateVars.pnPePdDot.x,stateVars.pnPePdDot.y,stateVars.pnPePdDot.z,aCMD_refin.x,aCMD_refin.y,aCMD_refin.z,aCMD_refbody.x+gCMD_refbody.x,aCMD_refbody.y+gCMD_refbody.y,aCMD_refbody.z+gCMD_refbody.z,aCMD_refbody.x,aCMD_refbody.y,aCMD_refbody.z);
-                //hal.console->printf("%f\t%f\t%f\n",inputThrottlePID-stateVars.groundSpeed,inputThrottlePID,stateVars.groundSpeed);
-				//  hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
+            //hal.console->printf("s%d\n", Plane_flying_current_state);
+            //hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
         }
 
 

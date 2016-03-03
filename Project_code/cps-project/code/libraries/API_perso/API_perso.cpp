@@ -68,7 +68,7 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 {
 	int i=0; //local counter
 	char buffer_conv[10]; //buffer for atof
-	float attribut[4]={0};
+        float attribut[4];
 	int second_position_num=0;
 	int third_position_num=0;
 
@@ -86,15 +86,15 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		//Kp
 		for(i=first_position_num;stringAPI[i]!=separation_char;i++) buffer_conv[i-first_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-first_position_num]='\0'; //end char
-		attribut[1]=atof(buffer_conv); //convertion to inter
+                attribut[1]=atof_own(buffer_conv); //convertion to inter
 
 		//if(stringAPI[i]!=separation_char) { hal.console->printf("Wrong usage of the function \n"); break;} //if the standart is not respected
 
 		//Ki
 		second_position_num=i+1;
 		for(i=second_position_num;stringAPI[i]!=separation_char;i++) buffer_conv[i-second_position_num]=stringAPI[i]; //copy the number to convert
-		buffer_conv[i-second_position_num]='\0'; //end char
-		attribut[2]=atof(buffer_conv); //convertion to inter
+                buffer_conv[i-second_position_num]='\0'; //end char
+                attribut[2]=atof_own(buffer_conv); //convertion to inter
 
 		//if(stringAPI[i]!=separation_char) { hal.console->printf("Wrong usage of the function \n"); break;}//if the standart is not respected
 		
@@ -102,7 +102,7 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		third_position_num=i+1;
 		for(i=third_position_num;stringAPI[i]!=separation_char;i++) buffer_conv[i-third_position_num]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-third_position_num]='\0'; //end char
-		attribut[3]=atof(buffer_conv); //convertion to inter
+                attribut[3]=atof_own(buffer_conv); //convertion to inter
 		
 		//Which PID?
 		switch(stringAPI[1]) {
@@ -110,9 +110,9 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 		case PIDcontroller_Aileron     	: trCTRL.editPID(Aileron,attribut[1],attribut[2],attribut[3]); 		break; //hal.console->printf("PID modified\n");break;
 		case PIDcontroller_Rudder 	: trCTRL.editPID(Rudder,attribut[1],attribut[2],attribut[3]);		break; //hal.console->printf("PID modified\n");break;
 		case PIDcontroller_Elevator	: trCTRL.editPID(Elevator,attribut[1],attribut[2],attribut[3]); 	break; //hal.console->printf("PID modified\n");break;
-		default:hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
+                //default:hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
-		break;	
+                break;
 	
 	//*** help ***//
 	case 'h': 
@@ -140,7 +140,7 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 
 		for(i=2;stringAPI[i]!='-';i++) buffer_conv[i-2]=stringAPI[i]; //copy the number to convert
 		buffer_conv[i-1]='\0'; //end char
-		desiredL=atof(buffer_conv)*1000; //convertion to inter
+                desiredL=atof_own(buffer_conv)*1000; //convertion to inter
 		
 	default: 
 		hal.console->printf("The function does not exist or is not operational yet! \n");
@@ -149,7 +149,7 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 }
 
 //**********************//
-float atof(char *str)
+/*float atof(char *str)
 {	
 	//Optimisation: conversion in float only at the end
 	int res = 0; // Initialize // int to reduce the complexity of the operation
@@ -163,4 +163,52 @@ float atof(char *str)
 	//hal.console->printf("atof %f\n",(float) res/1000);
 	// return result.
 	return (float) res/1000;
+}*/
+
+float atof_own(char* in){
+
+        float out;
+        int i;
+        int point=-1;
+        int length;
+        float multiplier;
+        float sign=1.0;
+
+        if(in[0]=='-'){
+                sign=-1.0;
+                in[0] = '0';
+        }
+        if(in[0]=='+'){
+                in[0] = '0';
+        }
+
+
+        for(i=0;in[i]!='\0';i++){
+                if (in[i]=='.'){
+                        point = i;
+                }
+        }
+        length=i-1;
+
+        if(point==-1){
+                point = length+1;
+        }
+
+        multiplier = 1;
+        for(i=point-1;i>=0;i--){
+                out += static_cast<float>(static_cast<int>(in[i])-48)*multiplier;
+                multiplier *= 10;
+        }
+
+        multiplier = 0.1;
+        for(i=point+1;i<=length;i++){
+                out += static_cast<float>(static_cast<int>(in[i])-48)*multiplier;
+                multiplier /= 10;
+        }
+
+        out = sign * out;
+
+        return(out);
+
 }
+

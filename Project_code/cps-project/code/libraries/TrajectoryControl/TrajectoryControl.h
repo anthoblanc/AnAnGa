@@ -61,7 +61,7 @@ TrajectoryControl.h
 
 #define Kp_Aileron 0.9		// PID parameters for Aileron
 #define Ki_Aileron 0.0
-#define Kd_Aileron 0.4
+#define Kd_Aileron 0.2
 #define IntLim_Aileron 0.5
 #define Casc_Aileron 1
 

@@ -63,7 +63,8 @@ char * str string to convert
 convert a char into an interger
 		
 *********************************************** */
-float atof(char *str);
+//float atof(char *str);
+float atof_own(char *in);
 
 
 #include "API_perso.cpp"
