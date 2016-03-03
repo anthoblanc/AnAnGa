@@ -140,26 +140,29 @@ void loop()
     hardware_time = hal.scheduler->micros(); // real hadware time
     relative_time=hardware_time-zero_time; //time since the new simulation
 
-    /* zero space time:
-    Manage the plane crash or reinitialsiation*/
-    if( ( fabs(stateVars.pnPePd.x-center_zero_space_x) < zero_space_size )
-    &&  ( fabs(stateVars.pnPePd.y-center_zero_space_y) < zero_space_size )
-    &&  ( fabs(stateVars.pnPePd.z-center_zero_space_z) < zero_space_size )
-    &&  ( relative_time > time_before_retesting_zero_time_condition ) )
-    {
-
-        //time initialisation
-        relative_time = 0; //will be recalculate at each iteration
-        zero_time=hal.scheduler->micros();
-        Plane_flying_current_state=takeoff_mode;
-        Plane_flying_next_state=takeoff_mode;
-        plane_flying_busy=FALSE;
-        firstLoop=TRUE;
-    }
-    //----//
-
     if(hardware_time >= nextWrite) {
         nextWrite += PERIOD;
+
+
+        /* zero space time:
+        Manage the plane crash or reinitialsiation*/
+        if( ( fabs(stateVars.pnPePd.x-center_zero_space_x) < zero_space_size )
+        &&  ( fabs(stateVars.pnPePd.y-center_zero_space_y) < zero_space_size )
+        &&  ( fabs(stateVars.pnPePd.z-center_zero_space_z) < zero_space_size )
+        &&  ( relative_time > time_before_retesting_zero_time_condition ) )
+        {
+
+            //time initialisation
+            relative_time = 0; //will be recalculate at each iteration
+            zero_time=hal.scheduler->micros();
+            Plane_flying_current_state=takeoff_mode;
+            Plane_flying_next_state=takeoff_mode;
+            plane_flying_busy=FALSE;
+            firstLoop=TRUE;
+        }
+        //----//
+
+
 
         // Read sensor data from emulation adapter
         uint8_t size = Wire.requestFrom(2, sizeof(dataSample.data));
@@ -216,7 +219,6 @@ void loop()
         // trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
 
         //***************************************************
-
         // Path Processing
 
          // Calculating controller input for throttle

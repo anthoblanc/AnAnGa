@@ -195,7 +195,7 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
         if(plane_flying_busy==FALSE){
          Plane_flying_current_state=Plane_flying_next_state;    
          timer = relative_time;     // Set timer to count time in a certain flying mode
-          }
+         }
         
         // Switch different flying mode according to the API typed-in commands, such as 'ft' for takeoff. Add or change in API_perso.cpp, starting from line 111
         switch(Plane_flying_current_state)
@@ -229,7 +229,8 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
                     if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
                     }
                 break; 
-            
+
+
             // Barrel looping needs high throttle and pitch acceleration, during test, desired path in looping might has not enough acceleration.
             // Barrel looping achieved by first glide forward and then glide backward, plane will adjust itself in a looping style.
             // looping function works when trying first roll upside down and perform a downward looping
