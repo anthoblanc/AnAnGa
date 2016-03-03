@@ -56,7 +56,6 @@ typedef int           BOOL;
 #include "../libraries/StandardController/StandardController.h"
 #include "../libraries/Path/Trajectory.h"							// Trajectory design
 #include "../libraries/Trajectory_management/Acceleration_mgt.h"	// maybe improve comments
-#include "../libraries/Interface/Interface.hpp"						// Not (yet) in use
 #include "../libraries/API_perso/API_perso.h"						// Not (yet) in use
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
@@ -90,7 +89,6 @@ float desiredL = LookAheadDistance;
 float errorThrottle;
 
 // Interface
-Interface intface(hal);
 char consoleInRaw[size_buffer_interface];
 
 //time management
