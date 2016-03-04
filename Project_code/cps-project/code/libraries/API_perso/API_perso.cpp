@@ -122,14 +122,14 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 	case 'f': 
 		switch(stringAPI[1]) {
 			case 't': Plane_flying_current_state=takeoff_mod; 	hal.console->printf("takeoff_mode actived \n"); 	break;
-			case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle_mode actived \n"); 	break;
+			case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle_mode actived \n"); 		break;
 			case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping_mode actived \n"); 	break;
-			case 'g': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("go_streight_mode actived \n"); break;
-			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mode actived \n"); 	break;
+			case 'g': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("go_streight_mode actived \n"); 	break;
+			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mode actived \n"); 		break;
 			case 'b': Plane_flying_current_state=back_glide_mod; 	hal.console->printf("back_glide_mode actived \n"); 	break;
 			case 'h': Plane_flying_current_state=half_circle_mod; 	hal.console->printf("half_circle_mode actived \n"); 	break;
 			case 'u': Plane_flying_current_state=upclimb_mod; 	hal.console->printf("climb_up_mode actived \n"); 	break;
-			case 's': Plane_flying_current_state=snake_mod; 	hal.console->printf("snake_mode actived \n"); 	break;
+			case 's': Plane_flying_current_state=snake_mod; 	hal.console->printf("snake_mode actived \n"); 		break;
 			
 			default: hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}
