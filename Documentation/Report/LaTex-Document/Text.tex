@@ -205,7 +205,9 @@ At the end of each program run, the four steering signals for the actuators thro
 We have implemented an user interface which enables a communication with the aircraft controller via an USB connection with the controller board. 
 We used the program \texttt{hterm} for communicating with the controller over a COM-Port.
 
-The interface enables the user to modify controller parameters and flight special pre-established paths at run time. All this path have been saved and are managed in a state machine in function~\textsf{trajectory.cpp}. Every state correspond to a different path. Here are this list of the possible paths:
+The interface enables the user to modify controller parameters and flight special pre-established paths at run time. Sending the lette \texttt{'h'} print help instruction and explaination how to use the interface.
+
+All this path have been saved and are managed in a state machine in function~\textsf{trajectory.cpp}. Every state correspond to a different path. Here are this list of the possible paths:
 
 \begin{itemize}
 \item 
@@ -255,7 +257,44 @@ fc - Climb up
 fs - Snake
 \end{itemize}
 
-Note: f is for flying and all the second letter are correspond to the state name.
+Note: 'f' is for flying and all the second letter are correspond to the state name.
+
+The API allowed us to edit some variables. It includes only the PID and the lookahead distance. Because, we are dealing with numbers, the formalism is very strict.
+
+\begin{itemize}
+\item 
+et-#VAL_P#-#VAL_I#-#VAL_D# : edit throttle PID value
+\item
+ea-#VAL_P#-#VAL_I#-#VAL_D# :  edit aileron PID value
+\item
+er-#VAL_P#-#VAL_I#-#VAL_D# : edit rudder PID value
+\item
+ee-#VAL_P#-#VAL_I#-#VAL_D# : edit elevator PID value
+\item
+l-#VAL_Lookahead# : edit look ahead distance
+\end{itemize}
+
+with \begin{itemize}
+\item
+  #VAL_P# sould be remplace by the value of the PROPORTIONAL gain 
+\item
+  #VAL_I# sould be remplace by the value of the INTEGRALE gain 
+\item
+  #VAL_D# sould be remplace by the value of the DERIVATE gain 
+\item
+  #VAL_Lookahead# sould be remplace by the value of the wished Look ahead distance 
+\end{itemize}
+
+Note: In the code, it is possible to change the separtation charactere. We have chosen '-' but it might be modify by changing the defined value separation_char.
+
+Here are some example to understand how it works:
+
+\begin{itemize}
+\item 
+et-1.56-2.55-0 : edit throttle PID with the proportional gain equal to 1.56, the integrale gain equal to 1.56 and the derivate gain equal to 0
+\item
+ea-7.01-0.55-0.22 : edit aileron PID with the proportional gain equal to 7.01, the integrale gain equal to 0.55 and the derivate gain equal to 0.22
+\end{itemize}
 
 In the code, the function \textsf{API\_interpretate\_chain} cares for the interpretation of the user commands and the instruction transfer.
 
