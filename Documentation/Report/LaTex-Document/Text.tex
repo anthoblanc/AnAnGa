@@ -205,14 +205,57 @@ At the end of each program run, the four steering signals for the actuators thro
 We have implemented an user interface which enables a communication with the aircraft controller via an USB connection with the controller board. 
 We used the program \texttt{hterm} for communicating with the controller over a COM-Port.
 
-The interface enables the user to modify controller parameters and flight paths at run time by sending following instructions:
+The interface enables the user to modify controller parameters and flight special pre-established paths at run time. All this path have been saved and are managed in a state machine in function~\textsf{trajectory.cpp}. Every state correspond to a different path. Here are this list of the possible paths:
 
 \begin{itemize}
 \item 
-instruction 1
+0.	Take off
 \item
-instruction 2
+1.	Circle
+\item
+2.	Looping
+\item
+3.	Go streight / Glide
+\item
+4.	Roll		
+\item	
+5.	Glide back
+\item
+6.	Half circle
+\item
+7.	Climb up
+\item
+8.	Snake
 \end{itemize}
+
+We can sum up this state in the fallowing diagram:
+
+INSER HERE THE PICTURE OF THE DIAGRAM
+
+To go from one state to an other, the user has to tipp the fallowing command.
+
+\begin{itemize}
+\item 
+ft - Take off 
+\item
+fc - Circle 
+\item
+fl - Looping
+\item
+fg - Go streight / Glide
+\item
+fr - Roll		
+\item	
+fb - Glide back
+\item
+fh - Half circle
+\item
+fc - Climb up
+\item
+fs - Snake
+\end{itemize}
+
+Note: f is for flying and all the second letter are correspond to the state name.
 
 In the code, the function \textsf{API\_interpretate\_chain} cares for the interpretation of the user commands and the instruction transfer.
 
