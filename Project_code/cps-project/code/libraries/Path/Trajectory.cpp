@@ -16,8 +16,8 @@
 // Trajectory duration
 #define takeoff_time            10e6
 #define circle_time             20e6
-#define rolling_time            15e6
-#define looping_duration        3e6
+#define rolling_time            10e6
+#define looping_duration        8e6
 #define half_circle_duration    17e6
 #define climb_time              10e6
 
@@ -136,8 +136,8 @@
     struct vector traj_circle (struct vector &desired_path, struct vector current_location, uint32_t time){
     struct vector delta_p; 
 
-        desired_path.x += (70.0*cos(360.0*(M_PI/180.0)*(time-30e6)/(30e6)))*static_cast<float>(PERIOD)/1e6; //
-        desired_path.y += (70.0*sin(360.0*(M_PI/180.0)*(time-30e6)/(30e6)))*static_cast<float>(PERIOD)/1e6; //
+        desired_path.x += (70.0*cos(360.0*(M_PI/180.0)*(time)/(30e6)))*static_cast<float>(PERIOD)/1e6; //
+        desired_path.y += (70.0*sin(360.0*(M_PI/180.0)*(time)/(30e6)))*static_cast<float>(PERIOD)/1e6; //
         desired_path.z -= 1.0 * static_cast<float>(PERIOD) /1e6;
         
         delta_p.x = desired_path.x - current_location.x;
@@ -211,7 +211,7 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
                 break;
                 
             case circle_mode:
-                trajectory_refgnd = traj_circle(desired_path, current_location, relative_time);
+                trajectory_refgnd = traj_circle(desired_path, current_location, relative_time-timer);
                 if(relative_time-timer > circle_time){
                     plane_flying_busy=FALSE;
                     timer = relative_time;
@@ -221,12 +221,11 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
                 
             case half_circle_mode:  // Turn half a circle, better to perform loop acrobatics
                 plane_flying_busy=TRUE;
-                //code
-                trajectory_refgnd = traj_circle(desired_path, current_location, relative_time);
+                trajectory_refgnd = traj_circle(desired_path, current_location, relative_time-timer);
                 if(relative_time-timer > half_circle_duration){
                     plane_flying_busy=FALSE;
                     timer = relative_time;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=back_glide_mode; //security
                     }
                 break; 
 
@@ -235,6 +234,17 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
             // Barrel looping achieved by first glide forward and then glide backward, plane will adjust itself in a looping style.
             // looping function works when trying first roll upside down and perform a downward looping
             case looping_mode:
+                plane_flying_busy=TRUE;
+                trajectory_refgnd = traj_glide(desired_path, current_location);
+                if(relative_time-timer > looping_duration){
+                    trajectory_refgnd = traj_back_glide(desired_path, current_location);
+                    plane_flying_busy=FALSE;
+                    timer = relative_time;
+                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    }
+                break; 
+
+            /*  // 
                 plane_flying_busy=TRUE;
                 trajectory_refgnd = traj_loop(desired_path, current_location, relative_time, timer);
                 phiRef += 180.0/5e6*static_cast<float>(PERIOD);
@@ -248,6 +258,7 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
                     }
 
                 break;
+            */
                 
             case glide_mode:    // fly forward, these three modes are maintained without disturbance
                 trajectory_refgnd = traj_glide(desired_path, current_location);
@@ -271,11 +282,13 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
                 plane_flying_busy=TRUE;
                 trajectory_refgnd = traj_roll(desired_path, current_location);
                 phiRef += 180.0/5e6*static_cast<float>(PERIOD);
-                if (360>phiRef>180){
+                if (phiRef>180){
                     phiRef=180;
-                }
-                if (phiRef>360){
-                phiRef=0;
+                }else{
+                    phiRef += 180.0/5e6*static_cast<float>(PERIOD);
+                    if (phiRef>360){
+                        phiRef=0;
+                    }
                 }
                 if(relative_time-timer > rolling_time){
                     plane_flying_busy=FALSE;
