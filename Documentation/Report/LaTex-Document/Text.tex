@@ -232,9 +232,9 @@ All this path have been saved and are managed in a state machine in function~\te
 
 We can sum up this state in the fallowing diagram:
 
-INSER HERE THE PICTURE OF THE DIAGRAM
+\includegraphics[scale=0.3]{picture/StateDiagramme_liason.gif}
 
-To go from one state to an other, the user has to tipp the fallowing command.
+As you can see on the diagram, some states are unstable are limited during the time. The arrow indicates the direct next state. For more detail about the path, report direclty to the concerning section. To go from one state to an other, the user has to tipp the fallowing command: 
 
 \begin{itemize}
 \item 
@@ -285,7 +285,7 @@ with \begin{itemize}
   #VAL_Lookahead# sould be remplace by the value of the wished Look ahead distance 
 \end{itemize}
 
-Note: In the code, it is possible to change the separtation charactere. We have chosen '-' but it might be modify by changing the defined value separation_char.
+Note: In the code, it is possible to change the separtation charactere. We have chosen '-' but it might be modify by changing the defined value \textsf{separation_char} in \textsf{API\_perso.h}.
 
 Here are some example to understand how it works:
 
