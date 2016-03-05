@@ -215,7 +215,6 @@ struct vector choose_traj (uint8_t firstLoop, int Plane_flying_current_state, in
                 if(relative_time-timer > circle_time){
                     plane_flying_busy=FALSE;
                     timer = relative_time;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
                     }
                 break; 
                 
