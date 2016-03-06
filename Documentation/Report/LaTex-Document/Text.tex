@@ -52,7 +52,6 @@
 \usepackage{pst-plot}
 
 
-
 % Dokumentbeginn
 % ======================================================================
 % Ab hier beginnt das eigentliche Dokument.
@@ -110,7 +109,7 @@
 \newpage
 \tableofcontents	
 
-\vspace{2.0cm}
+\vfill
 
 % Abbildungsverzeichnis
 % ===========================================
@@ -151,7 +150,7 @@ The aircraft's aim is to fly along this commanded path by determining the deviat
 \textbf{Figure~\ref{fig_complete_structure}} depicts the complete control structure of the aerobatic controller. 
 With the position data from the desired trajectory and with actual position signals of the aircraft, the desired acceleration to follow the path is computed.
 After considering the gravity, the desired acceleration is handed to the control structure where the acceleration in body frame is used as the control variable for the aileron-, elevator-, and rudder-controllers.
-Also, with the position data, the delay of the aircraft from the desired position is determined, and by considering a \textsl{look-ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
+Also, with the position data, the delay of the aircraft from the desired position is determined, and by considering a \textsl{look ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
 
 The resulting steering signals, computed by the control structure, are handed to the simulation environment which simulates the physical reaction of the aircraft and then hands back measurement results of its virtual sensors.
 These signals are processed and provided to the control structure. 
@@ -310,52 +309,54 @@ In the code, this functionality is implemented in lines 164--178 in \textsf{Auto
 
 
 
-\subsection{Path Generation} \label{ch-Path-Generation}
+\subsection{Path Generation}
 
-Connected with the instructions of the user interface.
+Path generation is connected with the user interface. By typing in certain commands in programs such as \texttt{hterm}, we could assign different acrobatic gestures to the plane. 
 
-stable flight paths: flight in one direction, flying a curve. -> Can be interrupted at any time.
-Flight paths, performed from beginning till end: Looping,... -> New instructions have to wait till completion.
-
-List all possible flight manoeuvres.
-
-
-\medskip
-
-
-
-
-
-\subsection{Processing of Control Variables}
-
-Now, we describe the computation of the variables, handed to the \texttt{Control Structure}, given the state variables, provided in function~\textsf{calculateStateVariables}, and the desired path, as described in Chapter~\ref{ch-Path-Generation}.
-
-\subsubsection*{Computing the Desired Acceleration}
-
-As an essential part of the aerobatic controller, a \textsl{look-ahead distance}~$\L_{des}$ is introduced which effects the system to control the aircraft to lag behind the desired path by an adjustable distance.
-This guarantees the difference between desired and actual position of the aircraft 
+Trajectories are designed in function~\textsf{Trajectory}. The idea of designing a trajectory is calculating out the desired postion of the plane 1 second later from the actual position of the aircraft, using the function below:
 \begin{equation}
 \vec{L}_{is}^i = \vec{P}_{des}^i - \vec{P}_{is}^i
 \end{equation}
-to be greater than zero and leading to acceleration commands 
-\begin{equation}
-\vec{a}_{CMD}^v = \frac{2}{|\vec{L}_{des}^i|^2}\left(\vec{V}^v \times \vec{L}_{is}^i \right) \times \vec{V}^v
-\end{equation}
-being moderate and viable by the aircraft.
-This acceleration command is then subtracted by the gravity constant
-\begin{equation}
-\vec{A}_{CMD}^v = \vec{a}_{CMD}^v - \vec{g}^v
-\end{equation}
-and handed to the Control Structure in body frame:
-\begin{equation}
-\vec{A}_{CMD}^b = \mathcal{R}_i^b(\phi,\theta,\psi) \cdot \vec{A}_{CMD}^v \quad .
-\end{equation}
+And by using the $\vec{L}_{is}^i$ vector, we could control the aircraft like dragging the string of a kite.
+
+Currently we have 9 different acrobatic gestures. They are divided into two categories, one stable flight paths and the other temoprary flight gestures.
+
+\subsubsection*{Stable gestures}
+Stable flight gestures serve as kind of default flying states, they are maintained when undisturbed, can be also interrupted at any time by other flying modes. To choose from different gestures, we can type in the API interface the following commands:
+
+\texttt{'fg'}: glide or go-straight mode. Speed is set to 50 in the forward (or Y) direction.
+
+\texttt{'fb'}: back glide mode. Speed is set to 50 in the backward (or -Y) direction.
+
+\texttt{'fc'}: circle mode. Testing radius is 70, can be changed in function~\textsf{Trajectory}. It has a slight going up speed of 1 to avoid crashing when manoeuvring at a low altitude.
+
+\texttt{'fs'}: snake mode. Now tested is a gesture that goes forward (Y direction), and has a left/right snake sinusoidal turns in X direction. Radius is set to 50.
+
+\subsubsection*{Temporal acrobatic gestures}
+
+Thest gestures are temporal ones, which have certain durations and executed from beginning till end. Afterwards the aircraft changes into default flying states -like fly forward or backward. Commands for them are:
+
+\texttt{'ft'}: takeoff mode. In this mode the plane has a relatively low climb rate for a safe takeoff.
+
+\texttt{'fl'}: looping mode. The plane performs a backward-direction loop by first climbing up and flipping over. A whole barrel loop can be achieved by two backward-direction looping. 
+
+\texttt{'fr'}: roll mode. The plane rolls over 360 degrees for one time in this mode. The plane finishes rolling in two steps, each turn is 180 degrees.
+
+\texttt{'fh'}: half-circle mode. The aircraft flies a half-circle, which would be easier for a downward looping and then flies straight forward.
+
+\texttt{'fc'}: climb up mode. Takeoff mode has a too low climb rate, in this mode climb rate is bigger for a quicker climb up.
+
+These acrobatic flight durations are defined and can be changed in function~\textsf{Trajectory}. In each gesture's sub-function, parameters such as speed, climb rate or roll speed can also be changed.
 
 \medskip
 
+\subsection{Processing of Control Variables}
 
+\subsubsection*{Processing the Sensor Data}
 
+\subsubsection*{Computing the Desired Acceleration}
 
+Introduce look ahead distance, explain, why important -> $L_is$ is always > 0 and ensures a good acceleration command
 
 \subsubsection*{Determining the Desired Speed}\label{ch-Determ-Desired-Speed}
 
@@ -364,7 +365,7 @@ The desired speed of the aircraft is given implicitly with the desired path and 
 \vec{v}_{Path}^i(t_k) = \frac{\vec{P}_{des}^i(t_k)-\vec{P}_{des}^i(t_{k-1})}{\Delta T}\quad .
 \end{equation}
 
-But the desired speed is not the control variable of the throttle controller. As shown in Figure~\ref{fig_complete_structure}, the input for the throttle controller is $\Delta L$ which is the distance of the aircraft from the desired position with respect to the \textsl{look-ahead distance}~$L_{des}$ and is computed by
+But the desired speed is not the control variable of the throttle controller. As shown in Figure~\ref{fig_complete_structure}, the input for the throttle controller is $\Delta L$ which is the distance of the aircraft from the desired position with respect to the look-ahead distance~$L_{des}$ and is computed by
 \begin{equation}
 \Delta L = \frac{\vec{v}_{Path}^i \cdot \vec{L}_{is}^i}{|\vec{v}_{Path}^i|}-L_{des} = L_{is,Path}-L_{des} \quad .
 \end{equation}
@@ -388,7 +389,7 @@ Finally, $\Delta L$ is divided by a constant value~$K$ and handed to the throttl
   \label{fig_Path_Delay}
 \end{figure} 
 
-With this control mechanism, the aircraft will adjust the throttle in order to always stay behind the desired position by the length of the \textsl{look-ahead distance}~$L_{des}$ which is the intersection of the desired flight direction~$\vec{v}_{Path}^i$ and the circle of $L_{des}$ as shown in Figure~\ref{fig_explanation-diagram-throttle}. In this point, $\Delta L$ will become zero, which is the control target of the control structure (of course, the whole tangent of the intersection point will meet the control target of $\Delta L = 0$ but the rest of the control structure will force the aircraft onto the desired path and thus to this one intersection point).  
+With this control mechanism, the aircraft will adjust the throttle in order to always stay behind the desired position by the length of the look ahead distance~$L_{des}$ which is the intersection of the desired flight direction~$\vec{v}_{Path}^i$ and the circle of $L_{des}$ as shown in Figure~\ref{fig_explanation-diagram-throttle}. In this point, $\Delta L$ will become zero, which is the control target of the control structure (of course, the whole tangent of the intersection point will meet the control target of $\Delta L = 0$ but the rest of the control structure will force the aircraft onto the desired path and thus to this one intersection point).  
 
 \medskip
 
@@ -505,6 +506,44 @@ Also, the GPS signal estimation could not be activated due to imprecise estimati
 The reasons were the lack of information about the used units of the measurement data and the position of the accelerometers in the aircraft which has to be considered in a compensation term.
 
 \subsubsection*{Analysis of flown Trajectories}
+
+In this project, we also adopted Matlab to help us analyse our flown trajectories. What we wanted is a 3D recording of the real flown trajectory, with this it is easier to find out possible errors in control or path parameter designs.
+
+Matlab code and results are stored in analysis part. Basically we compare 3 sets of data recorded from program \texttt{hterm}: desired path, real trajectory and $\vec{L}_{is}^i$ vector. By dragging around the 3D \textsf{fig} format plot in Matlab we can have a direct notion of how the aircraft had flown and also changes in $\vec{L}_{is}^i$ vector.
+
+\begin{figure}[!ht]
+  \centering
+  	\includegraphics[width=12cm]{pictures/Results/Circle-desired.jpg}
+  	\includegraphics[width=12cm]{pictures/Results/Circle-real.jpg}
+  \caption{Comparison of desired and real trajectories of circle flights.}
+  \label{fig_circle}
+\end{figure}
+
+Here shown in \textbf{Figure~\ref{fig_circle}} are plots with the circle mode. The desired path is shown above and the real trajectory is underneath. We can see that the aircraft adjusted itself to the sharp turn quickly and followed the desired path quite accurate. The takeoff part and glide flight are also flown desirably according to the recorded plot.
+
+\begin{figure}[!ht]
+  \centering
+  	\includegraphics[width=12cm]{pictures/Results/snake-desired.jpg}
+  	\includegraphics[width=12cm]{pictures/Results/snake-real.jpg}
+  \caption{Comparison of desired and real trajectories of snake flights.}
+  \label{fig_snake}
+\end{figure}			
+
+
+
+For the snake flight also, here we tested the left/right sinusoidal turns in \textbf{Figure~\ref{fig_snake}}. In coordinates this corresponds to sinusoidal changes in X directions. Similarily, the aircraft had adjusted itself for the first few seconds and then followed the previously designed path.
+
+\begin{figure}[!ht]
+  \centering
+  	\includegraphics[width=12cm]{pictures/Results/roll-desired.jpg}
+  	\includegraphics[width=12cm]{pictures/Results/roll-real.jpg}
+  \caption{Comparison of desired and real trajectories of rolling flights.}
+  \label{fig_roll}
+\end{figure}		
+
+Rolling are shown in \textbf{Figure~\ref{fig_roll}}. We first designed a straight path and then performed the acrobatic rolling. During rolling, the aircraft would inevitably fly off-course a bit, especially when the rolling is performed at a lower rate. It is also proven from the plot, the plane did the full roll in two steps and then adjusted itself to the desired straight path again.
+
+A very important parameter to reassure that the plane would follow the desired path is the look ahead distance $L_{des}$. If $L_{des}$ is too large, and the designed path is not a straight line, the plane would probably fly randomly or even finally crash. A reasonable short $L_{des}$ can provide good responses of the plane when changing courses.
 
 \bigskip
 

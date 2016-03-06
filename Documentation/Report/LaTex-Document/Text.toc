@@ -5,11 +5,11 @@
 \contentsline {section}{\numberline {2}Details}{5}{section.2}
 \contentsline {subsection}{\numberline {2.1}Interface with the Simulation Environment}{5}{subsection.2.1}
 \contentsline {subsection}{\numberline {2.2}User Interface}{5}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Path Generation}{6}{subsection.2.3}
-\contentsline {subsection}{\numberline {2.4}Processing of Control Variables}{6}{subsection.2.4}
-\contentsline {subsection}{\numberline {2.5}Control Structure}{8}{subsection.2.5}
-\contentsline {subsection}{\numberline {2.6}GPS Signal Estimation}{9}{subsection.2.6}
-\contentsline {section}{\numberline {3}Results}{11}{section.3}
-\contentsline {section}{\numberline {A}Appendix}{12}{appendix.A}
-\contentsline {subsection}{\numberline {A.1}References}{12}{subsection.A.1}
-\contentsline {subsection}{\numberline {A.2}Notation}{12}{subsection.A.2}
+\contentsline {subsection}{\numberline {2.3}Path Generation}{7}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Processing of Control Variables}{8}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}Control Structure}{10}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}GPS Signal Estimation}{11}{subsection.2.6}
+\contentsline {section}{\numberline {3}Results}{12}{section.3}
+\contentsline {section}{\numberline {A}Appendix}{14}{appendix.A}
+\contentsline {subsection}{\numberline {A.1}References}{14}{subsection.A.1}
+\contentsline {subsection}{\numberline {A.2}Notation}{14}{subsection.A.2}
