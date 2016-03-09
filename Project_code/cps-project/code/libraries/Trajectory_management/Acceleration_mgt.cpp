@@ -1,11 +1,7 @@
 #include <math.h>  //mathematical operator such as sqrt
 #include "../TrajectoryControl/TrajectoryControl.h"
 
-struct vector Provide_nice_curve_acc()
-{
-	struct vector acc_cmd;
-	return( acc_cmd );
-}
+
 
 struct vector Get_Acc_straigth(const AP_HAL::HAL& hal,struct vector velocity_refgnd, struct vector trajectory_refgnd)
 {

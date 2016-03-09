@@ -2,20 +2,8 @@
 #define THISFIRMWARE "CPS-Autopilot-Project"
 
 //***************************************************
-//                   Define
+//                   Relevant Defines
 //***************************************************
-
-//General
-typedef int           BOOL;
-#define FALSE         0
-#define TRUE          1
-//Note: Boolean also exist in a library but we don't really need to do complex feature
-
-#define NOT           !
-#define AND           &&
-#define OR            ||
-
-
 
 // Look Ahead Distance (Desired Length) [feet]
 #define LookAheadDistance 40
@@ -23,8 +11,34 @@ typedef int           BOOL;
 // Activate the GPS-Signal Estimation when setting to 1
 #define ActivateGPS_SignalEstimation 0
 
+// Trajectory Settings
+// -> in Trajectory.cpp
+
+// StateVariablesEstimation: radius Coefficient Matrix
+// -> In VectorMath.c
+
+// Trajectory Controller: All Settings of the controllers
+// -> in TrajectoryControl.h
+
+// API: All setting concerning the interface over the COM-Port
+// -> in API_Perso.cpp
+
+//***************************************************
+//***************************************************
+
+
 //interface
 #define size_buffer_interface 20
+
+//General
+typedef int           BOOL;
+#define FALSE         0
+#define TRUE          1
+//Note: Boolean also exist in a library but we don't really need to do complex features
+
+#define NOT           !
+#define AND           &&
+#define OR            ||
 
 
 //***************************************************
@@ -53,12 +67,13 @@ typedef int           BOOL;
 #include "../libraries/StateVariables/StateVariables.h"
 #include "../libraries/TrajectoryControl/TrajectoryControl.h"
 #include "../libraries/StandardController/StandardController.h"
-#include "../libraries/Path/Trajectory.h"							// Trajectory design
-#include "../libraries/Trajectory_management/Acceleration_mgt.h"	// maybe improve comments
-#include "../libraries/API_perso/API_perso.h"						// Not (yet) in use
+#include "../libraries/Path/Trajectory.h"							
+#include "../libraries/Trajectory_management/Acceleration_mgt.h"	
+#include "../libraries/API_perso/API_perso.h"						
 #include "generateOutSignals.h"
 #include "../libraries/StateVariablesEstimation/StateVariablesEstimation.h"
 #include "../libraries/PathDelay/PathDelay.h"
+
 
 //***************************************************
 // Variable Declaration
@@ -67,6 +82,7 @@ typedef int           BOOL;
 //Flying state
 int Plane_flying_current_state=takeoff_mode;
 int Plane_flying_next_state=takeoff_mode;
+int Plane_flying_previous_state=takeoff_mode;
 BOOL plane_flying_busy=FALSE;
 
 // Position variables
@@ -96,9 +112,9 @@ uint32_t zero_time = hal.scheduler->micros(); //time of the last initialisation
 uint32_t hardware_time = hal.scheduler->micros(); // real hadware time
 uint32_t timer = 0; // trajectory timer
 
-
 //temp for test							<--------------------------------------- temp
 BOOL testLock,testLock2;
+
 
 //***************************************************
 // Setup cycle
@@ -143,7 +159,7 @@ void loop()
     if(hardware_time >= nextWrite) {
         nextWrite += PERIOD;
 
-
+		//***************************************************
         /* zero space time:
         Manage the plane crash or reinitialsiation*/
         if( ( fabs(stateVars.pnPePd.x-center_zero_space_x) < zero_space_size )
@@ -157,13 +173,13 @@ void loop()
             zero_time=hal.scheduler->micros();
             Plane_flying_current_state=takeoff_mode;
             Plane_flying_next_state=takeoff_mode;
+			Plane_flying_previous_state=takeoff_mode;
             plane_flying_busy=FALSE;
             firstLoop=TRUE;
         }
-        //----//
 
 
-
+		//***************************************************
         // Read sensor data from emulation adapter
         uint8_t size = Wire.requestFrom(2, sizeof(dataSample.data));
         int i = 0;
@@ -182,15 +198,14 @@ void loop()
         AND    i < size_buffer_interface ) 
         {
             consoleInRaw[i] = hal.console->read();
-//            hal.console->printf("%c",i);
             i++;
         }
         consoleInRaw[i] = '\0';
         if(i!=0) API_interpretate_chain(consoleInRaw, min(0,i-1),trCTRL, Plane_flying_next_state, desiredL); //i=0 means that there is nothing in the buffer
 
+		
         //***************************************************
         // Measurements of the plane
-
         // From the measured data of the plane, calculate all necessary state variables.
         stateVars = calculateStateVariables (dataSample);
 		
@@ -211,12 +226,13 @@ void loop()
         // Save stateVars for possible iteration in next time step
         prevStateVars.importData(stateVars);
 
+		
         //***************************************************
         // Path Generation
 
-        trajectory_refgnd = choose_traj(firstLoop, Plane_flying_current_state, Plane_flying_next_state, plane_flying_busy, pathned, stateVars.pnPePd , relative_time, timer, phiRef);
+        trajectory_refgnd = choose_traj(firstLoop, Plane_flying_current_state, Plane_flying_next_state, Plane_flying_previous_state, plane_flying_busy, pathned, stateVars.pnPePd , relative_time, timer, phiRef);
         // Path can also be replaced by a total designed trajectory in a function of time, out commentted in Trajectory.cpp
-        // trajectory_refgnd = FlyTrajectory(firstLoop, pathned, stateVars.pnPePd, relative_time, tstart, tend);
+		
 
         //***************************************************
         // Path Processing
@@ -240,6 +256,7 @@ void loop()
         stSig = trCTRL.update(hardware_time,errorThrottle,aCMD_refbody,gCMD_refbody,stateVars,phiRef);
         stSig.rudder = 0;
 
+		
         //***************************************************
         // Print to Console
 
