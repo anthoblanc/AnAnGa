@@ -51,6 +51,7 @@
 \usepackage{pstricks}	% Erstellung von Plots
 \usepackage{pst-plot}
 
+\usepackage{placeins}
 
 % Dokumentbeginn
 % ======================================================================
@@ -95,7 +96,7 @@
 
 		\vspace{1cm}		
 		
-		Date: 7\textsuperscript{th} March 2016
+		Date: 6\textsuperscript{th} March 2016
 	
 	\end{center}
 	
@@ -109,7 +110,7 @@
 \newpage
 \tableofcontents	
 
-\vfill
+\vspace{2.0cm}
 
 % Abbildungsverzeichnis
 % ===========================================
@@ -150,7 +151,7 @@ The aircraft's aim is to fly along this commanded path by determining the deviat
 \textbf{Figure~\ref{fig_complete_structure}} depicts the complete control structure of the aerobatic controller. 
 With the position data from the desired trajectory and with actual position signals of the aircraft, the desired acceleration to follow the path is computed.
 After considering the gravity, the desired acceleration is handed to the control structure where the acceleration in body frame is used as the control variable for the aileron-, elevator-, and rudder-controllers.
-Also, with the position data, the delay of the aircraft from the desired position is determined, and by considering a \textsl{look ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
+Also, with the position data, the delay of the aircraft from the desired position is determined, and by considering a \textsl{look-ahead distance} which forces the aircraft to lag behind the path by a specific distance, the throttle is controlled with this information.
 
 The resulting steering signals, computed by the control structure, are handed to the simulation environment which simulates the physical reaction of the aircraft and then hands back measurement results of its virtual sensors.
 These signals are processed and provided to the control structure. 
@@ -203,99 +204,76 @@ At the end of each program run, the four steering signals for the actuators thro
 
 We have implemented an user interface which enables a communication with the aircraft controller via an USB connection with the controller board. 
 We used the program \texttt{hterm} for communicating with the controller over a COM-Port.
-
-The interface enables the user to modify controller parameters and flight special pre-established paths at run time. Sending the lette \texttt{'h'} print help instruction and explaination how to use the interface.
-
-All this path have been saved and are managed in a state machine in function~\textsf{trajectory.cpp}. Every state correspond to a different path. Here are this list of the possible paths:
-
-\begin{itemize}
-\item 
-0.	Take off
-\item
-1.	Circle
-\item
-2.	Looping
-\item
-3.	Go streight / Glide
-\item
-4.	Roll		
-\item	
-5.	Glide back
-\item
-6.	Half circle
-\item
-7.	Climb up
-\item
-8.	Snake
-\end{itemize}
-
-We can sum up this state in the fallowing diagram:
-
-\includegraphics[scale=0.3]{picture/StateDiagramme_liason.gif}
-
-As you can see on the diagram, some states are unstable are limited during the time. The arrow indicates the direct next state. For more detail about the path, report direclty to the concerning section. To go from one state to an other, the user has to tipp the fallowing command: 
-
-\begin{itemize}
-\item 
-ft - Take off 
-\item
-fc - Circle 
-\item
-fl - Looping
-\item
-fg - Go streight / Glide
-\item
-fr - Roll		
-\item	
-fb - Glide back
-\item
-fh - Half circle
-\item
-fc - Climb up
-\item
-fs - Snake
-\end{itemize}
-
-Note: 'f' is for flying and all the second letter are correspond to the state name.
-
-The API allowed us to edit some variables. It includes only the PID and the lookahead distance. Because, we are dealing with numbers, the formalism is very strict.
-
-\begin{itemize}
-\item 
-et-#VAL_P#-#VAL_I#-#VAL_D# : edit throttle PID value
-\item
-ea-#VAL_P#-#VAL_I#-#VAL_D# :  edit aileron PID value
-\item
-er-#VAL_P#-#VAL_I#-#VAL_D# : edit rudder PID value
-\item
-ee-#VAL_P#-#VAL_I#-#VAL_D# : edit elevator PID value
-\item
-l-#VAL_Lookahead# : edit look ahead distance
-\end{itemize}
-
-with \begin{itemize}
-\item
-  #VAL_P# sould be remplace by the value of the PROPORTIONAL gain 
-\item
-  #VAL_I# sould be remplace by the value of the INTEGRALE gain 
-\item
-  #VAL_D# sould be remplace by the value of the DERIVATE gain 
-\item
-  #VAL_Lookahead# sould be remplace by the value of the wished Look ahead distance 
-\end{itemize}
-
-Note: In the code, it is possible to change the separtation charactere. We have chosen '-' but it might be modify by changing the defined value \textsf{separation_char} in \textsf{API\_perso.h}.
-
-Here are some example to understand how it works:
-
-\begin{itemize}
-\item 
-et-1.56-2.55-0 : edit throttle PID with the proportional gain equal to 1.56, the integrale gain equal to 1.56 and the derivate gain equal to 0
-\item
-ea-7.01-0.55-0.22 : edit aileron PID with the proportional gain equal to 7.01, the integrale gain equal to 0.55 and the derivate gain equal to 0.22
-\end{itemize}
-
 In the code, the function \textsf{API\_interpretate\_chain} cares for the interpretation of the user commands and the instruction transfer.
+The interface enables the user to modify controller parameters and flight special pre-established paths at run time:
+
+\medskip
+
+Sending the letter \texttt{'h'} prints help instructions and explanations how to use the interface.
+
+\medskip
+
+We have implemented a few (aerobatic) paths that can be commanded to the aircraft. 
+These trajectories are managed as a state machine in function~\textsf{Trajectory.cpp} and are depicted graphically in \textbf{Figure~\ref{fig_state-machine}}. 
+Every state corresponds to a different path. Some of the states are \textsl{'unstable'} due to a finite duration of the path. The arrows in the figure indicate the subsequent state. 
+Paths, represented as \textsl{'stable'} states, have an unlimited duration and are active as long as no other command occurs.
+With following commands, starting with \texttt{'f'}, the commanded path can be changed (Details on each path are given in the following section):
+
+\begin{tabbing}
+	\hspace{2cm} \= \hspace{4cm} \= \hspace{3cm} \kill
+	\> 0. Take Off \> \texttt{ft} \\	
+	\> 1. Circle \> \texttt{fc} \\	
+	\> 2. Looping\> \texttt{fl} \\	
+	\> 3. Glide Eastwards \> \texttt{fg} \\
+	\> 4. Roll Manoeuvre \> \texttt{fr} \\		
+	\> 5. Glide Westwards \> \texttt{fb} \\	
+	\> 6. Half Circle \> \texttt{fh} \\	
+	\> 7. Climb Up \> \texttt{fc} \\	
+	\> 8. Snake Flight \> \texttt{fs} \\		
+\end{tabbing}
+
+
+
+\medskip
+
+Furthermore, with the user interface variables, changing the behaviour of the control structure, can be adjusted during flight, namely the gains~$K$ of the PID-controllers and the \textsl{look-ahead distance}~$L_{des}$:
+
+\begin{tabbing}
+	\hspace{2cm} \= \hspace{6cm} \= \hspace{7cm} \kill
+	\> Edit Throttle-PID gains \> \texttt{et-\#$K_P$\#-\#$K_I$\#-\#$K_D$\#} \\
+	\> Edit Aileron-PID gains \> \texttt{ea-\#$K_P$\#-\#$K_I$\#-\#$K_D$\#} \\
+	\> Edit Rudder-PID gains \> \texttt{er-\#$K_P$\#-\#$K_I$\#-\#$K_D$\#} \\
+	\> Edit Elevator-PID gains \> \texttt{ee-\#$K_P$\#-\#$K_I$\#-\#$K_D$\#} \\
+	\> Edit \textsl{look-ahead distance} \> \texttt{l-\#$L_{des}$\#} 
+\end{tabbing} 
+with 
+\begin{tabbing}
+	\hspace{2cm} \= \hspace{3cm} \= \hspace{7cm} \kill
+	\> \#$K_P$\# \> Value of the \textsc{Proportional}-gain \\
+	\> \#$K_I$\# \> Value of the \textsc{Integral}-gain \\
+	\> \#$K_D$\# \> Value of the \textsc{Derivative}-gain \\
+	\> \#$L_{des}$\# \> Value of the \textsl{look-ahead distance} \\
+\end{tabbing}
+\noindent
+Note: In the code, it is possible to change the \textsl{separation character}. We have chosen \texttt{\'-\'} but it might be modify by changing the defined value \textsf{separation\_char}.
+
+\medskip
+\noindent
+As demonstration, two commands are given how to change controller gains:
+\begin{itemize}
+\item 
+\texttt{et-1.56-2.55-0} : Edit the Throttle-PID with the Proportional-gain equal to 1.56, the Integral-gain equal to 2.55 and the Derivative-gain equal to 0.0.
+\item
+\texttt{ea-7.01-0.55-0.22} : Edit the Aileron-PID with the proportional-gain equal to 7.01, the Integral-gain equal to 0.55 and the Derivative-gain equal to 0.22.
+\end{itemize}
+
+\begin{figure}[bt]
+  \begin{center}
+  	\includegraphics[width=11cm]{pictures/StateDiagramme_liason.pdf}
+  \end{center}
+  \caption{Overview of implemented paths depicted as a State Machine.}
+  \label{fig_state-machine}
+\end{figure}
 
 \bigskip
 
@@ -309,54 +287,103 @@ In the code, this functionality is implemented in lines 164--178 in \textsf{Auto
 
 
 
-\subsection{Path Generation}
+\subsection{Path Generation} \label{ch-Path-Generation}
 
-Path generation is connected with the user interface. By typing in certain commands in programs such as \texttt{hterm}, we could assign different acrobatic gestures to the plane. 
-
-Trajectories are designed in function~\textsf{Trajectory}. The idea of designing a trajectory is calculating out the desired postion of the plane 1 second later from the actual position of the aircraft, using the function below:
+Our commanded paths are designed in function~\textsf{Trajectory.cpp}. 
+The idea of designing a trajectory, the aircraft should follow, is a stepwise addition of a position vector at every time step
 \begin{equation}
-\vec{L}_{is}^i = \vec{P}_{des}^i - \vec{P}_{is}^i
+\vec{P}^i_{des}(t_k)=\vec{P}^i_{des}(t_{k-1}) + \Delta\vec{P}^i(t_k) \cdot \Delta T
 \end{equation}
-And by using the $\vec{L}_{is}^i$ vector, we could control the aircraft like dragging the string of a kite.
-
-Currently we have 9 different acrobatic gestures. They are divided into two categories, one stable flight paths and the other temoprary flight gestures.
-
-\subsubsection*{Stable gestures}
-Stable flight gestures serve as kind of default flying states, they are maintained when undisturbed, can be also interrupted at any time by other flying modes. To choose from different gestures, we can type in the API interface the following commands:
-
-\texttt{'fg'}: glide or go-straight mode. Speed is set to 50 in the forward (or Y) direction.
-
-\texttt{'fb'}: back glide mode. Speed is set to 50 in the backward (or -Y) direction.
-
-\texttt{'fc'}: circle mode. Testing radius is 70, can be changed in function~\textsf{Trajectory}. It has a slight going up speed of 1 to avoid crashing when manoeuvring at a low altitude.
-
-\texttt{'fs'}: snake mode. Now tested is a gesture that goes forward (Y direction), and has a left/right snake sinusoidal turns in X direction. Radius is set to 50.
-
-\subsubsection*{Temporal acrobatic gestures}
-
-Thest gestures are temporal ones, which have certain durations and executed from beginning till end. Afterwards the aircraft changes into default flying states -like fly forward or backward. Commands for them are:
-
-\texttt{'ft'}: takeoff mode. In this mode the plane has a relatively low climb rate for a safe takeoff.
-
-\texttt{'fl'}: looping mode. The plane performs a backward-direction loop by first climbing up and flipping over. A whole barrel loop can be achieved by two backward-direction looping. 
-
-\texttt{'fr'}: roll mode. The plane rolls over 360 degrees for one time in this mode. The plane finishes rolling in two steps, each turn is 180 degrees.
-
-\texttt{'fh'}: half-circle mode. The aircraft flies a half-circle, which would be easier for a downward looping and then flies straight forward.
-
-\texttt{'fc'}: climb up mode. Takeoff mode has a too low climb rate, in this mode climb rate is bigger for a quicker climb up.
-
-These acrobatic flight durations are defined and can be changed in function~\textsf{Trajectory}. In each gesture's sub-function, parameters such as speed, climb rate or roll speed can also be changed.
+which can be considered as a integration process of the position with the \textsl{velocity vector}~$\Delta\vec{P}^i(t_k)$.
+As described later in Chapter~\ref{ch-control-variables}, the aircraft is controlled that it will stay behind the commanded path in a distance equal of about one second leading to a vector $\vec{L}_{is}^i = \vec{P}_{des}^i - \vec{P}_{is}^i$ which controls the aircraft like dragging the string of a kite.
 
 \medskip
 
-\subsection{Processing of Control Variables}
+Currently we have nine different acrobatic paths implemented. They can be divided into two categories, into stable flight paths and temporary flight paths (compare Figure~\ref{fig_state-machine}).
 
-\subsubsection*{Processing the Sensor Data}
+\subsubsection*{Stable Paths}
+Stable flight paths serve as a kind of default flying states.
+They are maintained when undisturbed, and can be interrupted at any time by other flying modes. To change the commanded path, one enters a new path command, given in previous section, in the console.
+Details of our implemented paths are listed here:
+
+\begin{itemize}
+
+\item
+\texttt{fg}: Glide Eastwards or Go-Straight mode. The airspeed is set to $\SI{50}{ft\per\second}$ in direction east.
+
+\item
+\texttt{fb}: Glide Westwards mode. The airspeed is set to $\SI{50}{ft\per\second}$ in direction west.
+
+\item
+\texttt{fc}: Circle mode. With a radius of $\SI{70}{ft}$, a circle is flown. 
+The radius and speed of the aircraft can be modified in function~\textsf{Trajectory.cpp}. Additionally, the path commands a slight inclination speed of $\SI{1}{ft\per\second}$ to avoid a crash when manoeuvring at a low altitudes.
+
+\item
+\texttt{fs}: Snake mode. This path goes into east-direction, with a left/right snake sinusoidal turn in north/south direction. The radius is set to $\SI{50}{ft}$.
+
+\end{itemize}
+
+\subsubsection*{Temporal Aerobatic Paths}
+
+Paths, which have certain durations and are executed from beginning until its end, are  temporal ones. After performing a temporal aerobatic path, the aircraft changes back into a default flying state, such as flying forward or backward. 
+Details of temporal aerobatic paths are:
+
+\begin{itemize}
+
+\item
+\texttt{ft}: Take Off mode. In this mode the aircraft has a relatively low climb rate for a safe take Off.
+
+\item
+\texttt{fl}: Looping mode. The aircraft performs a backward-direction loop by first climbing up and flipping over. A whole barrel loop can be achieved by two backward-direction loopings. 
+
+\item
+\texttt{fr}: Roll mode. The aircraft rolls over 360 degrees for one time in this mode. The aircraft finishes rolling in two steps, each turn is 180 degrees.
+
+\item
+\texttt{fh}: Half Circle mode. The aircraft, going westwards, flies a half-circle in a downward looping manner and then flies straight eastwards.
+
+\item
+\texttt{fc}: Climb Up mode. The Take Off mode has a low climb rate, in this mode, the climb rate is larger in order to have a quicker climb up.
+
+\end{itemize}
+
+The aerobatic flight durations are defined and can be changed in function~\textsf{Trajectory.cpp}. In each gesture's sub-function, parameters, such as speed, climb rate, or roll rate, can also be changed.
+
+\medskip
+
+
+
+
+
+\subsection{Processing of Control Variables} \label{ch-control-variables}
+
+Now, we describe the computation of the variables, handed to the \texttt{Control Structure}, given the state variables, provided in function~\textsf{calculateStateVariables}, and the desired path, as described in Chapter~\ref{ch-Path-Generation}.
 
 \subsubsection*{Computing the Desired Acceleration}
 
-Introduce look ahead distance, explain, why important -> $L_is$ is always > 0 and ensures a good acceleration command
+As an essential part of the aerobatic controller, a \textsl{look-ahead distance}~$\L_{des}$ is introduced which effects the system to control the aircraft to lag behind the desired path by an adjustable distance.
+This guarantees the difference between desired and actual position of the aircraft 
+\begin{equation}
+\vec{L}_{is}^i = \vec{P}_{des}^i - \vec{P}_{is}^i
+\end{equation}
+to be greater than zero and leading to acceleration commands 
+\begin{equation}
+\vec{a}_{CMD}^v = \frac{2}{|\vec{L}_{des}^i|^2}\left(\vec{V}^v \times \vec{L}_{is}^i \right) \times \vec{V}^v
+\end{equation}
+being moderate and viable by the aircraft.
+This acceleration command is then subtracted by the gravity constant
+\begin{equation}
+\vec{A}_{CMD}^v = \vec{a}_{CMD}^v - \vec{g}^v
+\end{equation}
+and handed to the Control Structure in body frame:
+\begin{equation}
+\vec{A}_{CMD}^b = \mathcal{R}_i^b(\phi,\theta,\psi) \cdot \vec{A}_{CMD}^v \quad .
+\end{equation}
+
+\medskip
+
+
+
 
 \subsubsection*{Determining the Desired Speed}\label{ch-Determ-Desired-Speed}
 
@@ -365,7 +392,7 @@ The desired speed of the aircraft is given implicitly with the desired path and 
 \vec{v}_{Path}^i(t_k) = \frac{\vec{P}_{des}^i(t_k)-\vec{P}_{des}^i(t_{k-1})}{\Delta T}\quad .
 \end{equation}
 
-But the desired speed is not the control variable of the throttle controller. As shown in Figure~\ref{fig_complete_structure}, the input for the throttle controller is $\Delta L$ which is the distance of the aircraft from the desired position with respect to the look-ahead distance~$L_{des}$ and is computed by
+But the desired speed is not the control variable of the throttle controller. As shown in Figure~\ref{fig_complete_structure}, the input for the throttle controller is $\Delta L$ which is the distance of the aircraft from the desired position with respect to the \textsl{look-ahead distance}~$L_{des}$ and is computed by
 \begin{equation}
 \Delta L = \frac{\vec{v}_{Path}^i \cdot \vec{L}_{is}^i}{|\vec{v}_{Path}^i|}-L_{des} = L_{is,Path}-L_{des} \quad .
 \end{equation}
@@ -389,7 +416,7 @@ Finally, $\Delta L$ is divided by a constant value~$K$ and handed to the throttl
   \label{fig_Path_Delay}
 \end{figure} 
 
-With this control mechanism, the aircraft will adjust the throttle in order to always stay behind the desired position by the length of the look ahead distance~$L_{des}$ which is the intersection of the desired flight direction~$\vec{v}_{Path}^i$ and the circle of $L_{des}$ as shown in Figure~\ref{fig_explanation-diagram-throttle}. In this point, $\Delta L$ will become zero, which is the control target of the control structure (of course, the whole tangent of the intersection point will meet the control target of $\Delta L = 0$ but the rest of the control structure will force the aircraft onto the desired path and thus to this one intersection point).  
+With this control mechanism, the aircraft will adjust the throttle in order to always stay behind the desired position by the length of the \textsl{look ahead distance}~$L_{des}$ which is the intersection of the desired flight direction~$\vec{v}_{Path}^i$ and the circle of $L_{des}$ as shown in Figure~\ref{fig_explanation-diagram-throttle}. In this point, $\Delta L$ will become zero, which is the control target of the control structure (of course, the whole tangent of the intersection point will meet the control target of $\Delta L = 0$ but the rest of the control structure will force the aircraft onto the desired path and thus to this one intersection point).  
 
 \medskip
 
@@ -507,50 +534,59 @@ The reasons were the lack of information about the used units of the measurement
 
 \subsubsection*{Analysis of flown Trajectories}
 
-In this project, we also adopted Matlab to help us analyse our flown trajectories. What we wanted is a 3D recording of the real flown trajectory, with this it is easier to find out possible errors in control or path parameter designs.
+In this project, we adopted \textsc{Matlab} to help us analysing our flown trajectories. 
+We were able to compile 3-dimensional recordings of the flown path enabling us to find possible errors in control or path parameter designs.
 
-Matlab code and results are stored in analysis part. Basically we compare 3 sets of data recorded from program \texttt{hterm}: desired path, real trajectory and $\vec{L}_{is}^i$ vector. By dragging around the 3D \textsf{fig} format plot in Matlab we can have a direct notion of how the aircraft had flown and also changes in $\vec{L}_{is}^i$ vector.
+The \textsc{Matlab} code and our recorded results were released together with the code of the aerobatic controller in the \textsl{Analysis}-folder . 
+Basically we compare 3 sets of data recorded with the program \texttt{hterm}: The desired path, the real flown trajectory, and the $\vec{L}_{is}^i$ vector. 
 
-\begin{figure}[!ht]
+\medskip
+
+In \textbf{Figure~\ref{fig_circle}}, the plots of the desired and the real trajectory of the Circle Path are shown. 
+The desired path is shown above and the real trajectory is underneath. 
+We can see that the aircraft adjusted itself to the sharp turn quickly and followed the desired path quite accurate. The take off and the gliding were flown desirably according to the recorded plot.
+
+\medskip
+
+For the flight in Snake mode, we depict the flown trajectory in \textbf{Figure~\ref{fig_snake}} graphically, too. Similarly, the aircraft adjusted itself inner with the first few seconds and then followed the designed path accurately.
+
+\medskip
+
+The Roll manoeuvre is shown in \textbf{Figure~\ref{fig_roll}}. We designed a straight path on which we performed a slow aerobatic roll-over. While rolling, the aircraft would inevitably fly off-course due to the inactive rudder. 
+In the plot it is proven that the aircraft did the full roll in two steps and then adjusted itself to the desired straight path again.
+
+\bigskip
+
+A very important parameter to reassure that the aircraft follows the desired path is the \textsl{look-ahead distance}~$L_{des}$. 
+If $L_{des}$ is too large, and the designed path is not a straight line, the aircraft would probably fly randomly or even finally crash. 
+A reasonable short $L_{des}$ can provide good responses of the aircraft on curvy paths.
+
+\begin{figure}[!h]
   \centering
-  	\includegraphics[width=12cm]{pictures/Results/Circle-desired.jpg}
-  	\includegraphics[width=12cm]{pictures/Results/Circle-real.jpg}
+  	\includegraphics[width=16cm]{pictures/Results/Circle-desired.jpg}
+  	\includegraphics[width=16cm]{pictures/Results/Circle-real.jpg}
   \caption{Comparison of desired and real trajectories of circle flights.}
   \label{fig_circle}
 \end{figure}
 
-Here shown in \textbf{Figure~\ref{fig_circle}} are plots with the circle mode. The desired path is shown above and the real trajectory is underneath. We can see that the aircraft adjusted itself to the sharp turn quickly and followed the desired path quite accurate. The takeoff part and glide flight are also flown desirably according to the recorded plot.
-
-\begin{figure}[!ht]
+\begin{figure}[!h]
   \centering
-  	\includegraphics[width=12cm]{pictures/Results/snake-desired.jpg}
-  	\includegraphics[width=12cm]{pictures/Results/snake-real.jpg}
+  	\includegraphics[width=13cm]{pictures/Results/snake-desired.jpg}
+  	\includegraphics[width=13cm]{pictures/Results/snake-real.jpg}
   \caption{Comparison of desired and real trajectories of snake flights.}
   \label{fig_snake}
 \end{figure}			
 
-
-
-For the snake flight also, here we tested the left/right sinusoidal turns in \textbf{Figure~\ref{fig_snake}}. In coordinates this corresponds to sinusoidal changes in X directions. Similarily, the aircraft had adjusted itself for the first few seconds and then followed the previously designed path.
-
-\begin{figure}[!ht]
+\begin{figure}[!h]
   \centering
-  	\includegraphics[width=12cm]{pictures/Results/roll-desired.jpg}
-  	\includegraphics[width=12cm]{pictures/Results/roll-real.jpg}
+  	\includegraphics[width=13cm]{pictures/Results/roll-desired.jpg}
+  	\includegraphics[width=13cm]{pictures/Results/roll-real.jpg}
   \caption{Comparison of desired and real trajectories of rolling flights.}
   \label{fig_roll}
 \end{figure}		
 
-Rolling are shown in \textbf{Figure~\ref{fig_roll}}. We first designed a straight path and then performed the acrobatic rolling. During rolling, the aircraft would inevitably fly off-course a bit, especially when the rolling is performed at a lower rate. It is also proven from the plot, the plane did the full roll in two steps and then adjusted itself to the desired straight path again.
 
-A very important parameter to reassure that the plane would follow the desired path is the look ahead distance $L_{des}$. If $L_{des}$ is too large, and the designed path is not a straight line, the plane would probably fly randomly or even finally crash. A reasonable short $L_{des}$ can provide good responses of the plane when changing courses.
-
-\bigskip
-
-
-
-
-
+\FloatBarrier
 
 % Textende
 %----------------------------------------------------------------
