@@ -230,7 +230,7 @@ void loop()
         //***************************************************
         // Path Generation
 
-        trajectory_refgnd = choose_traj(firstLoop, Plane_flying_current_state, Plane_flying_next_state, Plane_flying_previous_state, plane_flying_busy, pathned, stateVars.pnPePd , relative_time, timer, phiRef);
+        trajectory_refgnd = choose_traj(hal,firstLoop, Plane_flying_current_state, Plane_flying_next_state, Plane_flying_previous_state, plane_flying_busy, pathned, stateVars.pnPePd , relative_time, timer, phiRef);
         // Path can also be replaced by a total designed trajectory in a function of time, out commentted in Trajectory.cpp
 		
 
@@ -268,11 +268,12 @@ void loop()
         // Printing in 1 sec cycle
         if(hardware_time >= nextPrint) {
             // Print some status
-            nextPrint += 2000000;
+            nextPrint += 1000000;
             //hal.console->printf("** PERIOD **\r\n");
             // Print some values to the screen
-            //hal.console->printf("s%d\n", Plane_flying_current_state);
+            //hal.console->printf("current: %d\tnext: %d\tprev: %d\n", Plane_flying_current_state,Plane_flying_next_state,Plane_flying_previous_state);
             //hal.console->printf("task-time: %i\n",-hardware_time+hal.scheduler->micros());
+            //hal.console->printf("is: (%f,%f,%f)\ttraj: (%f,%f,%f)\n",stateVars.pnPePd.x,stateVars.pnPePd.y,stateVars.pnPePd.z,pathned.x,pathned.y,pathned.z);
         }
 
 

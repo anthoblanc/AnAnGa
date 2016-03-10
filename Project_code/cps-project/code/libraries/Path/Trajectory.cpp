@@ -15,10 +15,10 @@
 
 // Trajectory duration
 #define takeoff_time            10e6
-#define circle_time             30e6
+#define circle_time             50e6
 #define rolling_time            10e6
-#define looping_duration        8e6
-#define half_circle_duration    17e6
+#define looping_duration        6e6
+#define half_circle_duration    50e6
 #define climb_time              10e6
 #define snake_time_duration		20e6
 
@@ -122,8 +122,8 @@
     	struct vector delta_p; 
 
     	desired_path.x +=  0.0;
-    	desired_path.y +=  100.0*cos(2.0*M_PI*time/looping_duration)*static_cast<float>(PERIOD)/1e6;   // here radius is 100, need to reconsider
-    	desired_path.z -=  100.0*sin(2.0*M_PI*time/looping_duration)*static_cast<float>(PERIOD)/1e6;     //
+        desired_path.y +=  60.0*cos(2.0*M_PI*time/looping_duration/2)*static_cast<float>(PERIOD)/1e6;   // here radius is 100, need to reconsider
+        desired_path.z +=  60.0*sin(2.0*M_PI*time/looping_duration/2)*static_cast<float>(PERIOD)/1e6;     //
 
     
         delta_p.x = desired_path.x - current_location.x;
@@ -196,7 +196,7 @@ struct vector traj_roll (struct vector &desired_path, struct vector current_loca
 //         Trajectory function based on API commands
 //***********************************************************
 // Restore initial conditions of the path, when a reset has taken place.
-struct vector choose_traj (uint8_t firstLoop, int &Plane_flying_current_state, int &Plane_flying_next_state, int &Plane_flying_previous_state, BOOL &plane_flying_busy, struct vector &desired_path, struct vector current_location, uint32_t relative_time, uint32_t &timer, float &phiRef){
+struct vector choose_traj (const AP_HAL::HAL& hal, uint8_t firstLoop, int &Plane_flying_current_state, int &Plane_flying_next_state, int &Plane_flying_previous_state, BOOL &plane_flying_busy, struct vector &desired_path, struct vector current_location, uint32_t relative_time, uint32_t &timer, float &phiRef){
         
 		struct vector trajectory_refgnd={0,0,0};
 
@@ -208,9 +208,22 @@ struct vector choose_traj (uint8_t firstLoop, int &Plane_flying_current_state, i
         }
         // If the plane is not busy, just jump into next flying mode/state
         if(plane_flying_busy==FALSE && Plane_flying_current_state!=Plane_flying_next_state){
-		 Plane_flying_previous_state = Plane_flying_current_state;
-         Plane_flying_current_state=Plane_flying_next_state;  
-         timer = relative_time;     // Set timer to count time in a certain flying mode
+            Plane_flying_previous_state = Plane_flying_current_state;
+            Plane_flying_current_state=Plane_flying_next_state;
+            switch(Plane_flying_current_state){
+                case takeoff_mode: hal.console->printf("take off mode active\n");break;
+            case circle_mode: hal.console->printf("circle mode active\n");break;
+            case half_circle_mode:hal.console->printf("half circle mode active\n");break;
+            case looping_mode: hal.console->printf("looping mode active\n");break;
+            case glide_mode: hal.console->printf("glide eastwards mode active\n");break;
+            case back_glide_mode: hal.console->printf("back glide westwards mode active\n");break;
+            case roll_mode: hal.console->printf("roll mode active\n");break;
+            case snake_mode: hal.console->printf("snake mode active\n");break;
+            case upclimb_mode: hal.console->printf("up climb mode active\n");break;
+            default: hal.console->printf("??? active\n");break;
+            }
+
+            timer = relative_time;     // Set timer to count time in a certain flying mode
          }
         
         // Switch different flying mode according to the API typed-in commands, such as 'ft' for takeoff. Add or change in API_perso.cpp, starting from line 111
@@ -255,7 +268,7 @@ struct vector choose_traj (uint8_t firstLoop, int &Plane_flying_current_state, i
 					trajectory_refgnd = traj_halfcircle(desired_path, current_location, relative_time-timer);
 				}				
 				
-                if(relative_time-timer > half_circle_duration){
+                if(relative_time-timer > half_circle_duration/2){
                     plane_flying_busy=FALSE;
                     if(Plane_flying_next_state==Plane_flying_current_state){
 						if (Plane_flying_previous_state == back_glide_mode){
@@ -275,10 +288,12 @@ struct vector choose_traj (uint8_t firstLoop, int &Plane_flying_current_state, i
                 plane_flying_busy=TRUE;
                 trajectory_refgnd = traj_loop(desired_path, current_location, relative_time-timer);
 
-                if(relative_time-timer > looping_duration){ 
+                if(relative_time-timer > looping_duration*2.0/3.0){
                     plane_flying_busy=FALSE;
-                    if(Plane_flying_next_state==Plane_flying_current_state) Plane_flying_next_state=glide_mode; //security
+                    if(Plane_flying_next_state==Plane_flying_current_state) {
+                        Plane_flying_next_state=back_glide_mode; //security
                     }
+                }
 
                 break;
 
@@ -294,21 +309,27 @@ struct vector choose_traj (uint8_t firstLoop, int &Plane_flying_current_state, i
                 break;
                 
             case snake_mode: // snake mode, fly sinusoidally left/right or up/down
+                plane_flying_busy = TRUE;
                 trajectory_refgnd = traj_snake(desired_path, current_location, relative_time-timer);
-                if ( relative_time-timer > snake_time_duration/2 ){
-					plane_flying_busy=FALSE;
-				}
+                if ( (relative_time-timer-PERIOD <= snake_time_duration/2 && relative_time-timer+PERIOD >= snake_time_duration/2) ||
+                     (relative_time-timer-PERIOD <= snake_time_duration && relative_time-timer+PERIOD >= snake_time_duration)){
+                                        plane_flying_busy=FALSE;
+                }
+                if(relative_time-timer+PERIOD > snake_time_duration){
+                    timer = relative_time + PERIOD;
+                }
                 break;
                                 
             case roll_mode: // can be shrinked 
                 plane_flying_busy=TRUE;
                 trajectory_refgnd = traj_roll(desired_path, current_location);
-                phiRef += 180.0/rolling_time*static_cast<float>(PERIOD);
+                phiRef += 360.0/rolling_time*static_cast<float>(PERIOD);
 				if (phiRef>360){
 					phiRef=0;
 				}
                 if(relative_time-timer > rolling_time){
                     plane_flying_busy=FALSE;
+                    phiRef=0;
                     if(Plane_flying_next_state==Plane_flying_current_state) {
 						Plane_flying_next_state=glide_mode; //security
 						phiRef=0;
@@ -333,7 +354,7 @@ struct vector choose_traj (uint8_t firstLoop, int &Plane_flying_current_state, i
                 break;
         }
 
-		Plane_flying_previous_state = Plane_flying_current_state;
+
         return(trajectory_refgnd);
     }
 

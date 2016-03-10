@@ -38,22 +38,23 @@
 //***************************************************
 void API_print_help() 
 { 
-    char str[]=\
+/*    char str[]=\
 "h help \n\
 et-#VAL_P#-#VAL_I#-#VAL_D# edit throttle \n\
 ea-#VAL_P#-#VAL_I#-#VAL_D# edit aileron \n\
 er-#VAL_P#-#VAL_I#-#VAL_D# edit rudder \n\
-ee-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \n\
+eh-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \n\
   #VAL_P# sould be remplace by the value of the PROPORTIONAL gain \n\
   #VAL_I# sould be remplace by the value of the INTEGRALE gain \n\
   #VAL_D# sould be remplace by the value of the DERIVATE gain \n\
-ft takeoff_mod \n\
-fc circle_mod \n\
-fl looping_mod \n\
-fs go_streight_mod \n\
-fr roll_mod \n\
-fb back_glide_mod \n\
-fh half_circle_mod \n\
+ft take off mode \n\
+fc circle mode \n\
+fl looping mode \n\
+fg glide forward (eastwards) mode \n\
+fr roll mode \n\
+fb back glide (westwards) mode \n\
+fh half circle mode \n\
+fu up lift mode \n\
 \0";
     int i=0;
     while (str[i]!='\0')
@@ -61,6 +62,24 @@ fh half_circle_mod \n\
         hal.console->printf("%c",str[i]);
 	i++;
     }
+ */
+            hal.console->printf("h help \n\
+            et-#VAL_P#-#VAL_I#-#VAL_D# edit throttle \n\
+            ea-#VAL_P#-#VAL_I#-#VAL_D# edit aileron \n\
+            er-#VAL_P#-#VAL_I#-#VAL_D# edit rudder \n\
+            eh-#VAL_P#-#VAL_I#-#VAL_D# edit elevator \n\n\
+              #VAL_P# sould be replaced by the value of the PROPORTIONAL gain \n\
+              #VAL_I# sould be replaced by the value of the INTEGRAL gain \n\
+              #VAL_D# sould be replaced by the value of the DERIVATIVE gain \n\n\n\
+            ft take off mode \n\
+            fc circle mode \n\
+            fl looping mode \n\
+            fg glide forward (eastwards) mode \n\
+            fr roll mode \n\
+            fb back glide (westwards) mode \n\
+            fh half circle mode \n\
+            fu up lift mode \n\n\
+            l-#VAL_Distance# \n");
 }
 
 //**********************//
@@ -121,15 +140,15 @@ void API_interpretate_chain(char * stringAPI, int length_stringAPI, TrajectoryCo
 	//*** fly ***//
 	case 'f': 
 		switch(stringAPI[1]) {
-			case 't': Plane_flying_current_state=takeoff_mod; 	hal.console->printf("takeoff_mode actived \n"); 	break;
-			case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle_mode actived \n"); 		break;
-			case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping_mode actived \n"); 	break;
-			case 'g': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("go_streight_mode actived \n"); 	break;
-			case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll_mode actived \n"); 		break;
-			case 'b': Plane_flying_current_state=back_glide_mod; 	hal.console->printf("back_glide_mode actived \n"); 	break;
-			case 'h': Plane_flying_current_state=half_circle_mod; 	hal.console->printf("half_circle_mode actived \n"); 	break;
-			case 'u': Plane_flying_current_state=upclimb_mod; 	hal.console->printf("climb_up_mode actived \n"); 	break;
-			case 's': Plane_flying_current_state=snake_mod; 	hal.console->printf("snake_mode actived \n"); 		break;
+                        case 't': Plane_flying_current_state=takeoff_mod; 	hal.console->printf("take off mode as next \n"); 	break;
+                        case 'c': Plane_flying_current_state=circle_mod; 	hal.console->printf("circle mode as next \n"); 		break;
+                        case 'l': Plane_flying_current_state=looping_mod; 	hal.console->printf("looping mode as next \n"); 	break;
+                        case 'g': Plane_flying_current_state=go_streight_mod; 	hal.console->printf("glide straight (eastwards) mode as next \n"); 	break;
+                        case 'r': Plane_flying_current_state=roll_mod; 		hal.console->printf("roll mode as next \n"); 		break;
+                        case 'b': Plane_flying_current_state=back_glide_mod; 	hal.console->printf("back glide (westwards) mode as next \n"); 	break;
+                        case 'h': Plane_flying_current_state=half_circle_mod; 	hal.console->printf("halfcircle_mode as next \n"); 	break;
+                        case 'u': Plane_flying_current_state=upclimb_mod; 	hal.console->printf("climb up mode as next \n"); 	break;
+                        case 's': Plane_flying_current_state=snake_mod; 	hal.console->printf("snake mode as next \n"); 		break;
 			
 			default: hal.console->printf("Wrong usage of the function \n"); break; //if the standart is not respected
 		}

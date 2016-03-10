@@ -61,7 +61,7 @@ TrajectoryControl.h
 
 #define Kp_Aileron 0.9		// PID parameters for Aileron
 #define Ki_Aileron 0.0
-#define Kd_Aileron 0.2
+#define Kd_Aileron 0.1
 #define IntLim_Aileron 0.5
 #define Casc_Aileron 1
 
@@ -72,8 +72,8 @@ TrajectoryControl.h
 #define Casc_Rudder 1
 
 #define Kp_Elevator 0.1		// PID parameters for Elevator
-#define Ki_Elevator 0.05
-#define Kd_Elevator 0.01
+#define Ki_Elevator 0.0
+#define Kd_Elevator 0.0
 #define IntLim_Elevator 1
 #define Casc_Elevator 1
 
